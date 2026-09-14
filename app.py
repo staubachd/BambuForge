@@ -1670,6 +1670,10 @@ def _slicer_apply(row: dict, conn=None) -> bool:
     try:
         meta = gcode_meta.fetch(
             CFG.get("ip"), CFG.get("access_code"), subtask=subtask,
+            # a job pushed from MakerWorld reports the print profile as its
+            # subtask and is written to the drive under the model title, so
+            # the subtask alone never finds those files
+            design=row.get("design_title"),
             plate=_live_plate(job_id),
             timeout=float(SLICER_CFG.get("timeout_sec", 20) or 20),
             conn=conn)
@@ -2019,6 +2023,64 @@ _drive_cache = {"at": 0.0, "data": None}
 DRIVE_TTL = 30.0
 
 
+def _print_of(row: dict) -> str:
+    """What to call a print on screen: what it was renamed to, else the plate
+    it made, else the model it is of, else the name the printer gave it.
+
+    The printer's own name comes last because for a job pushed from MakerWorld
+    it is the print profile - "0.16mm layer, 2 walls, 15% infill" - which says
+    nothing about which model this was."""
+    block = _slice_block(row) or {}
+    return (row.get("label") or block.get("plate_name")
+            or row.get("design_title") or row.get("name") or "")
+
+
+def _name_prints(files: list[dict]) -> None:
+    """Tie each sliced file on the drive back to the print it made, so the
+    listing is about the workshop rather than about a filesystem.
+
+    Matching on `<subtask>.gcode.3mf` alone was leaving files unnamed that the
+    history plainly had: a job pushed from MakerWorld carries the print profile
+    as its subtask and is written to the drive under the model title instead
+    (see gcode_meta.loose_key). So three things are tried, strongest first -
+    the file a print was actually read from, the printer's own naming, and the
+    letters-and-digits of a name - and the loose one only answers when every
+    print it turns up would put the same words on the screen anyway. Two prints
+    of one model may share a file; two different models must never.
+    """
+    exact: dict = {}
+    loose: dict = {}
+    for r in store.recent_prints(limit=200):     # newest first
+        if not r.get("name"):
+            continue
+        block = _slice_block(r) or {}
+        for n in (block.get("source_file"), r["name"] + gcode_meta.SUFFIX):
+            if n:
+                exact.setdefault(n.casefold(), r)
+        for cand in (r.get("design_title"), block.get("plate_name"), r["name"]):
+            key = gcode_meta.loose_key(cand or "")
+            if key:
+                loose.setdefault(key, []).append(r)
+
+    for f in files:
+        if not f.get("sliced"):
+            continue
+        r = exact.get(f["name"].casefold())
+        if r is None:
+            hits = loose.get(gcode_meta.loose_key(
+                gcode_meta.file_stem(f["name"])), [])
+            # a profile name is shared by every print made with it, so a loose
+            # match is trusted only where the candidates do not disagree about
+            # what the file is - then the newest of them is the one shown
+            if hits and len({_print_of(h) for h in hits}) == 1:
+                r = hits[0]
+        if r is None:
+            continue
+        f["job_id"] = r["job_id"]
+        f["print"] = _print_of(r) or None
+        f["printed_at"] = r.get("started_at")
+
+
 @app.route("/api/storage")
 def api_storage():
     """What is on the printer's USB drive, and how full it is.
@@ -2060,20 +2122,7 @@ def api_storage():
         _drive_cache.update(at=time.time(), data=fresh)
 
     files = [dict(f) for f in fresh["files"]]
-    # tie each sliced file back to the print it made, so the list is about the
-    # workshop rather than about a filesystem
-    by_sub = {}
-    for r in store.recent_prints(limit=200):
-        if r.get("name"):
-            by_sub[r["name"] + gcode_meta.SUFFIX] = r
-    for f in files:
-        r = by_sub.get(f["name"])
-        if not r:
-            continue
-        block = _slice_block(r) or {}
-        f["job_id"] = r["job_id"]
-        f["print"] = r.get("label") or block.get("plate_name") or r.get("name")
-        f["printed_at"] = r.get("started_at")
+    _name_prints(files)
     out.update(files=files, truncated=fresh["truncated"], error=fresh["error"],
                at=fresh["at"],
                listed_bytes=sum(f["size"] for f in files),
@@ -2092,9 +2141,53 @@ def api_slicer_status():
     })
 
 
+def _name_detail_colors(entries: list) -> list:
+    """Put a colour NAME on each per-slot line of a past print.
+
+    The stored detail carries the hex and nothing else, which is unreadable a
+    month later: "Slot 1 · Bambu PLA" does not say which of the eleven blacks it
+    was. The name is not stored with the print on purpose - it can be typed in
+    or corrected long afterwards, and a copy frozen into the row would be the
+    stale one. So it is resolved on read, by the same precedence the AMS
+    enrichment uses: a name given by hand wins, the Bambu catalogue answers for
+    a coded spool, and anything else stays on the hex alone.
+    """
+    overrides = None
+    for e in entries:
+        if not isinstance(e, dict):
+            continue
+        fkey = _canon_fkey(filament_catalog.key(
+            e.get("filament_id"), e.get("color"), e.get("type")))
+        vendor, product, cname = _FIL_NAMES.get(fkey, (None, None, None))
+        if not cname and e.get("code"):
+            if overrides is None:
+                overrides = _color_overrides()      # built once per request
+            cname = filament_catalog.color_name(e["code"], overrides)
+        e["color_name"] = cname or None
+        # the identity's own names beat "Bambu"/"third-party", which is all the
+        # cloud's per-print detail knows
+        if vendor:
+            e["vendor"] = vendor
+        if product:
+            e["product"] = product
+    return entries
+
+
 @app.route("/api/prints")
 def api_prints():
-    rows = store.recent_prints(limit=int(request.args.get("limit", 60)))
+    """One page of the print history, newest first.
+
+    The page is paged rather than capped: `total` says how many prints exist, so
+    the history can tell "these are all of them" from "there are older ones you
+    have not asked for yet" - a group whose members are all older than the first
+    page used to just vanish from the page.
+    """
+    try:
+        limit = int(request.args.get("limit", 60))
+        offset = int(request.args.get("offset", 0))
+    except (TypeError, ValueError):
+        limit, offset = 60, 0
+    rows = store.recent_prints(limit=limit, offset=offset)
     for r in rows:
         r["slice"] = _slice_block(r)
         r.pop("slice_json", None)      # the page reads `slice`, not the raw JSON
@@ -2103,11 +2196,13 @@ def api_prints():
         r["total_cost"] = round((r.get("cost") or 0) + (r.get("filament_cost") or 0), 4)
         if r.get("filament_detail"):
             try:
-                r["filament_detail"] = json.loads(r["filament_detail"])
+                r["filament_detail"] = _name_detail_colors(
+                    json.loads(r["filament_detail"]) or [])
             except (TypeError, ValueError):
                 r["filament_detail"] = None
     cost = _cost_block()
-    return jsonify({"currency": cost["currency"], "prints": rows})
+    return jsonify({"currency": cost["currency"], "prints": rows,
+                    "offset": max(0, offset), "total": store.count_prints()})
 
 
 @app.route("/api/stats")

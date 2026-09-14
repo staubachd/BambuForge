@@ -30,15 +30,15 @@ sec = readme[start:readme.index("## How the tricky bits work", start)]
 # The table's "used at" column points at where each dialect key is READ, so
 # that is what these lines must contain - not the value it resolves to.
 CITED = {
-    248: "DIALECTS = {",
-    276: 'dialect["auto"]',
-    277: 'dialect["blob"]',
-    278: 'dialect["server"]',
-    294: "FOUND_ROWS",
-    324: 'dialect["inline_index"]',
-    420: 'dialect["columns"]',
-    909: "REPLACE INTO settings",
-    920: "REPLACE INTO hms_ack",
+    253: "DIALECTS = {",
+    281: 'dialect["auto"]',
+    282: 'dialect["blob"]',
+    283: 'dialect["server"]',
+    299: "FOUND_ROWS",
+    329: 'dialect["inline_index"]',
+    425: 'dialect["columns"]',
+    927: "REPLACE INTO settings",
+    938: "REPLACE INTO hms_ack",
 }
 # A link's visible label names a line too, and the two rot independently: a
 # bulk update of the hrefs left "[storage.py:717](storage.py#L812)" behind,

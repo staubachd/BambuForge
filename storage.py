@@ -166,6 +166,11 @@ PRINT_COLS = ["job_id", "name", "started_at", "ended_at", "final_state",
               "layer_h_manual", "nozzle_mm", "slicer_profile", "est_min",
               "slice_json"]
 
+# Ceiling on one recent_prints() read. Not the page size the history uses (that
+# is the caller's `limit`) - it is what keeps a hand-written ?limit= from asking
+# for a decade of prints in one request. The listing walks past it with `offset`.
+PRINT_PAGE_MAX = 2000
+
 # Never touched by upsert_print's UPDATE branch (which runs from the MQTT loop):
 #   started_at        - so a restart mid-print can't rewrite when the job began
 #   label             - user-supplied, must survive the 60s upserts
@@ -567,11 +572,24 @@ class Storage:
             cur.close(); conn.close()
         return n > 0
 
-    def recent_prints(self, limit: int = 60) -> list[dict]:
-        limit = max(1, min(int(limit), 500))   # cast + clamp: never interpolate raw input
+    def count_prints(self) -> int:
+        """How many prints exist in total - what a paged listing needs to know
+        whether there is an older page behind the one it just read."""
+        conn, cur = self._cursor()
+        cur.execute("SELECT COUNT(*) FROM prints")
+        row = cur.fetchone()
+        if self.backend != "sqlite":
+            cur.close(); conn.close()
+        return int(row[0] or 0) if row else 0
+
+    def recent_prints(self, limit: int = 60, offset: int = 0) -> list[dict]:
+        # cast + clamp: never interpolate raw input. The ceiling is a guard, not
+        # a page size - the listing pages through it with `offset`.
+        limit = max(1, min(int(limit), PRINT_PAGE_MAX))
+        offset = max(0, int(offset))
         conn, cur = self._cursor()
         cur.execute(f"SELECT {','.join(PRINT_COLS)} FROM prints "
-                    f"ORDER BY started_at DESC LIMIT {limit}")
+                    f"ORDER BY started_at DESC LIMIT {limit} OFFSET {offset}")
         rows = cur.fetchall()
         if self.backend == "sqlite":
             out = [dict(r) for r in rows]

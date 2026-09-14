@@ -26,7 +26,8 @@ const ctx = {
   $: id => el[id] || (el[id] = { innerHTML: "", dataset: {}, textContent: "" }),
 };
 vm.createContext(ctx);
-for (const fn of ["function kb(", "function bytes(", "function renderDrive("]) {
+for (const fn of ["function kb(", "function bytes(", "function driveWhen(",
+                  "function renderDrive("]) {
   vm.runInContext(grab(fn), ctx);
 }
 const render = d => {
@@ -60,9 +61,10 @@ const REAL = {
              external: { total_kb: 29897088, free_kb: 23592640, used_kb: 6304448 } },
   files: [
     { name: "Herbstliebe_Oberteil.gcode.3mf", dir: "/", path: "/x", size: 3832815,
-      when: "Jul 23 04:13", sliced: true, job_id: "j1", print: "Oberteile Herz" },
+      when: "Jul 23 04:13", mtime: 1753243980, sliced: true, job_id: "j1",
+      print: "Oberteile Herz" },
     { name: "video_001.mp4", dir: "/timelapse", path: "/timelapse/video_001.mp4",
-      size: 90000000, when: "Jul 23 04:13", sliced: false },
+      size: 90000000, when: "Jul 23 04:13", mtime: 1753243980, sliced: false },
   ],
   listed_bytes: 93832815, sliced_bytes: 3832815, truncated: false, error: null,
 };
@@ -81,6 +83,31 @@ if (/other files|Other/.test(h)) {
   throw new Error("the page invented a category for space it cannot see");
 }
 console.log("both figures shown, each labelled with where it came from");
+
+// --- the drive's clock is the printer's, in UTC -----------------------------
+// The printer's FTP server stamps files in UTC. Printing the string it sends is
+// how a file uploaded at 11:44 German time reads as 09:44 - an hour or two out
+// all summer, and wrong by a whole day either side of midnight. The app sends
+// an instant with the string; the instant is what gets shown, in the zone the
+// browser is in.
+const LOCAL = new Date(1753243980 * 1000).toLocaleString([],
+  { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+if (!h.includes(LOCAL)) {
+  throw new Error(`the drive's dates are not in the reader's own zone: expected `
+    + `${LOCAL} somewhere in the table`);
+}
+if (/Jul 23 04:13/.test(h)) {
+  throw new Error("the printer's raw UTC stamp was printed as it came - that is "
+    + "the whole bug: 06:13 German time shown as 04:13");
+}
+// a stamp the app could not parse is still worth more than an empty cell
+h = render({ ...REAL, files: [{ ...REAL.files[0], mtime: null }] });
+if (!h.includes("Jul 23 04:13")) {
+  throw new Error("a date the app could not read left the cell blank instead of "
+    + "falling back to what the printer said");
+}
+h = render(REAL);
+console.log("drive dates are shown in the reader's zone, not the printer's UTC");
 
 // --- and no gap note when the two roughly agree -----------------------------
 h = render({ ...REAL, listed_bytes: 6304448 * 1024 - 1000 });

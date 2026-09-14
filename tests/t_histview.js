@@ -32,7 +32,8 @@ vm.createContext(ctx);
 // detailRow leans on these; grabbed from the page rather than stubbed, so the
 // panel is exercised with the real precedence and the real formatting
 for (const fn of ["function fmtLH(", "function lhOf(", "function fmtMin(",
-                  "function sliceBlock(", "function detailRow("]) {
+                  "function sliceBlock(", "function slotLine(",
+                  "function detailRow("]) {
   vm.runInContext(grab(fn), ctx);
 }
 const detail = r => vm.runInContext("detailRow(" + JSON.stringify(r) + ", '€')", ctx);
@@ -88,6 +89,33 @@ h = detail({...BASE, filament_g: 61.5, filament_g_manual: 70});
 if (!/70/.test(h))
   throw new Error("a hand-corrected weight is not shown: " + h.replace(/\s+/g, " ").slice(0, 300));
 console.log("a hand-corrected weight is what the detail shows");
+
+// --- the colour of a past print stays readable ------------------------------
+// This is the whole point of the per-slot block: "Bambu PLA" names a dozen
+// blacks, so a print whose colour is only a stored hex is a print you cannot
+// repeat. The swatch, the name and the copyable code all have to survive.
+const SLOT = {slot: 1, brand: "Bambu", type: "PLA", grams: 28.3,
+              color: "AA0000", color_name: "Scarlet Red"};
+h = detail({...BASE, filament_detail: [SLOT]});
+// The stored hex has no '#'. Written into a custom property as-is it is invalid
+// at computed-value time and every swatch renders colourless - which is exactly
+// how the colour went missing from the history in the first place.
+let sw = h.match(/--sw:([^"';]+)/);
+if (!sw) throw new Error("the slot line lost its swatch");
+if (!/^#[0-9A-F]{6}$/i.test(sw[1].trim()))
+  throw new Error(`the swatch is set to "${sw[1].trim()}" - a CSS colour needs `
+                  + "the '#', or the dot renders colourless");
+if (!/Scarlet Red/.test(h)) throw new Error("the colour's name is not shown: " + h);
+if (!/data-hex="#AA0000"/.test(h))
+  throw new Error("the colour code is not there to copy: " + h);
+console.log("a slot shows swatch", sw[1].trim(), "· name · copyable code");
+
+// a print from before the names existed still renders, without inventing one
+h = detail({...BASE, filament_detail: [{slot: 1, type: "PLA", grams: 5}]});
+if (/undefined|null|NaN/.test(h))
+  throw new Error("a slot with no colour invented one: " + h.replace(/\s+/g, " ").slice(0, 240));
+if (/hexchip/.test(h)) throw new Error("a slot with no colour offered a code to copy");
+console.log("a slot with no recorded colour shows no swatch colour and no code");
 
 // --- the table stays aligned ------------------------------------------------
 // Every full-width row must span exactly as many columns as the header has, or

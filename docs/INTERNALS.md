@@ -143,21 +143,21 @@ one test, and only the third has anything to do with SQL:
 | **dialect** — the only genuinely database-specific SQL | **5** | yes, and that is the whole list |
 
 The five live in one table, `DIALECTS` at
-[storage.py:248](../storage.py#L248) — one row per backend, and adding a backend is
+[storage.py:253](../storage.py#L253) — one row per backend, and adding a backend is
 filling one in:
 
 | key | sqlite | MariaDB / MySQL | used at |
 |--|--|--|--|
-| `auto` | `AUTOINCREMENT` | `AUTO_INCREMENT` | [storage.py:276](../storage.py#L276) |
-| `blob` | `BLOB` | `LONGBLOB` | [storage.py:277](../storage.py#L277) |
-| `inline_index` | separate `CREATE INDEX` after | inline in `CREATE TABLE` | [storage.py:324](../storage.py#L324) |
-| `columns` | `PRAGMA table_info` | `information_schema.COLUMNS` | [storage.py:420](../storage.py#L420) |
-| `upsert` | `REPLACE INTO` | `REPLACE INTO` | [storage.py:909](../storage.py#L909), [storage.py:920](../storage.py#L920) |
+| `auto` | `AUTOINCREMENT` | `AUTO_INCREMENT` | [storage.py:281](../storage.py#L281) |
+| `blob` | `BLOB` | `LONGBLOB` | [storage.py:282](../storage.py#L282) |
+| `inline_index` | separate `CREATE INDEX` after | inline in `CREATE TABLE` | [storage.py:329](../storage.py#L329) |
+| `columns` | `PRAGMA table_info` | `information_schema.COLUMNS` | [storage.py:425](../storage.py#L425) |
+| `upsert` | `REPLACE INTO` | `REPLACE INTO` | [storage.py:927](../storage.py#L927), [storage.py:938](../storage.py#L938) |
 
 A sixth key, `server`, is not about SQL: it says whether the backend is reached
 over TCP with a connection per call (and so needs no explicit commit), which is
 the lifecycle question, and it is what the connect branch at
-[storage.py:278](../storage.py#L278) tests.
+[storage.py:283](../storage.py#L283) tests.
 
 Two things make this smaller than it looks. There is **no
 `ON DUPLICATE KEY UPDATE` anywhere** — the `prints` and `filaments` upserts are
@@ -184,7 +184,7 @@ So, concretely:
   differs), `BYTEA`, a separate `CREATE INDEX`, `INSERT … ON CONFLICT DO UPDATE`
   for those two statements, and a slightly different information_schema query.
   `rowcount` is a bonus: Postgres counts matched rows natively, so the
-  `CLIENT.FOUND_ROWS` workaround at [storage.py:294](../storage.py#L294) is not
+  `CLIENT.FOUND_ROWS` workaround at [storage.py:299](../storage.py#L299) is not
   needed. The work that is **not** visible in a grep is type strictness —
   sqlite and MySQL accept `None` or `""` into a `FLOAT`, Postgres does not — and
   finding those needs the test suite run against a live server, not reasoning

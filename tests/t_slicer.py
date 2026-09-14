@@ -341,6 +341,37 @@ assert gcode_meta.pick_file(FILES[:1], None)["mtime"] == 200, \
 assert gcode_meta.pick_file([], "x") is None
 print("the file is chosen by name; ambiguity reads nothing rather than guessing")
 
+# --- ...and the name is not always the one the printer reports --------------
+# A job pushed from MakerWorld or Handy carries the print PROFILE as its
+# subtask - "0.16mm layer, 2 walls, 15% infill", which every print made with
+# that profile shares - and the printer writes the file under the MODEL title
+# instead, with the spaces turned into underscores and the punctuation dropped.
+# Matching on the subtask alone therefore never found those files, and every
+# MakerWorld print in the history stayed without a layer height.
+MW = FILES + [{"name": "Polaroid_Foto_Glücksmomente.gcode.3mf",
+               "size": 1, "mtime": 300}]
+got = gcode_meta.pick_file(MW, "0.16mm layer, 2 walls, 15% infill",
+                           "Polaroid Foto // Glücksmomente")
+assert got and got["mtime"] == 300, (
+    "a MakerWorld job's file was not found: its subtask is the print profile "
+    "and the file is named after the model, sanitised")
+# the subtask still wins where it does match - the model title is the fallback,
+# never the thing that overrules a file the printer named itself
+assert gcode_meta.pick_file(MW, "Herbstliebe_Oberteil",
+                            "Polaroid Foto // Glücksmomente")["mtime"] == 100
+# and the model title only answers when exactly one file does: two plates of
+# one model on the drive is two files, and picking either would be a guess
+TWO = MW + [{"name": "Polaroid Foto Glücksmomente.gcode.3mf",
+             "size": 1, "mtime": 400}]
+assert gcode_meta.pick_file(TWO, "0.16mm layer, 2 walls, 15% infill",
+                            "Polaroid Foto // Glücksmomente") is None, (
+    "two files answer to the model title and it took one anyway - a wrong "
+    "layer height reads as a fact, which is worse than a missing one")
+assert gcode_meta.pick_file(MW, "0.16mm layer, 2 walls, 15% infill",
+                            "A model with no file here") is None
+print("a job named after its model, not its subtask, is found - and only when "
+      "one file answers")
+
 # --- and the plate is a second opinion, not a formality --------------------
 # MQTT says which plate is printing; the file says which plate it holds. They
 # have always agreed. If they ever do not, the file is not this print's, and

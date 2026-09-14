@@ -46,6 +46,7 @@ per finished print.
 """
 from __future__ import annotations
 
+import calendar
 import ftplib
 import io
 import json
@@ -225,6 +226,7 @@ def list_drive(ftp, path: str = "/", max_depth: int = 3,
                 # round trip each would turn a directory of 200 into 200 more
                 # commands, on a printer that may be printing
                 "when": " ".join(parts[5:8]),
+                "mtime": _list_time(parts[5:8]),
                 "sliced": name.lower().endswith((".3mf", ".gcode")),
             })
 
@@ -243,9 +245,61 @@ def _mtime(ftp, name: str) -> float | None:
     if not m:
         return None
     try:
-        return time.mktime(time.strptime(m.group(1), "%Y%m%d%H%M%S"))
+        # MDTM is UTC by definition, so it is read as UTC. `mktime` would read
+        # it as the *reader's* local time, which is a two-hour lie here in
+        # summer and a different lie on a machine in another country.
+        return calendar.timegm(time.strptime(m.group(1), "%Y%m%d%H%M%S"))
     except ValueError:
         return None
+
+
+_LIST_MONTHS = {m: i for i, m in enumerate(
+    "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(), 1)}
+
+
+def _list_time(fields: list[str], now: float | None = None) -> float | None:
+    """The epoch behind a LIST line's three date fields, or None.
+
+    The printer's FTP server stamps files in UTC - checked against the cloud's
+    own (UTC) start time for the same job, where a file's stamp is the moment
+    it was uploaded, a minute before its print began. Handing the raw string to
+    the page is therefore how a file uploaded at 11:44 German time comes to
+    read as 09:44; only a real instant can be shown in the reader's own zone.
+
+    `ls` gives the clock for anything recent and the year for anything old, so
+    both forms turn up in the same listing and the year has to be worked out
+    for the first: the most recent one in which that date has already been.
+    """
+    if len(fields) < 3:
+        return None
+    mon = _LIST_MONTHS.get(fields[0][:3].title())
+    if not mon:
+        return None
+    try:
+        day = int(fields[1])
+    except ValueError:
+        return None
+    stamp, now = fields[2], time.time() if now is None else now
+    if ":" not in stamp:
+        try:
+            return calendar.timegm((int(stamp), mon, day, 0, 0, 0, 0, 0, 0))
+        except (ValueError, TypeError):
+            return None
+    try:
+        hh, mm = (int(x) for x in stamp.split(":", 1))
+    except ValueError:
+        return None
+    # A listing made on 1 January must not date a December file eleven months
+    # into the future, so a stamp that has not happened yet belongs to last
+    # year. A day of slack absorbs a printer clock that runs slightly ahead.
+    for year in (time.gmtime(now).tm_year, time.gmtime(now).tm_year - 1):
+        try:
+            t = calendar.timegm((year, mon, day, hh, mm, 0, 0, 0, 0))
+        except (ValueError, TypeError):
+            return None
+        if t <= now + 86400:
+            return t
+    return None
 
 
 class Conn:
@@ -603,36 +657,78 @@ def parse(settings_raw: bytes | None, slice_raw: bytes | None,
 # the whole flow
 # --------------------------------------------------------------------------
 
-def pick_file(files: list[dict], subtask: str | None) -> dict | None:
+def file_stem(name: str) -> str:
+    """A drive file's name without whichever slicer extension it carries."""
+    for ext in (SUFFIX, ".3mf", ".gcode"):
+        if name.lower().endswith(ext):
+            return name[:-len(ext)]
+    return name
+
+
+def loose_key(name: str) -> str:
+    """A name reduced to what survives being turned into a filename.
+
+    The printer does not always write a job under the name it reports for it.
+    A job pushed from MakerWorld or Handy carries the *print profile* as its
+    subtask - "0.16mm layer, 2 walls, 15% infill", which every print made with
+    that profile shares - while the file on the drive is named after the model:
+    `Polaroid Foto // Glücksmomente` is written as
+    `Polaroid_Foto_Glücksmomente.gcode.3mf`, spaces turned into underscores and
+    the punctuation dropped.
+
+    Rather than reproduce the printer's sanitising rule - which is guesswork,
+    and wrong the first time it meets a character nobody tried - both sides are
+    reduced to their letters and digits, which no sanitiser touches.
+    """
+    return "".join(ch for ch in (name or "").casefold() if ch.isalnum())
+
+
+def pick_file(files: list[dict], subtask: str | None,
+              design: str | None = None) -> dict | None:
     """Which file on the drive belongs to this print.
 
-    The printer names it after the subtask exactly - `<subtask>.gcode.3mf` -
-    which is checked against the print we are asking about rather than assumed.
+    The printer usually names it after the subtask exactly -
+    `<subtask>.gcode.3mf` - which is checked against the print we are asking
+    about rather than assumed. When it does not (see `loose_key`), the model
+    title is tried the same way, and only ever when exactly one file on the
+    drive answers to it: a profile name is shared by every print made with it,
+    so a second candidate means we do not know which file this print used.
+
     Falling back to "the newest one" would attribute one print's settings to
-    another, and a wrong layer height is worse than a missing one, so the
+    another, and a wrong layer height is worse than a missing one, so that
     fallback only applies when there is exactly one candidate and no name to
     check it against.
     """
     if not files:
         return None
-    if subtask:
-        want = (subtask + SUFFIX)
-        for f in files:
-            if f["name"] == want:
-                return f
-        # some names round-trip through the filesystem with the extension only
-        stem = subtask.strip().lower()
-        for f in files:
-            n = f["name"].lower()
-            if n == stem + SUFFIX or n.rsplit(".", 2)[0] == stem:
-                return f
+    if subtask or design:
+        if subtask:
+            want = (subtask + SUFFIX)
+            for f in files:
+                if f["name"] == want:
+                    return f
+            # some names round-trip through the filesystem with the extension only
+            stem = subtask.strip().lower()
+            for f in files:
+                n = f["name"].lower()
+                if n == stem + SUFFIX or n.rsplit(".", 2)[0] == stem:
+                    return f
+        # the model title, and the subtask once more with the punctuation and
+        # spacing that a filename cannot keep taken out of both sides
+        for cand in (design, subtask):
+            key = loose_key(cand or "")
+            if not key:
+                continue
+            hits = [f for f in files if loose_key(file_stem(f["name"])) == key]
+            if len(hits) == 1:
+                return hits[0]
         return None
     return files[0] if len(files) == 1 else None
 
 
 def fetch(ip: str, access_code: str, subtask: str | None = None,
           plate: int | None = None, timeout: float = 20.0,
-          conn: "Conn | None" = None) -> dict:
+          conn: "Conn | None" = None, design: str | None = None) -> dict:
     """Everything the slicer knows about one print. Raises SlicerError.
 
     Pass `conn` to read several prints over one session. Without it, one is
@@ -648,7 +744,7 @@ def fetch(ip: str, access_code: str, subtask: str | None = None,
         conn = Conn(dial=lambda: connect(ip, access_code, timeout))
     try:
         files = sliced_files(conn.ftp)
-        chosen = pick_file(files, subtask)
+        chosen = pick_file(files, subtask, design)
         if chosen is None:
             raise SlicerError(
                 f"no sliced file on the drive for {subtask!r}"

@@ -79,6 +79,30 @@ assert by["video_001.mp4"]["sliced"] is False and by["readme.txt"]["sliced"] is 
 assert by["video_001.mp4"]["when"] == "Jul 23 04:13", by["video_001.mp4"]
 print(f"walked {len(files)} files across {len(TREE)} folders, biggest first")
 
+# --- the listing's clock is UTC, and has to leave here as an instant --------
+# The printer stamps its files in UTC: on the real drive a file stamped
+# "Sep 03 09:44" is the upload of a job the cloud (also UTC) records as
+# starting at 09:45:28Z. Handing the page that string is how a file uploaded at
+# 11:44 German time reads as 09:44, so the page is given an epoch to format in
+# whatever zone the browser is in, and the string only as a fallback.
+import calendar
+NOON = calendar.timegm((2026, 9, 4, 12, 0, 0, 0, 0, 0))
+assert gcode_meta._list_time(["Sep", "03", "09:44"], now=NOON) ==     calendar.timegm((2026, 9, 3, 9, 44, 0, 0, 0, 0)), (
+    "the listing's clock was not read as UTC - a print at 11:44 German time "
+    "shows as 09:44, which is the whole reason this is parsed at all")
+# `ls` prints the year instead of the clock once a file is old enough
+assert gcode_meta._list_time(["Jan", "01", "1970"], now=NOON) == 0
+# and drops it for anything recent, so it has to be worked out: a listing made
+# in January must not date a December file eleven months into the future
+JAN = calendar.timegm((2026, 1, 2, 12, 0, 0, 0, 0, 0))
+assert gcode_meta._list_time(["Dec", "28", "23:10"], now=JAN) ==     calendar.timegm((2025, 12, 28, 23, 10, 0, 0, 0, 0)),     "a December file listed in January was dated into the future"
+assert gcode_meta._list_time(["Sep", "03", "09:44"], now=NOON) <= NOON
+# a stamp nobody can read is not a crash, and the raw string still shows
+assert gcode_meta._list_time(["Smarch", "??", "??"]) is None
+assert gcode_meta._list_time(["Sep"]) is None
+assert by["video_001.mp4"]["mtime"], "the listing carried no instant at all"
+print("the listing's UTC clock is parsed to an instant, year and all")
+
 # --- a folder that will not open is not a failed listing -------------------
 ftp = FakeFTP(TREE, fail={"/timelapse"})
 files, _ = gcode_meta.list_drive(ftp)
@@ -164,6 +188,46 @@ try:
         "a file with no matching print was given one anyway"
     print("files are tied to their prints; a hand-typed label wins over the plate name")
 
+    # --- a job pushed from MakerWorld is not named after its subtask --------
+    # It carries the print PROFILE as its subtask - shared by every print made
+    # with it - and the printer writes it to the drive under the model title
+    # with the spaces turned into underscores and the punctuation dropped.
+    # Matching on `<subtask>.gcode.3mf` left exactly those files unnamed
+    # although the history plainly had the print that made them.
+    MW = dict(TREE)
+    MW["/"] = MW["/"] + [("-rw-r--r--", 4770719,
+                          "Polaroid_Foto_Glücksmomente.gcode.3mf")]
+    files_fixture, _ = _list(FakeFTP(MW))
+    store.delete_print("drv-2")
+    store.upsert_print(job_id="drv-2", name="0.16mm layer, 2 walls, 15% infill",
+                       started_at=time.time() - 7200, ended_at=time.time() - 3600,
+                       final_state="FINISH", total_layers=80)
+    store.update_print_fields("drv-2", design_title="Polaroid Foto // Glücksmomente")
+    app._drive_cache.update(at=0.0, data=None)
+    got = {f["name"]: f for f in c.get("/api/storage").get_json()["files"]}
+    mw = got["Polaroid_Foto_Glücksmomente.gcode.3mf"]
+    assert mw.get("job_id") == "drv-2", (
+        "a MakerWorld job's file was not tied to its print: the subtask is the "
+        "print profile and the file is named after the model, so matching on "
+        "the subtask alone can never find it")
+    assert mw["print"] == "Polaroid Foto // Glücksmomente", mw
+
+    # ...and the profile name must not drag in a print of another model
+    store.delete_print("drv-3")
+    store.upsert_print(job_id="drv-3", name="0.16mm layer, 2 walls, 15% infill",
+                       started_at=time.time() - 9000, ended_at=time.time() - 8000,
+                       final_state="FINISH")
+    store.update_print_fields("drv-3", design_title="Something else entirely")
+    app._drive_cache.update(at=0.0, data=None)
+    got = {f["name"]: f for f in c.get("/api/storage").get_json()["files"]}
+    assert got["Polaroid_Foto_Glücksmomente.gcode.3mf"].get("job_id") == "drv-2", (
+        "a second print sharing the profile name changed which print the file "
+        "was said to be - the model title decides, not the profile")
+    assert "job_id" not in got["Fall in Love_Riffel.gcode.3mf"], (
+        "a loose match reached a file that answers to no print at all")
+    print("a MakerWorld file is found by its model title, and only by that")
+    files_fixture, _ = _list(FakeFTP(TREE))
+
     # --- the listing is cached, the capacity is not ------------------------
     calls = []
     gcode_meta.list_drive = lambda ftp, *a, **k: (calls.append(1), (files_fixture, False))[1]
@@ -191,5 +255,6 @@ finally:
     gcode_meta.connect, gcode_meta.list_drive = _connect, _list
     app._drive_cache.update(at=0.0, data=None)
 
-store.delete_print("drv-1")
+for job in ("drv-1", "drv-2", "drv-3"):
+    store.delete_print(job)
 print("ok")

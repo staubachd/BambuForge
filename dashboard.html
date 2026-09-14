@@ -247,6 +247,10 @@
     background:var(--accent-soft); border:1px solid var(--accent);
     font-size:12.5px; font-weight:600}
   .day-filter.on{display:flex}
+  /* the way back through a long history: the table holds the pages read so far
+     and this says how far back that reaches */
+  .hist-more{display:none; align-items:center; gap:10px; margin-top:12px}
+  .hist-more.on{display:flex}
   /* the expanded print: everything about one job in one place, instead of the
      five tabs its facts used to be spread over */
   .htab .exp{width:1%; padding-right:0}
@@ -267,7 +271,11 @@
   .det .dl .v{font-variant-numeric:tabular-nums; text-align:right;
     font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
   .det .slot{display:flex; align-items:center; gap:9px; padding:5px 0;
-    border-top:1px solid var(--border); font-size:12.5px}
+    border-top:1px solid var(--border); font-size:12.5px; flex-wrap:wrap}
+  /* name + colour + hex chip on one run, wrapping before the grams get pushed
+     off the row */
+  .det .slot .sn{display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0}
+  .det .slot .cn{font-weight:600}
   .det .slot:first-of-type{border-top:0}
   .det .slot .sw{flex:none; width:13px; height:13px; border-radius:4px;
     background:var(--sw,#888); box-shadow:inset 0 0 0 1px rgba(127,127,127,.45)}
@@ -502,6 +510,9 @@
 
   /* ---------- AMS spools ---------- */
   .spools{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  /* the same cards on a full-width card: 150px is sized for the narrow live
+     panel and squeezes the identity line here, where there is room */
+  #amsNow{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
   .spool{display:flex; gap:13px; align-items:center; padding:13px; border-radius:14px;
     border:1px solid var(--border); background:var(--surface-2); transition:.2s}
   /* the loaded slot. The background here was the same value as the base tile,
@@ -1367,6 +1378,13 @@
       <div style="overflow-x:auto">
         <table class="htab" id="histTable"><tbody></tbody></table>
       </div>
+      <!-- The history is paged. Older prints are fetched on request instead of
+           on every refresh, so a history of hundreds costs one page, not all of
+           it - and nothing is hidden: the count says what is still behind. -->
+      <div class="hist-more" id="histMoreBar">
+        <button class="wbtn" id="histMoreBtn" data-i18n="Load older">Load older</button>
+        <span class="meta" id="histMoreMeta"></span>
+      </div>
     </section>
   </div>
 
@@ -1408,6 +1426,16 @@
         <span class="meta" data-i18n="every filament ever used">every filament ever used</span>
       </div>
       <div class="kpis" id="filKpis"></div>
+    </section>
+    <!-- The rest of this page answers "what have I used". This one answers
+         "what is in the machine right now", which is the question you actually
+         have while deciding what to print. Same cards as the live AMS panel, so
+         the two can never disagree; hidden entirely when nothing is loaded. -->
+    <section class="card span-12" id="amsNowCard" style="display:none">
+      <div class="card-head">
+        <h3 data-i18n="Loaded now">Loaded now</h3><span class="meta" id="amsNowMeta"></span>
+      </div>
+      <div class="spools" id="amsNow"></div>
     </section>
     <section class="card span-12">
       <div class="card-head" id="filHead">
@@ -1719,6 +1747,7 @@ const DE = {
   "Filament · AMS":"Filament · AMS", "humidity":"Feuchtigkeit", "drying":"Trocknen",
   "reading RFID":"RFID wird gelesen", "switching slot":"switching slot",
   "external spool":"externe Spule", "no RFID data":"keine RFID-Daten",
+  "Loaded now":"Aktuell geladen", "slots loaded":"Fächer belegt",
   "Loaded":"Geladen", "Empty":"Leer", "left":"übrig", "min":"Min",
   "Low":"Wenig", "Reorder":"Nachbestellen",
   "search the Bambu store":"im Bambu-Store suchen",
@@ -1927,9 +1956,16 @@ const DE = {
   "Error":"Fehler", "Slot":"Slot", "Filing":"Ablage", "Group":"Gruppe",
   "Slicer profile":"Slicer-Profil", "Energy":"Energie", "Material":"Material",
   "no per-slot detail recorded":"keine Slot-Details aufgezeichnet",
+  "no colour recorded":"keine Farbe aufgezeichnet",
   "nothing recorded":"nichts aufgezeichnet",
   // chart -> table drill-down
   "Showing":"Zeige", "Show all prints":"Alle Drucke zeigen",
+  // paging back through the history
+  "Load older":"Ältere laden", "loaded":"geladen",
+  "No prints on this day.":"An diesem Tag wurde nichts gedruckt.",
+  "No prints from this day are loaded yet — load older prints below.":
+    "Von diesem Tag ist noch nichts geladen – unten ältere Drucke nachladen.",
+  "Could not load older prints.":"Ältere Drucke konnten nicht geladen werden.",
   "+ Add an order":"+ Bestellung hinzufügen", "− Hide the importer":"− Import ausblenden",
   "copy this colour code":"Farbcode kopieren", "copied":"kopiert",
   "€/kg":"€/kg", "That is not a price.":"Das ist kein Preis.",
@@ -2365,6 +2401,87 @@ function amsSignature(s){
     parts.push(`E:${tr.type||""}:${tr.color||""}`);
   return parts.join("|");
 }
+// One spool, as a card. Lifted out of the live panel so the Filament page can
+// show the same thing: two renderers for one spool would be two places for the
+// colour, the remaining grams or the reorder link to drift out of step.
+//
+// `isActive` is decided by the caller, because a tray's own id restarts at 0 in
+// every AMS unit while the printer's "loaded" pointer counts across them.
+function spoolCard(tr, isActive, canAssign){
+  const known = tr.remain_pct!=null && tr.remain_pct>=0;
+  const pctv = known ? tr.remain_pct : 100;
+  const center = known ? tr.remain_pct+'<span>%</span>' : '—';
+  const fc = tr.color || 'var(--text-3)';
+  // remaining % is all the printer reports; grams/metres are derived from
+  // the spool's nominal weight and length
+  const left = [tr.grams_left!=null ? tr.grams_left+" g" : null,
+                tr.metres_left!=null ? tr.metres_left+" m" : null]
+               .filter(Boolean).join(" · ");
+  // identity line: product line + the colour's name, falling back to its
+  // raw code when the catalogue doesn't know it (never a guessed name)
+  // What it is called. `brand` is the AMS's own product line; vendor and
+  // product come from the Filament page, and for a spool with no RFID they
+  // are the only name it will ever have - "no RFID data" is true but
+  // useless once you have told the app what the spool is.
+  const ident = [tr.vendor, tr.product || tr.brand,
+                 tr.color_name || (tr.is_bambu ? tr.code : null)]
+                .filter(Boolean).map(esc).join(" · ");
+  // only genuine RFID spools get a store link - a third-party spool reports
+  // a Bambu SKU whenever it was sliced with a Bambu profile
+  const reorder = tr.store_url
+    ? `<a class="reorder" href="${esc(tr.store_url)}" target="_blank" rel="noopener noreferrer"
+         title="${t("search the Bambu store")}">${t("Reorder")} ↗</a>` : "";
+  // a second AMS makes "slot 2" ambiguous, so the caller labels those A2 / B2
+  const badge = tr._label || (tr._ext ? 'EXT' : ((tr.id ?? 0) + 1));
+  return `<div class="spool ${isActive?'active':''} ${tr.low?'low':''}">
+    <div class="donut" style="--fc:${fc};--pct:${pctv}"><div class="donut-hole">${center}</div></div>
+    <div>
+      <div class="spool-type"><span class="slot-badge">${esc(badge)}</span>${
+        esc(tr.type)||t('Empty')}</div>
+      <div class="spool-brand">${tr._ext ? t('external spool') : (ident || t('no RFID data'))}</div>
+      ${left ? `<div class="spool-left">${left} ${t("left")}</div>` : ""}
+      <div class="spool-tags">${
+        isActive && !tr._ext ? `<span class="tag">${t("Loaded")}</span>` : ''}${
+        tr.low ? `<span class="tag tag-low">${t("Low")}</span>` : ''}${reorder}${
+        tr._ext || tr.id==null || !canAssign ? "" : `<button class="assign-btn" type="button"
+          data-slot="${tr.id+1}" title="${t("tell the printer what is in this slot")}"
+          >${t("assign")}</button>`}</div>
+    </div>
+  </div>`;
+}
+
+// "What is loaded right now", for the Filament page. Every AMS unit, plus the
+// external holders - on a two-nozzle machine the side extruder feeds from one,
+// so a fifth spool is genuinely in the machine and belongs in the count.
+function renderAmsNow(){
+  const card = $("amsNowCard");
+  if(!card) return;
+  const ams = (lastState || {}).ams || {};
+  const units = ams.units || [];
+  const multi = units.length > 1;
+  const rows = [];
+  units.forEach((u, i)=> (u.trays || []).forEach(tr=> rows.push({...tr,
+    // the printer's "loaded" pointer counts across units; a tray id restarts
+    _global: i * 4 + (tr.id ?? 0),
+    _label: multi ? String.fromCharCode(65 + i) + ((tr.id ?? 0) + 1) : null})));
+  const ext = ams.external || [];
+  ext.forEach((x, i)=> rows.push({...x, _ext: true,
+    _label: ext.length > 1 ? "EXT" + (i + 1) : "EXT"}));
+  // no AMS reporting at all: an empty card says less than no card
+  if(!rows.length){ card.style.display = "none"; return; }
+  card.style.display = "";
+  $("amsNow").innerHTML = rows.map(tr=>
+    spoolCard(tr, ams.active_tray === tr._global, ams.can_assign)).join("");
+  // an empty slot is a slot, not a spool - count what is actually in there
+  const full = rows.filter(r=> r.type);
+  const grams = full.reduce((a, r)=> a + (r.grams_left || 0), 0);
+  const damp = units.filter(u=> u.humidity_pct != null);
+  $("amsNowMeta").textContent =
+    `${full.length} ${t("of")} ${rows.length} ${t("slots loaded")}`
+    + (grams ? ` · ${kgF(grams)} ${t("left")}` : "")
+    + (damp.length ? `  ·  ${t("humidity")} ${damp.map(u=> u.humidity_pct + "%").join(" / ")}` : "");
+}
+
 function render(s){
   if(!s || !s.job) return;
   lastState = s;   // so the language switcher can re-render without new telemetry
@@ -2611,47 +2728,10 @@ function render(s){
         ? `  ·  ${t("switching slot")} ${(s.ams.active_tray ?? 0)+1} → ${(s.ams.tray_target ?? 0)+1}`
         : (s.ams.reading ? "  ·  "+t("reading RFID") : ""));
     const all = u.trays.concat((s.ams.external||[]).map(x=>({...x, _ext:true})));
-    $("spools").innerHTML = all.map(tr=>{
-      const known = tr.remain_pct!=null && tr.remain_pct>=0;
-      const pctv = known ? tr.remain_pct : 100;
-      const center = known ? tr.remain_pct+'<span>%</span>' : '—';
-      const fc = tr.color || 'var(--text-3)';
-      // remaining % is all the printer reports; grams/metres are derived from
-      // the spool's nominal weight and length
-      const left = [tr.grams_left!=null ? tr.grams_left+" g" : null,
-                    tr.metres_left!=null ? tr.metres_left+" m" : null]
-                   .filter(Boolean).join(" · ");
-      // identity line: product line + the colour's name, falling back to its
-      // raw code when the catalogue doesn't know it (never a guessed name)
-      // What it is called. `brand` is the AMS's own product line; vendor and
-      // product come from the Filament page, and for a spool with no RFID they
-      // are the only name it will ever have - "no RFID data" is true but
-      // useless once you have told the app what the spool is.
-      const ident = [tr.vendor, tr.product || tr.brand,
-                     tr.color_name || (tr.is_bambu ? tr.code : null)]
-                    .filter(Boolean).map(esc).join(" · ");
-      // only genuine RFID spools get a store link - a third-party spool reports
-      // a Bambu SKU whenever it was sliced with a Bambu profile
-      const reorder = tr.store_url
-        ? `<a class="reorder" href="${esc(tr.store_url)}" target="_blank" rel="noopener noreferrer"
-             title="${t("search the Bambu store")}">${t("Reorder")} ↗</a>` : "";
-      return `<div class="spool ${active===tr.id?'active':''} ${tr.low?'low':''}">
-        <div class="donut" style="--fc:${fc};--pct:${pctv}"><div class="donut-hole">${center}</div></div>
-        <div>
-          <div class="spool-type"><span class="slot-badge">${
-            tr._ext ? 'EXT' : ((tr.id ?? 0) + 1)}</span>${esc(tr.type)||t('Empty')}</div>
-          <div class="spool-brand">${tr._ext ? t('external spool') : (ident || t('no RFID data'))}</div>
-          ${left ? `<div class="spool-left">${left} ${t("left")}</div>` : ""}
-          <div class="spool-tags">${
-            active===tr.id && !tr._ext ? `<span class="tag">${t("Loaded")}</span>` : ''}${
-            tr.low ? `<span class="tag tag-low">${t("Low")}</span>` : ''}${reorder}${
-            tr._ext || tr.id==null || !(s.ams&&s.ams.can_assign) ? "" : `<button class="assign-btn" type="button"
-              data-slot="${tr.id+1}" title="${t("tell the printer what is in this slot")}"
-              >${t("assign")}</button>`}</div>
-        </div>
-      </div>`;
-    }).join("");
+    $("spools").innerHTML = all.map(tr=>
+      spoolCard(tr, active === tr.id, s.ams && s.ams.can_assign)).join("");
   } else $("amsCard").style.display="none";
+  renderAmsNow();     // the Filament page's copy, live off the same frame
 
   // health warnings -> header badge + dropdown panel
   const hms=s.hms||[];
@@ -3120,6 +3200,17 @@ async function deletePrint(job, name, row){
   loadPrints();
 }
 $("histTable").addEventListener("click", async e=>{
+  const hex = e.target.closest("button.hexchip");
+  if(hex){
+    e.stopPropagation();          // the chip sits inside a row that toggles
+    try{
+      if(await copyText(hex.dataset.hex)) toast(hex.dataset.hex + " " + t("copied"));
+    }catch(err){
+      console.error("copy failed:", err);
+      toast(t("Could not copy — the code is") + " " + hex.dataset.hex, true);
+    }
+    return;
+  }
   const del = e.target.closest("button.del-btn");
   if(del){ deletePrint(del.dataset.job, del.dataset.name, del.closest("tr")); return; }
   const exp = e.target.closest("button.exp-btn");
@@ -3227,7 +3318,10 @@ function money(v, cur){
 function filTitle(r){
   const d = r.filament_detail;
   if(!Array.isArray(d) || !d.length) return t("click to override grams");
-  return d.map(x=>`Slot ${x.slot} · ${x.brand||"?"} ${x.type||""} · ${x.grams} g `
+  return d.map(x=>`Slot ${x.slot} · ${x.brand||"?"} ${x.type||""}`
+                 + (x.color_name ? ` · ${x.color_name}` : "")
+                 + (x.color ? ` (#${String(x.color).toUpperCase()})` : "")
+                 + ` · ${x.grams} g `
                  + `@ ${x.per_kg} per kg (${x.rule||"?"}) = ${ceil2(x.cost||0).toFixed(2)}`)
           .join("\n") + "\n\n" + t("click to override grams");
 }
@@ -3241,14 +3335,65 @@ function stateClass(st){
   if(["RUNNING","PREPARE","PAUSE","SLICING"].includes(st)) return "st-run";
   return "st-idle";
 }
+// The history is paged. The table starts on the newest page and walks back
+// through the rest on request; everything below renders histRows, so a group
+// whose members sit two pages back reads complete once those pages are in - the
+// group name lives on each print, so a half-loaded group is a half-told story.
+const HIST_PAGE = 60;
+let histRows = [];      // every page read so far, newest-first
+let histTotal = 0;      // how many prints exist, whether or not they are loaded
+let histBusy = false;
+
 async function loadPrints(){
   if(histEditing) return;   // a rename is in progress
+  // Re-read everything on screen, not just the first page: refreshing on a
+  // minute's timer must not quietly throw away the pages just loaded.
+  const want = Math.max(histRows.length, HIST_PAGE);
   let d;
-  try{ d = await (await fetch("/api/prints?limit=60")).json(); }
+  try{ d = await (await fetch(`/api/prints?limit=${want}&offset=0`)).json(); }
   catch(_){ return; }
-  const allRows = d.prints||[], cur = d.currency||"€";
+  histTotal = d.total ?? (d.prints||[]).length;
+  renderPrints(d.prints||[], d.currency||"€");
+}
+
+// One page further back. The offset counts from the newest print, so a print
+// started since the first page shifts every row by one and the next page can
+// repeat something already on screen - job_id decides that, never position.
+async function loadOlderPrints(){
+  if(histBusy || histEditing) return;
+  histBusy = true;
+  const btn = $("histMoreBtn"), was = btn.textContent;
+  btn.disabled = true; btn.textContent = t("Loading…");
+  let d = null;
+  try{
+    d = await (await fetch(
+      `/api/prints?limit=${HIST_PAGE}&offset=${histRows.length}`)).json();
+  }catch(_){}
+  btn.disabled = false; btn.textContent = was;
+  histBusy = false;
+  if(!d){ toast(t("Could not load older prints."), true); return; }
+  histTotal = d.total ?? histTotal;
+  const seen = new Set(histRows.map(r=> r.job_id));
+  renderPrints(histRows.concat((d.prints||[]).filter(r=> !seen.has(r.job_id))),
+               d.currency || printsCur);
+}
+
+// What is still behind the last loaded page. Shown as a count rather than a
+// bare button: "there are older prints" is the part that was missing.
+function updateHistMore(){
+  const left = Math.max(0, histTotal - histRows.length);
+  $("histMoreBar").classList.toggle("on", left > 0);
+  if(!left) return;
+  $("histMoreBtn").textContent = `${t("Load older")} (${Math.min(HIST_PAGE, left)})`;
+  $("histMoreMeta").textContent =
+    `${histRows.length} ${t("of")} ${histTotal} ${t("prints")} ${t("loaded")}`;
+}
+
+function renderPrints(allRows, cur){
+  histRows = allRows;
   lastPrints = allRows;       // the group header needs every member's job_id
   printsCache = allRows; printsCur = cur;
+  updateHistMore();           // before any early return below - it is always true
   // the chart above can narrow the table to one day; the caches above stay
   // complete, so group membership and the idle panel still see everything
   const rows = dayFilter
@@ -3259,7 +3404,13 @@ async function loadPrints(){
   if(idleState && lastState) renderIdle(lastState.job || {}, lastState);
   const tb = $("histTable").querySelector("tbody");
   if(!rows.length){
-    tb.innerHTML = `<tr><td style="color:var(--text-3);padding:10px 0">${t("No prints recorded yet — the first one appears here as soon as it starts.")}</td></tr>`;
+    // an older print the day filter points at may simply not be loaded yet -
+    // saying "nothing printed" there would be a plain lie
+    const msg = histRows.length < histTotal
+      ? t("No prints from this day are loaded yet — load older prints below.")
+      : dayFilter ? t("No prints on this day.")
+                  : t("No prints recorded yet — the first one appears here as soon as it starts.");
+    tb.innerHTML = `<tr><td style="color:var(--text-3);padding:10px 0">${msg}</td></tr>`;
     $("histMeta").textContent=""; syncHistSel(); return;
   }
   // Timeline keeps everything in date order; the other views split grouped from
@@ -3457,6 +3608,31 @@ function fmtMin(m){
 /* Everything known about one print, in one place. These facts exist today but
    are scattered: grams on this table, the per-slot breakdown in a title
    attribute, cost on the overview, the model link in the name cell. */
+// One slot of a past print. The colour is the part that cannot be reconstructed
+// afterwards: "Bambu PLA" names a dozen blacks, and the stored hex is unreadable
+// as text. So the swatch, the colour's name and the code all sit on this line,
+// and the code copies on click the way the Filament page's does - it is what you
+// type into the slicer or the shop to print the thing again.
+//
+// The swatch used to be written `--sw:${x.color}` with the stored hex, which has
+// no leading '#': an invalid custom property makes the background invalid at
+// computed-value time, so every dot rendered colourless. The '#' is not cosmetic.
+function slotLine(x){
+  const hex = x.color ? "#" + String(x.color).toUpperCase() : null;
+  // vendor/product come from the filament identity when it has been named;
+  // brand/type is what the cloud recorded with the print itself
+  const who = [x.vendor || t(x.brand || ""), x.product || x.type]
+                .filter(Boolean).join(" ");
+  return `<div class="slot">
+    <span class="sw" style="--sw:${hex || "transparent"}"
+      title="${hex ? esc(hex) : t("no colour recorded")}"></span>
+    <span class="sn">${t("Slot")} ${x.slot} · ${esc(who) || "?"}${
+      x.color_name ? ` · <span class="cn">${esc(x.color_name)}</span>` : ""}${
+      hex ? ` <button class="hexchip" type="button" data-hex="${hex}"
+        title="${t("copy this colour code")}">${hex}</button>` : ""}</span>
+    <span class="sg">${(x.grams ?? 0).toFixed(1)} g</span>
+  </div>`;
+}
 function detailRow(r, cur){
   const det = Array.isArray(r.filament_detail) ? r.filament_detail : [];
   const grams = r.filament_g_manual != null ? r.filament_g_manual : r.filament_g;
@@ -3487,11 +3663,7 @@ function detailRow(r, cur){
     </div>
     <div>
       <h4>${t("Filament")}</h4>
-      ${det.length ? det.map(x=>`<div class="slot">
-          <span class="sw" style="--sw:${esc(x.color || "#888")}"></span>
-          <span>${t("Slot")} ${x.slot} · ${esc([x.brand, x.type].filter(Boolean).join(" ")) || "?"}</span>
-          <span class="sg">${(x.grams ?? 0).toFixed(1)} g</span>
-        </div>`).join("")
+      ${det.length ? det.map(slotLine).join("")
         : `<div class="none">${grams != null
              ? t("no per-slot detail recorded") : t("nothing recorded")}</div>`}
       <div class="dl" style="margin-top:9px">
@@ -3663,6 +3835,7 @@ $("histBtn").addEventListener("click", async ()=>{
                        : t("Cloud had nothing new"));
   loadPrints();
 });
+$("histMoreBtn").addEventListener("click", loadOlderPrints);
 loadPrints(); setInterval(loadPrints, 60000);
 
 /* ---------- statistics ---------- */
@@ -3896,10 +4069,11 @@ $("asgList").addEventListener("click", async e=>{
   if(!d || !d.ok) toast(t("Could not set the slot.") + (d && d.error ? " ("+d.error+")" : ""), true);
   else toast(`${t("Slot")} ${slot} → ${d.type} #${d.color}`);
 });
-$("spools").addEventListener("click", e=>{
-  const b = e.target.closest(".assign-btn");
-  if(b) openAssign(+b.dataset.slot);
-});
+for(const id of ["spools", "amsNow"])
+  $(id).addEventListener("click", e=>{
+    const b = e.target.closest(".assign-btn");
+    if(b) openAssign(+b.dataset.slot);
+  });
 
 /* ---------- filament ----------
    Filtering and sorting happen on the payload already in hand, so neither the
@@ -4346,6 +4520,7 @@ async function loadFilaments(){
     ["Different filaments", tt.filaments ?? 0, tt.unused ? `${tt.unused} ${t("unused")}` : ""],
     ["Prints with data", tt.prints ?? 0, ""],
   ].map(([l,v,s])=>`<div class="kpi"><span class="kl">${t(l)}</span><span class="kv">${v}</span><span class="ks">${s}</span></div>`).join("");
+  renderAmsNow();     // paint at once on a tab switch, not on the next frame
   renderDupes(d.suggestions || []);
   renderPurchases(d);
   renderFilTable();
@@ -5291,6 +5466,17 @@ function bytes(v){
   return v + " B";
 }
 function kb(v){ return v == null ? "—" : bytes(v * 1024); }
+// The printer's FTP server stamps its files in UTC. Printing the string it
+// sends is how a file uploaded at 11:44 German time reads as 09:44, so the app
+// parses it to an instant and only the instant is formatted - in whatever zone
+// the browser is in. The raw string stays as the fallback for a date the app
+// could not make sense of, because a stamp we cannot read is still worth more
+// than an empty cell.
+function driveWhen(f){
+  if(!f.mtime) return f.when || "";
+  return new Date(f.mtime*1000).toLocaleString([],
+    {year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+}
 let driveBusy = false;
 async function loadDrive(refresh){
   if(driveBusy) return;
@@ -5358,7 +5544,7 @@ function renderDrive(d){
           <td>${f.print ? esc(f.print) : `<span class="meta">${
               f.sliced ? t("no print recorded") : "—"}</span>`}</td>
           <td class="num">${bytes(f.size)}</td>
-          <td class="meta">${esc(f.when || "")}</td>
+          <td class="meta">${esc(driveWhen(f))}</td>
         </tr>`).join("")}</tbody></table>`);
     }
     // the two figures come from different places and can disagree; say so
