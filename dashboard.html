@@ -294,10 +294,16 @@
   #liveFrame{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000}
   /* remaining / end time on the card-head line, pushed to the right of the caption */
   #liveHead{flex-wrap:wrap; row-gap:6px}
-  .head-stats{margin-left:auto; display:flex; align-items:baseline; gap:20px}
+  .head-stats{margin-left:auto; display:flex; align-items:baseline; gap:20px;
+    flex-wrap:wrap; row-gap:7px}
   .head-stats .hs{display:flex; align-items:baseline; gap:7px}
   .head-stats .hs-label{font-size:11px; color:var(--text-3); font-weight:600;
     text-transform:uppercase; letter-spacing:.06em}
+  /* the loaded spool's colour as a dot on the value line: faster to read than
+     any name, and it keeps its baseline with the figures beside it */
+  .head-stats .fdot{display:inline-block; width:10px; height:10px; border-radius:3px;
+    margin-right:7px; background:var(--fc,var(--text-3));
+    box-shadow:inset 0 0 0 1px rgba(127,127,127,.45)}
   .head-stats .hs-val{font-size:15px; font-weight:650; color:var(--text);
     font-variant-numeric:tabular-nums}
 
@@ -1317,6 +1323,10 @@
              switching tabs to see how far along the print is -->
         <div class="head-stats">
           <span class="hs"><span class="hs-label" data-i18n="Layer">Layer</span><span class="hs-val" id="liveLayers">—</span></span>
+          <!-- which spool is actually feeding. On the camera especially: the
+               colour growing on screen and the colour in the machine should be
+               the same one, and this is where you notice when they are not. -->
+          <span class="hs"><span class="hs-label" data-i18n="Filament">Filament</span><span class="hs-val" id="liveFil">—</span></span>
           <span class="hs"><span class="hs-label" data-i18n="Remaining">Remaining</span><span class="hs-val" id="liveEta">—</span></span>
           <span class="hs"><span class="hs-label" data-i18n="Ends">Ends</span><span class="hs-val" id="liveEnd">—</span></span>
         </div>
@@ -2450,23 +2460,71 @@ function spoolCard(tr, isActive, canAssign){
   </div>`;
 }
 
-// "What is loaded right now", for the Filament page. Every AMS unit, plus the
-// external holders - on a two-nozzle machine the side extruder feeds from one,
-// so a fifth spool is genuinely in the machine and belongs in the count.
-function renderAmsNow(){
-  const card = $("amsNowCard");
-  if(!card) return;
-  const ams = (lastState || {}).ams || {};
+// Every spool in the machine as one flat, labelled list - AMS trays first, then
+// the external holders, which on a two-nozzle machine feed the side extruder.
+//
+// This is the ONE place that knows how trays are numbered, because there are two
+// numberings and they disagree: a tray's own id restarts at 0 in every AMS unit,
+// while the printer's "loaded" pointer counts straight across them. Anything
+// that has to say *which* spool - a badge, a highlight, the live header - reads
+// `_label` and `_global` from here rather than working it out again.
+function amsTrays(s){
+  const ams = (s || {}).ams || {};
   const units = ams.units || [];
   const multi = units.length > 1;
   const rows = [];
   units.forEach((u, i)=> (u.trays || []).forEach(tr=> rows.push({...tr,
-    // the printer's "loaded" pointer counts across units; a tray id restarts
     _global: i * 4 + (tr.id ?? 0),
-    _label: multi ? String.fromCharCode(65 + i) + ((tr.id ?? 0) + 1) : null})));
+    _label: (multi ? String.fromCharCode(65 + i) : "") + ((tr.id ?? 0) + 1)})));
   const ext = ams.external || [];
-  ext.forEach((x, i)=> rows.push({...x, _ext: true,
+  ext.forEach((x, i)=> rows.push({...x, _ext: true, _global: null,
     _label: ext.length > 1 ? "EXT" + (i + 1) : "EXT"}));
+  return rows;
+}
+
+// One spool as a single line of header: its colour, then everything that names
+// it - the same parts, in the same order, as the card on the Filament page.
+//
+// `type` alone is the MATERIAL and nothing else: a spool of PLA Silk+ reads as
+// plain "PLA", which is every second spool in the drawer. The product line is
+// what distinguishes them, so it leads - from the Filament page when it has been
+// named there, otherwise from what the AMS itself reports (`tray_sub_brands`).
+function filChip(tr){
+  if(!tr || !tr.type) return "—";
+  const line = tr.product || tr.brand || null;
+  // "PLA Silk+" already carries the material; a bare "Silk+" does not, so pair
+  // them rather than dropping either
+  const what = !line ? tr.type
+    : (String(line).toUpperCase().includes(String(tr.type).toUpperCase())
+        ? line : `${tr.type} ${line}`);
+  const name = [tr.vendor, what, tr.color_name || (tr.is_bambu ? tr.code : null)]
+                 .filter(Boolean).join(" · ");
+  return `<span class="fdot" style="--fc:${esc(tr.color || "var(--text-3)")}"></span>`
+       + esc(name);
+}
+
+// What the printer is feeding from, in full, for the tooltip - slot, who made
+// it, what it is called and the code you would reorder or re-enter it by.
+function trayTitle(tr){
+  if(!tr || !tr.type) return "";
+  return [`${t("Slot")} ${tr._label}`, tr.vendor, tr.product || tr.brand,
+          tr.color_name, tr.color].filter(Boolean).join(" · ");
+}
+
+// The spool the printer is feeding from right now, or null when it says nothing.
+// An external holder is never it: the pointer only numbers AMS trays.
+function activeTray(s){
+  const at = ((s || {}).ams || {}).active_tray;
+  if(at == null) return null;
+  return amsTrays(s).find(tr => !tr._ext && tr._global === at) || null;
+}
+
+// "What is loaded right now", for the Filament page.
+function renderAmsNow(){
+  const card = $("amsNowCard");
+  if(!card) return;
+  const ams = (lastState || {}).ams || {};
+  const rows = amsTrays(lastState);
   // no AMS reporting at all: an empty card says less than no card
   if(!rows.length){ card.style.display = "none"; return; }
   card.style.display = "";
@@ -2475,7 +2533,7 @@ function renderAmsNow(){
   // an empty slot is a slot, not a spool - count what is actually in there
   const full = rows.filter(r=> r.type);
   const grams = full.reduce((a, r)=> a + (r.grams_left || 0), 0);
-  const damp = units.filter(u=> u.humidity_pct != null);
+  const damp = (ams.units || []).filter(u=> u.humidity_pct != null);
   $("amsNowMeta").textContent =
     `${full.length} ${t("of")} ${rows.length} ${t("slots loaded")}`
     + (grams ? ` · ${kgF(grams)} ${t("left")}` : "")
@@ -2538,6 +2596,9 @@ function render(s){
   $("liveLayers").textContent = layerTxt;
   $("liveEta").textContent = etaTxt;
   $("liveEnd").textContent = endTxt;
+  const feeding = activeTray(s);
+  $("liveFil").innerHTML = filChip(feeding);
+  $("liveFil").title = trayTitle(feeding);
   $("spd").textContent = s.speed ? (s.speed.magnitude_pct!=null ? s.speed.magnitude_pct+"%" : "—") : "—";
 
   // Printing or not decides what the panel is for: the ring and the controls

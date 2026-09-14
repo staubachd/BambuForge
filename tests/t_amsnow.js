@@ -32,8 +32,13 @@ const ctx = {
   kgF: g => (Math.abs(g) >= 1000 ? (g / 1000).toFixed(2) + " kg" : Math.round(g) + " g"),
 };
 vm.createContext(ctx);
-for (const fn of ["function spoolCard(", "function renderAmsNow("])
+for (const fn of ["function spoolCard(", "function amsTrays(", "function activeTray(",
+                  "function filChip(", "function trayTitle(", "function renderAmsNow("])
   vm.runInContext(grab(fn), ctx);
+const chip = ams => vm.runInContext(
+  "filChip(activeTray(" + JSON.stringify({ams}) + "))", ctx);
+const chipTitle = ams => vm.runInContext(
+  "trayTitle(activeTray(" + JSON.stringify({ams}) + "))", ctx);
 
 const tray = (id, o = {}) => ({id, type: "PLA", color: "AA0000", remain_pct: 80,
                                grams_left: 800, is_bambu: true, ...o});
@@ -121,6 +126,77 @@ r = paint({units: [{trays: [tray(0, {type: '"><script>alert(1)</script>'})]}], e
 if (/<script>alert/.test(r.html))
   throw new Error("a spool's type broke out of the markup");
 console.log("a hostile spool name is escaped, not executed");
+
+// --- the live view says which spool is feeding right now --------------------
+// Same numbering question as the highlight, in a place with no slot badge to
+// check it against: if this names the wrong spool, nothing on screen disagrees.
+const AMS1 = {units: [{trays: [tray(0, {type: "PLA", color: "#FFFFFF", color_name: "Jade White",
+                                        vendor: "Bambu Lab", product: "PLA Basic", code: "A00-W01"}),
+                               tray(1, {type: "PETG", color: "#1B1B1B"})]}],
+              external: [], active_tray: 1};
+let c = chip(AMS1);
+if (!/PETG/.test(c)) throw new Error("the feeding spool is not the loaded one: " + c);
+if (/PLA/.test(c)) throw new Error("it named a spool that is not feeding: " + c);
+if (!/--fc:#1B1B1B/.test(c)) throw new Error("the colour dot is not the spool's: " + c);
+console.log("the live header names the spool the printer is feeding from");
+
+c = chip({...AMS1, active_tray: 0});
+if (!/Jade White/.test(c))
+  throw new Error("a named colour is worth the width and was dropped: " + c);
+if (!/Bambu Lab/.test(c) || !/PLA Basic/.test(c))
+  throw new Error("the header dropped part of the spool's name: " + c);
+if (!/Slot 1 .* Bambu Lab .* Jade White/.test(chipTitle({...AMS1, active_tray: 0})))
+  throw new Error("the tooltip does not carry the full identity: "
+                  + chipTitle({...AMS1, active_tray: 0}));
+console.log("a named colour is shown, and the tooltip carries the rest");
+
+// --- the product line is what distinguishes two spools of "PLA" -------------
+// `type` is the material alone: a spool of PLA Silk+ that reads as plain "PLA"
+// is indistinguishable from every other PLA in the drawer, which is exactly how
+// this line was wrong when it shipped.
+const silk = ams => chip({units: [{trays: [tray(0, ams)]}], external: [], active_tray: 0});
+c = silk({type: "PLA", brand: "PLA Silk+", color_name: "Blau", vendor: null});
+if (!/PLA Silk\+/.test(c))
+  throw new Error("the AMS's own product line was dropped, leaving the bare "
+                  + "material: " + c);
+if (!/Blau/.test(c)) throw new Error("the colour went missing: " + c);
+console.log("the AMS product line is shown in full:", c.replace(/<[^>]*>/g, ""));
+
+// a name typed on the Filament page wins over what the AMS reports
+c = silk({type: "PLA", brand: "PLA Silk+", product: "PLA Silk+ Dual",
+          color_name: "Blau", vendor: "Bambu Lab"});
+if (!/PLA Silk\+ Dual/.test(c))
+  throw new Error("the hand-typed product line lost to the AMS's: " + c);
+console.log("a hand-typed product line wins:", c.replace(/<[^>]*>/g, ""));
+
+// a product line that does not name the material keeps the material too
+c = silk({type: "PETG", brand: "Silk+", color_name: "Blau", vendor: null});
+if (!/PETG Silk\+/.test(c))
+  throw new Error("a product line that does not say the material dropped it: " + c);
+// ...and one that does name it must not say it twice
+c = silk({type: "PLA", brand: "PLA Silk+", color_name: "Blau", vendor: null});
+if (/PLA.*PLA/.test(c.replace(/<[^>]*>/g, "")))
+  throw new Error("the material was printed twice: " + c);
+console.log("the material is added when missing and never doubled");
+
+// an unnamed third-party spool keeps its material, and never a guessed name
+c = chip({units: [{trays: [tray(0, {type: "PLA", is_bambu: false, code: "A00-W01",
+                                    color_name: null})]}], external: [], active_tray: 0});
+if (/A00-W01/.test(c))
+  throw new Error("a third-party spool's borrowed Bambu code was shown as its colour");
+console.log("a third-party spool shows its material, not a borrowed code");
+
+// nothing loaded, nothing reported, and an external holder is never "feeding"
+for (const [what, ams] of Object.entries({
+  "no pointer": {units: [{trays: [tray(0)]}], external: []},
+  "no AMS": {},
+  "an empty slot": {units: [{trays: [{id: 0}]}], external: [], active_tray: 0},
+  "an external holder": {units: [], external: [{id: 254, type: "PLA"}], active_tray: 254},
+})) {
+  const out = chip(ams);
+  if (out !== "—") throw new Error(`with ${what} the header claimed: ${out}`);
+}
+console.log("no spool feeding: the header says so instead of guessing");
 
 // --- and the live panel still renders through the same function ------------
 if (!/\$\("spools"\)\.innerHTML = all\.map\(tr=>\s*\n?\s*spoolCard\(/.test(src))
