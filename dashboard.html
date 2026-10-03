@@ -834,6 +834,7 @@
   .dupe:first-of-type{border-top:0}
   .dupe .arrow{color:var(--text-3)}
   .dupe .wbtn{margin-left:auto}
+  .dupe .wbtn + .wbtn{margin-left:0}
   .htab .shr{width:110px}
   .htab .shr .mt{display:block; height:7px; border-radius:4px; background:var(--surface-2); overflow:hidden}
   .htab .shr .mt>span{display:block; height:100%; background:var(--accent); border-radius:4px}
@@ -1057,6 +1058,134 @@
   .pwr-now > span:first-child{display:inline-block; min-width:2.2em}
   .pwr-unit{font-size:16px; color:var(--text-3); font-weight:600; margin-left:2px}
 
+  /* ---------- MakerWorld ---------- */
+  .mw-head{flex-wrap:wrap; align-items:center}
+  .mw-search{margin-left:auto; display:flex; gap:6px; min-width:0; flex:0 1 330px}
+  .mw-search .filt-in{width:auto; flex:1; min-width:0}
+  .mw-navs{display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin:-4px 0 14px;
+    scrollbar-width:thin}
+  .mw-navs button{flex:none; font:inherit; font-size:12px; font-weight:600; cursor:pointer;
+    padding:5px 12px; border-radius:999px; border:1px solid var(--border-strong);
+    background:var(--surface); color:var(--text-2); white-space:nowrap}
+  .mw-navs button:hover{color:var(--text); border-color:var(--accent)}
+  .mw-navs button.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .mw-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(172px,1fr)); gap:14px}
+  .mw-card{display:flex; flex-direction:column; text-align:left; font:inherit; color:inherit;
+    padding:0; cursor:pointer; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden; transition:border-color .15s, transform .15s}
+  .mw-card:hover{border-color:var(--accent); transform:translateY(-1px)}
+  .mw-card img, .mw-card .mw-noimg{width:100%; aspect-ratio:4/3; object-fit:cover; display:block;
+    background:var(--track)}
+  .mw-card .mw-cb{padding:9px 11px 11px; display:flex; flex-direction:column; gap:3px; min-width:0}
+  .mw-card .mw-ct{font-size:13px; font-weight:620; line-height:1.3; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+  .mw-card .mw-cc{font-size:11.5px; color:var(--text-3); overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap}
+  .mw-stats{display:flex; gap:10px; flex-wrap:wrap; font-size:11.5px; color:var(--text-2);
+    font-variant-numeric:tabular-nums}
+  .mw-navs button.mine{border-color:var(--accent); color:var(--accent)}
+  .mw-navs button.mine.on{color:var(--accent-ink)}
+  .mw-crumb{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:-4px 0 14px}
+  .mw-crumb b{font-size:15px}
+  .mw-crumb .meta{font-size:12.5px; color:var(--text-3)}
+  .mw-collage{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:2px;
+    aspect-ratio:4/3; background:var(--track)}
+  .mw-collage img{width:100%; height:100%; object-fit:cover; display:block; min-height:0}
+  .mw-collage img:only-child{grid-column:span 2; grid-row:span 2}
+  .mw-collage.n2 img{grid-row:span 2}
+  .mw-collage.n3 img:first-child{grid-row:span 2}
+  .mw-colcard{position:relative}
+  /* a channel: a round avatar rather than a model picture */
+  .mw-card.mw-creator{align-items:center; text-align:center; padding-top:16px}
+  .mw-card.mw-creator img, .mw-card.mw-creator .mw-noimg{width:84px; height:84px; aspect-ratio:1;
+    border-radius:50%; object-fit:cover}
+  .mw-card.mw-creator .mw-cb{align-items:center}
+  .mw-feedcard{align-items:center; justify-content:center; text-align:center; min-height:150px;
+    border-color:var(--accent); background:var(--accent-soft)}
+  .mw-feedcard .mw-cb{align-items:center}
+  .mw-feedcard .mw-cc{white-space:normal}
+  .mw-feedicon{font-size:30px; color:var(--accent); line-height:1; margin-top:14px}
+  .mw-unpin{position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%;
+    border:0; cursor:pointer; background:rgba(0,0,0,.55); color:#fff; font-size:12px; line-height:1}
+  .mw-linkform{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:16px;
+    padding-top:14px; border-top:1px solid var(--border)}
+  .mw-linkform .filt-in{flex:1 1 260px; width:auto}
+  .mw-linkform .mw-note{flex-basis:100%; margin-top:2px}
+  .mw-empty{color:var(--text-3); font-size:13px; padding:14px 0}
+  .mw-grid > .mw-empty{grid-column:1/-1}
+  .mw-empty .wbtn{margin-left:8px}
+  /* one model */
+  .mw-back{margin-bottom:14px}
+  .mw-top{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:22px}
+  .mw-main{width:100%; aspect-ratio:4/3; object-fit:contain; border-radius:14px; cursor:zoom-in;
+    background:var(--surface-2); display:block}
+  .mw-thumbs{display:flex; gap:6px; overflow-x:auto; margin-top:8px; padding-bottom:3px}
+  .mw-thumbs button{flex:none; padding:0; border:2px solid transparent; border-radius:9px;
+    overflow:hidden; cursor:pointer; background:none}
+  .mw-thumbs button.on{border-color:var(--accent)}
+  .mw-thumbs img{width:58px; height:44px; object-fit:cover; display:block}
+  .mw-title{font-size:21px; font-weight:650; letter-spacing:-.02em; margin:0 0 4px; line-height:1.25}
+  .mw-by{font-size:13px; color:var(--text-2); margin-bottom:12px}
+  .mw-info .mw-stats{font-size:12.5px; gap:14px; margin-bottom:12px}
+  .mw-tags{display:flex; gap:5px; flex-wrap:wrap; margin:10px 0}
+  .mw-tags span{font-size:11px; padding:2px 8px; border-radius:999px; background:var(--surface-2);
+    color:var(--text-2); border:1px solid var(--border)}
+  .mw-acts{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px}
+  .mw-sum{font-size:13px; line-height:1.55; color:var(--text-2); white-space:pre-line;
+    max-height:9.5em; overflow:hidden; position:relative; margin-top:12px}
+  .mw-sum.open{max-height:none}
+  .mw-sum:not(.open)::after{content:""; position:absolute; left:0; right:0; bottom:0; height:3em;
+    background:linear-gradient(transparent, var(--surface))}
+  .mw-more-txt{font:inherit; font-size:12px; font-weight:600; color:var(--accent); background:none;
+    border:0; padding:4px 0; cursor:pointer}
+  .mw-profs{display:flex; flex-direction:column; gap:10px; margin-top:6px}
+  .mw-prof{display:grid; grid-template-columns:96px minmax(0,1fr); gap:14px; padding:12px;
+    border:1px solid var(--border); border-radius:14px; background:var(--surface-2)}
+  .mw-prof.fit{border-color:var(--good)}
+  .mw-prof > img, .mw-prof > .mw-noimg{width:96px; height:96px; object-fit:cover; border-radius:10px;
+    background:var(--track)}
+  .mw-ph{display:flex; gap:8px; align-items:baseline; flex-wrap:wrap}
+  .mw-pt{font-size:13.5px; font-weight:620; line-height:1.3}
+  .mw-pm{font-size:12px; color:var(--text-2); margin:3px 0 8px; display:flex; gap:12px; flex-wrap:wrap;
+    font-variant-numeric:tabular-nums}
+  .mw-fils{display:flex; flex-direction:column; gap:4px}
+  .mw-fil{display:flex; align-items:center; gap:8px; font-size:12.5px; flex-wrap:wrap}
+  .mw-fil .sw{flex:none; width:14px; height:14px; border-radius:4px; background:var(--sw);
+    box-shadow:inset 0 0 0 1px var(--border-strong)}
+  .mw-fil .fg{color:var(--text-3); font-variant-numeric:tabular-nums; min-width:3.2em}
+  .mw-m{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600;
+    padding:2px 8px; border-radius:999px}
+  .mw-m .sw{width:10px; height:10px; border-radius:3px}
+  .mw-m.same{color:var(--good); background:var(--good-soft)}
+  .mw-m.close{color:var(--info); background:var(--accent-soft)}
+  .mw-m.shelf{color:var(--text-2); background:var(--track)}
+  .mw-m.none{color:var(--danger); background:var(--danger-soft)}
+  .mw-m.short{color:var(--warn); background:var(--warn-soft)}
+  .tag-fit{color:var(--good); background:var(--good-soft)}
+  .tag-info{color:var(--info); background:var(--accent-soft)}
+  .mw-sub{font-size:12px; font-weight:650; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-3); margin:22px 0 10px}
+  .mw-note{font-size:12px; color:var(--text-3); margin-top:10px}
+  /* print history */
+  .htab .nm .mw-thumb{flex:none; width:30px; height:30px; border-radius:7px; object-fit:cover;
+    cursor:pointer; background:var(--track); display:block}
+  .det .mw-brief{display:flex; gap:11px; align-items:center; margin-bottom:9px}
+  .det .mw-brief img{width:64px; height:64px; border-radius:10px; object-fit:cover; cursor:pointer;
+    background:var(--track)}
+  .det .mw-brief b{display:block; font-size:13px; line-height:1.3}
+  .det .mw-brief span{font-size:12px; color:var(--text-3)}
+  /* lightbox */
+  .mw-lb{background:rgba(0,0,0,.82); z-index:80}
+  .mw-lb img{max-width:94vw; max-height:88vh; border-radius:12px; object-fit:contain}
+  .mw-lb-x{position:fixed; top:14px; right:14px}
+  @media (max-width: 760px){
+    .mw-top{grid-template-columns:1fr}
+    .mw-search{flex-basis:100%; margin-left:0}
+    .mw-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px}
+    .mw-prof{grid-template-columns:64px minmax(0,1fr); gap:10px}
+    .mw-prof > img, .mw-prof > .mw-noimg{width:64px; height:64px}
+  }
+
   .stack{display:flex; flex-direction:column; gap:16px}
   /* last-update timestamp, folded into the connection pill in the header */
   .upd{color:var(--text-3); font-weight:500; font-variant-numeric:tabular-nums}
@@ -1079,6 +1208,7 @@
       <button data-sec="prints"   data-i18n="Prints">Prints</button>
       <button data-sec="filament" data-i18n="Filament">Filament</button>
       <button data-sec="workshop" data-i18n="Workshop">Workshop</button>
+      <button data-sec="makerworld" data-i18n="MakerWorld">MakerWorld</button>
       <!-- revealed once /api/camera reports one is configured -->
       <button data-sec="live" id="liveSec" data-i18n="Live" style="display:none">Live</button>
     </nav>
@@ -1323,6 +1453,9 @@
              switching tabs to see how far along the print is -->
         <div class="head-stats">
           <span class="hs"><span class="hs-label" data-i18n="Layer">Layer</span><span class="hs-val" id="liveLayers">—</span></span>
+          <!-- counted from the sliced file, which is read once early in the
+               print; the printer itself never reports it -->
+          <span class="hs"><span class="hs-label" data-i18n="Filament changes">Filament changes</span><span class="hs-val" id="liveChanges">—</span></span>
           <!-- which spool is actually feeding. On the camera especially: the
                colour growing on screen and the colour in the machine should be
                the same one, and this is where you notice when they are not. -->
@@ -1581,6 +1714,41 @@
     </section>
   </div>
 
+  <!-- ============ MAKERWORLD ============
+       makerworld.com refuses to be framed, so this is built from the API behind
+       it. What it adds over the website: every profile says which of your
+       spools it would use. The list and the model page share the view - the
+       list is only hidden, so going back keeps the scroll position and the
+       results already loaded. -->
+  <div class="dash view" id="v-makerworld-browse">
+    <section class="card span-12" id="mwListCard">
+      <div class="card-head mw-head">
+        <h3 data-i18n="MakerWorld">MakerWorld</h3><span class="meta" id="mwMeta"></span>
+        <form id="mwSearch" class="mw-search">
+          <input id="mwQ" class="filt-in" type="search" enterkeyhint="search"
+                 data-i18n-ph="Search models…">
+          <button class="wbtn" type="submit" data-i18n="Search">Search</button>
+        </form>
+      </div>
+      <div class="mw-navs" id="mwNavs"></div>
+      <!-- where you are inside "My collections": the collection's name and the
+           way back to the list of them -->
+      <div class="mw-crumb" id="mwCrumb" hidden></div>
+      <div class="mw-grid" id="mwGrid"></div>
+      <div class="hist-more" id="mwMoreBar">
+        <button class="wbtn" id="mwMore" data-i18n="Load more">Load more</button>
+        <span class="meta" id="mwMoreMeta"></span>
+      </div>
+    </section>
+    <section class="card span-12" id="mwDetail" hidden></section>
+  </div>
+
+</div>
+
+<!-- a model's pictures, full size -->
+<div class="modal mw-lb" id="mwLightbox" hidden>
+  <button class="icon-btn mw-lb-x" id="mwLbClose" type="button" aria-label="Close">✕</button>
+  <img id="mwLbImg" alt="">
 </div>
 
 <!-- transient confirmation, bottom centre; aria-live so it is announced too -->
@@ -1666,6 +1834,9 @@ const DE = {
   "Could not read it.":"Konnte nicht gelesen werden.",
   "Plate":"Platte", "Profile":"Profil", "Nozzle":"Düse", "First layer":"Erste Schicht",
   "Infill":"Füllung", "Walls":"Wände", "Supports":"Stützen", "none":"keine",
+  "Filament changes":"Filamentwechsel", "still to come":"noch ausstehend",
+  "not known yet - read from the sliced file early in the print":
+    "noch nicht bekannt – wird zu Beginn des Drucks aus der gesliceten Datei gelesen",
   "Slicer weight":"Slicer-Gewicht", "Estimated":"Geschätzt",
   "typed in by hand":"von Hand eingetragen",
   "from the sliced file":"aus der geslicten Datei",
@@ -1809,6 +1980,10 @@ const DE = {
     "Gleiche Farbe und gleiches Material, aber nur einer ist benannt – meist eine Spule, die unter zwei Slicer-Profilen gedruckt wurde.",
   "Merge":"Zusammenführen", "Merged":"Zusammengeführt",
   "Could not merge.":"Zusammenführen fehlgeschlagen.",
+  "Dismiss":"Verwerfen", "Suggestion dismissed":"Vorschlag verworfen",
+  "Could not dismiss.":"Verwerfen fehlgeschlagen.",
+  "not the same filament — stop suggesting this":
+    "nicht dasselbe Filament – nicht mehr vorschlagen",
   "Unmerged":"Zusammenführung aufgehoben", "undo":"rückgängig",
   "Merge into which filament?":"Mit welchem Filament zusammenführen?",
   "same filament as another row? merge them":
@@ -1889,6 +2064,61 @@ const DE = {
   "Power draw":"Stromverbrauch", "now":"jetzt", "today":"heute",
   "this month":"dieser Monat", "this print":"dieser Druck",
   "plug error":"Steckdosen-Fehler", "View on MakerWorld":"Auf MakerWorld ansehen",
+  // MakerWorld tab
+  "Discover":"Entdecken", "Search models…":"Modelle suchen…", "Search":"Suchen",
+  "Load more":"Mehr laden", "Trending":"Im Trend", "models":"Modelle", "likes":"Likes",
+  "printed":"gedruckt", "Nothing found.":"Nichts gefunden.",
+  "Nothing here right now.":"Hier ist gerade nichts.",
+  "MakerWorld did not answer.":"MakerWorld antwortet nicht.", "Try again":"Nochmal versuchen",
+  "Back":"Zurück", "Open on MakerWorld":"Auf MakerWorld öffnen",
+  "This model is no longer on MakerWorld.":"Dieses Modell gibt es auf MakerWorld nicht mehr.",
+  "might not be enough left":"reicht möglicherweise nicht", "only":"nur",
+  "same material, similar colour":"gleiches Material, ähnliche Farbe",
+  "same colour":"gleiche Farbe", "similar colour":"ähnliche Farbe",
+  "on the shelf":"im Lager", "not in stock":"nicht vorrätig", "for":"für",
+  "not on the shelf":"nicht im Lager",
+  "The printer is not connected, so the AMS is not compared - only the shelf.":
+    "Der Drucker ist nicht verbunden, daher wird nur mit dem Lager verglichen, nicht mit dem AMS.",
+  "adapted for":"angepasst für", "compatible with":"kompatibel mit",
+  "the figures are the author's, for their printer":
+    "Zeit und Gewicht stammen vom Autor, für dessen Drucker",
+  "sliced by the author for another printer, re-sliced by Bambu for yours":
+    "vom Autor für einen anderen Drucker erstellt, von Bambu für deinen neu gesliced",
+  "colours":"Farben", "plates":"Platten", "all in the AMS":"alles im AMS",
+  "no filament list for this profile":"keine Filamentliste für dieses Profil",
+  "Open this profile on MakerWorld":"Dieses Profil auf MakerWorld öffnen",
+  "by":"von", "licence":"Lizenz", "printed here":"hier gedruckt",
+  "Show more":"Mehr anzeigen", "Show less":"Weniger anzeigen",
+  "Print profiles":"Druckprofile", "This model has no print profiles.":"Dieses Modell hat keine Druckprofile.",
+  "Show all profiles":"Alle Profile anzeigen",
+  "Colours are compared with what the AMS reports right now and with the spools on the Filament page. Printing still happens from Bambu Studio or Bambu Handy.":
+    "Farben werden mit dem aktuellen AMS-Inhalt und den Spulen auf der Filament-Seite verglichen. Gedruckt wird weiterhin über Bambu Studio oder Bambu Handy.",
+  "show this model in the app":"dieses Modell in der App ansehen",
+  "My collections":"Meine Sammlungen", "collections":"Sammlungen", "model":"Modell",
+  "No collections yet.":"Noch keine Sammlungen.", "Open":"Öffnen",
+  "remove from this list":"aus dieser Liste entfernen",
+  "Paste a collection link…":"Link einer Sammlung einfügen…",
+  "Any collection opens from its link, e.g. makerworld.com/en/collections/35678497 - also someone else's public one. Opened ones are kept in this list, in this browser.":
+    "Jede Sammlung lässt sich über ihren Link öffnen, z. B. makerworld.com/en/collections/35678497, auch öffentliche Sammlungen anderer. Geöffnete Sammlungen bleiben in dieser Liste, in diesem Browser.",
+  "The app has no Bambu Cloud login, or it has expired. Log in under Settings → Cloud, then your collections and channels show up here.":
+    "In der App ist kein Bambu-Cloud-Login hinterlegt, oder er ist abgelaufen. Melde dich unter Einstellungen → Cloud an, dann erscheinen deine Sammlungen und Kanäle hier.",
+  "Channels I follow":"Gefolgte Kanäle", "channels":"Kanäle", "followers":"Follower",
+  "New from your channels":"Neu von deinen Kanälen",
+  "the latest models of everyone you follow":"die neuesten Modelle aller Kanäle, denen du folgst",
+  "You do not follow any channels yet.":"Du folgst noch keinen Kanälen.",
+  "The channels you follow could not be read from MakerWorld.":
+    "Die gefolgten Kanäle konnten nicht von MakerWorld gelesen werden.",
+  "This channel has no models yet.":"Dieser Kanal hat noch keine Modelle.",
+  "This channel does not exist (any more).":"Diesen Kanal gibt es nicht (mehr).",
+  "Nothing new from the channels you follow.":"Nichts Neues von deinen Kanälen.",
+  "Your collections could not be read from MakerWorld.":"Deine Sammlungen konnten nicht von MakerWorld gelesen werden.",
+  "This collection is private, and the login in the app is not its owner's.":
+    "Diese Sammlung ist privat, und der Login in der App gehört nicht ihrem Besitzer.",
+  "This collection is private.":"Diese Sammlung ist privat.",
+  "This collection does not exist (any more).":"Diese Sammlung gibt es nicht (mehr).",
+  "This collection is empty.":"Diese Sammlung ist leer.",
+  "That is not a collection link.":"Das ist kein Link zu einer Sammlung.",
+  "Show in the app":"In der App ansehen",
   // statistics + maintenance
   "Statistics":"Statistik", "all recorded prints":"alle erfassten Drucke",
   "Prints per month":"Drucke pro Monat", "Top models":"Top-Modelle",
@@ -2153,6 +2383,12 @@ function setLang(l){
   applyStatic();
   if(lastState) render(lastState);   // everything built in JS
   loadPrints();
+  if(mw.navs) mwRenderNavs();
+  if(mw.detail) mwRenderDetail();
+  else if(mwPersonal() && !mw.sub){
+    if(mw.nav === MW_MINE){ if(mw.cols) mwRenderCols(); } else if(mw.fol) mwRenderFollow();
+  }
+  else if(mw.hits.length) mwRenderGrid();
 }
 
 /* Which dashboard.html is actually being served - hover the serial line, or read
@@ -2594,6 +2830,12 @@ function render(s){
   $("eta").textContent = etaTxt;
   $("endTime").textContent = endTxt;
   $("liveLayers").textContent = layerTxt;
+  // done / total, like the layer; the title says how many are still to come
+  const fc = j.fil_changes;
+  $("liveChanges").textContent = !fc ? "—"
+    : fc.total === 0 ? t("none") : `${fc.done} / ${fc.total}`;
+  $("liveChanges").title = !fc ? t("not known yet - read from the sliced file early in the print")
+    : fc.total ? `${Math.max(0, fc.total - fc.done)} ${t("still to come")}` : "";
   $("liveEta").textContent = etaTxt;
   $("liveEnd").textContent = endTxt;
   const feeding = activeTray(s);
@@ -3261,6 +3503,9 @@ async function deletePrint(job, name, row){
   loadPrints();
 }
 $("histTable").addEventListener("click", async e=>{
+  // the model's picture and its button open it on the MakerWorld tab
+  const mwEl = e.target.closest("[data-mw]");
+  if(mwEl){ mwOpen(+mwEl.dataset.mw); return; }
   const hex = e.target.closest("button.hexchip");
   if(hex){
     e.stopPropagation();          // the chip sits inside a row that toggles
@@ -3517,6 +3762,7 @@ function renderPrints(allRows, cur){
       return printRow(it.row, cur);
     }).join("");
   syncHistSel();
+  mwFillBriefs();    // pictures for the MakerWorld prints, filled in when they arrive
 }
 // One model is often several prints. Grouped rows fold under a named header that
 // sits at the position of its NEWEST member, so the history still reads
@@ -3574,6 +3820,7 @@ function printRow(r, cur){
         ? "https://makerworld.com/models/" + encodeURIComponent(r.design_id)
           + (r.profile_id ? "#profileId-" + encodeURIComponent(r.profile_id) : "")
         : null;
+      const mwB = r.design_id ? mwBriefs[String(r.design_id)] : null;
       const d0 = r.started_at ? new Date(r.started_at*1000) : null;
       const when = d0 ? d0.toLocaleString([], {year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—";
       const running = !r.ended_at;
@@ -3589,7 +3836,9 @@ function printRow(r, cur){
         </div></td>
         <td style="color:var(--text-2);white-space:nowrap">${when}</td>
         <td class="nm" data-job="${r.job_id}" data-label="${esc(r.label)}" data-name="${esc(auto)}"
-            title="${t("click to rename")}${r.name?" · "+t("slicer profile")+": "+esc(r.name):""}"><div class="nm-wrap"><span class="nm-txt">${
+            title="${t("click to rename")}${r.name?" · "+t("slicer profile")+": "+esc(r.name):""}"><div class="nm-wrap">${
+              mwB && mwB.cover ? `<img class="mw-thumb" src="${esc(mwB.cover)}" alt="" loading="lazy"
+                data-mw="${esc(r.design_id)}" title="${t("show this model in the app")}">` : ""}<span class="nm-txt">${
               esc(r.label || auto) || "—"}${
               r.label && auto ? `<span class="orig">${esc(auto)}</span>` : ""}</span>${
               mwUrl ? `<a class="mw-h" href="${mwUrl}" target="_blank" rel="noopener noreferrer" title="MakerWorld">↗</a>` : ""}</div></td>
@@ -3747,9 +3996,8 @@ function detailRow(r, cur){
         ${line("Group", r.pgroup ? esc(r.pgroup) : "—")}
         ${line("Slicer profile", r.name ? esc(r.name) : "—")}
       </div>
-      ${mwUrl ? `<a class="mw-link" style="margin-top:9px" href="${mwUrl}" target="_blank"
-                   rel="noopener noreferrer">${t("View on MakerWorld")} ↗</a>` : ""}
     </div>
+    ${mwUrl ? mwBriefBlock(r, mwUrl) : ""}
   </div></td></tr>`;
 }
 
@@ -4481,6 +4729,8 @@ function renderDupes(list){
       <span><b>${esc(s.name)}</b> · ${s.into_grams} g</span>
       <button class="wbtn" data-from="${esc(s.from)}" data-into="${esc(s.into)}"
         >${t("Merge")}</button>
+      <button class="wbtn" data-act="dismiss" data-from="${esc(s.from)}" data-into="${esc(s.into)}"
+        title="${t("not the same filament — stop suggesting this")}">${t("Dismiss")}</button>
     </div>`).join("")}
   </div>`;
 }
@@ -4558,6 +4808,17 @@ $("filDupes").addEventListener("click", async e=>{
   const b = e.target.closest("button.wbtn");
   if(!b) return;
   let d = null;
+  if(b.dataset.act === "dismiss"){
+    try{
+      d = await (await fetch("/api/filaments/not-dupe", {method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({from: b.dataset.from, into: b.dataset.into})})).json();
+    }catch(_){}
+    if(!d || !d.ok) toast(t("Could not dismiss.") + (d && d.error ? " ("+d.error+")" : ""), true);
+    else toast(t("Suggestion dismissed"));
+    loadFilaments();
+    return;
+  }
   try{
     d = await (await fetch("/api/filaments/merge", {method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -5848,6 +6109,540 @@ $("setSave").addEventListener("click", async ()=>{
   await loadSettings();
 });
 
+/* ---------- MakerWorld ----------
+   Browse and search, and a model's page: both come from /api/mw/*, which reads
+   the API behind makerworld.com (the site itself will not be framed). A model's
+   page is where this earns its place - each print profile lists its filaments
+   against what is in the AMS and on the shelf. Everything MakerWorld sends is
+   treated as text: titles, tags and the description all go through esc(), the
+   description arrives already stripped of its HTML. */
+const mw = {navs:null, nav:"Trending", q:"", hits:[], total:0, tok:0, more:false,
+            detail:null, pushed:false, allProfiles:false,
+            // "My collections" and "Channels I follow": two pseudo-categories,
+            // their lists, and `sub` - what is open inside one of them: a
+            // collection, a channel, or the feed of new models from all channels
+            loggedIn:false, sub:null, cols:null, colsErr:null, fol:null, folErr:null};
+const MW_MINE = "__mine", MW_FOLLOW = "__follow";
+const MW_NO_LOGIN = "The app has no Bambu Cloud login, or it has expired. Log in under Settings → Cloud, then your collections and channels show up here.";
+// Collections opened by pasting their link. The account's own list comes from
+// an undocumented call; should that ever fail, these still work, because a
+// collection read by its number needs nothing but the number.
+const mwLinked = {
+  get(){ try{ return JSON.parse(localStorage.getItem("mw-linked") || "[]"); }catch(_){ return []; } },
+  put(list){ try{ localStorage.setItem("mw-linked", JSON.stringify(list.slice(0, 30))); }catch(_){} },
+};
+// a pasted or reloaded link to one model; the router rewrites the hash to the
+// view before the MakerWorld code sees it, so it is read here, at load
+let mwBoot = (location.hash.match(/^#makerworld\/browse\/(\d+)$/) || [])[1] || null;
+const mwModelUrl = (id, pid) => "https://makerworld.com/models/" + encodeURIComponent(id)
+  + (pid ? "#profileId-" + encodeURIComponent(pid) : "");
+const fmtK = n => { n = +n || 0;
+  return n >= 1e6 ? (n/1e6).toFixed(1).replace(/\.0$/, "") + "M"
+       : n >= 1e3 ? (n/1e3).toFixed(1).replace(/\.0$/, "") + "k" : String(n); };
+async function mwJson(url){
+  const r = await fetch(url);
+  const d = await r.json().catch(()=> null);
+  if(!d || !d.ok) throw new Error((d && d.error) || ("HTTP " + r.status));
+  return d;
+}
+
+function mwShow(){
+  if(!mw.navs) mwLoadNavs();
+  if(mwBoot){ const id = mwBoot; mwBoot = null; mwOpen(+id, true); }
+  else if(!/\/\d+$/.test(location.hash) && !$("mwDetail").hidden) mwClose(true);
+  if(!mw.hits.length && !mw.tok) mwLoad(false);
+}
+async function mwLoadNavs(){
+  mw.navs = [{key:"Trending", name:"Trending"}];
+  mwRenderNavs();
+  try{
+    const d = await mwJson("/api/mw/navs");
+    mw.navs = d.navs; mw.loggedIn = !!d.logged_in;
+  }catch(_){}
+  mwRenderNavs();
+}
+function mwRenderNavs(){
+  const on = k => !mw.q && k === mw.nav;
+  $("mwNavs").innerHTML =
+    `<button type="button" class="mine${on(MW_MINE) ? " on" : ""}" data-nav="${MW_MINE}">★ ${
+      t("My collections")}</button>` +
+    `<button type="button" class="mine${on(MW_FOLLOW) ? " on" : ""}" data-nav="${MW_FOLLOW}">♥ ${
+      t("Channels I follow")}</button>` +
+    (mw.navs || []).map(n=>
+    `<button type="button" data-nav="${esc(n.key)}"${on(n.key) ? ' class="on"' : ""}>${
+      esc(n.key === "Trending" ? t("Trending") : n.name)}</button>`).join("");
+}
+const mwPersonal = () => !mw.q && (mw.nav === MW_MINE || mw.nav === MW_FOLLOW);
+function mwSubUrl(offset){
+  const s = mw.sub;
+  return s.kind === "col" ? `/api/mw/collection/${s.id}?offset=${offset}`
+       : s.kind === "creator" ? `/api/mw/creator/${s.id}?offset=${offset}`
+       : `/api/mw/browse?nav=Following&offset=${offset}`;
+}
+async function mwLoad(more){
+  if(more && mw.more) return;
+  if(mwPersonal() && !mw.sub) return mw.nav === MW_MINE ? mwLoadCols() : mwLoadFollow();
+  const tok = ++mw.tok;             // a newer search makes this one's answer moot
+  mw.more = more;
+  if(!more){
+    mw.hits = []; mw.total = 0;
+    $("mwGrid").innerHTML = `<div class="mw-empty">${t("Loading…")}</div>`;
+    $("mwMoreBar").classList.remove("on");
+    mwRenderCrumb();
+  }
+  $("mwMore").disabled = true;
+  const qs = new URLSearchParams({offset: more ? mw.hits.length : 0});
+  if(mw.q) qs.set("q", mw.q); else qs.set("nav", mw.nav);
+  const url = mw.sub && mwPersonal()
+    ? mwSubUrl(more ? mw.hits.length : 0)
+    : "/api/mw/browse?" + qs;
+  try{
+    const d = await mwJson(url);
+    if(tok !== mw.tok) return;
+    if(mw.sub) mw.sub = {...mw.sub, title: d.title || d.name || mw.sub.title,
+                         total: d.total, url: d.url || mw.sub.url, fans: d.fans ?? mw.sub.fans};
+    mw.total = d.total;
+    const seen = new Set(mw.hits.map(h=> h.id));
+    mw.hits = mw.hits.concat(d.hits.filter(h=> !seen.has(h.id)));
+    mwRenderGrid();
+  }catch(e){
+    if(tok !== mw.tok) return;
+    if(more) toast(t("MakerWorld did not answer.") + " (" + e.message + ")", true);
+    else if(mw.sub && e.message === "private")
+      $("mwGrid").innerHTML = `<div class="mw-empty">${
+        t("This collection is private, and the login in the app is not its owner's.")}</div>`;
+    else if(mw.sub && e.message === "login")
+      $("mwGrid").innerHTML = `<div class="mw-empty">${t(MW_NO_LOGIN)}</div>`;
+    else $("mwGrid").innerHTML = `<div class="mw-empty">${t(e.message !== "not found"
+        ? "MakerWorld did not answer." : mw.sub && mw.sub.kind === "creator"
+        ? "This channel does not exist (any more)." : "This collection does not exist (any more).")}
+      <span style="opacity:.7">(${esc(e.message)})</span>
+      <button class="wbtn" type="button" data-retry="1">${t("Try again")}</button></div>`;
+  }finally{
+    if(tok === mw.tok){ mw.more = false; $("mwMore").disabled = false; }
+  }
+}
+/* My collections */
+async function mwLoadCols(fresh){
+  const tok = ++mw.tok;
+  mw.hits = []; mw.total = 0;
+  $("mwMoreBar").classList.remove("on");
+  mwRenderCrumb();
+  if(!mw.cols || fresh) $("mwGrid").innerHTML = `<div class="mw-empty">${t("Loading…")}</div>`;
+  else mwRenderCols();
+  try{
+    const d = await mwJson("/api/mw/collections" + (fresh ? "?fresh=1" : ""));
+    if(tok !== mw.tok) return;
+    mw.cols = d.collections; mw.colsErr = null;
+  }catch(e){
+    if(tok !== mw.tok) return;
+    mw.cols = mw.cols || []; mw.colsErr = e.message;
+  }
+  mwRenderCols();
+}
+function mwColCard(c, unpin){
+  const n = (c.covers || []).length;
+  return `<button class="mw-card mw-colcard" type="button" data-col="${esc(c.id)}"
+      data-title="${esc(c.title)}">
+    ${unpin ? `<span class="mw-unpin" role="button" data-unpin="${esc(c.id)}"
+        title="${t("remove from this list")}">✕</span>` : ""}
+    ${n ? `<span class="mw-collage n${n}">${c.covers.map(u=>
+        `<img src="${esc(u)}" alt="" loading="lazy">`).join("")}</span>`
+        : `<span class="mw-noimg"></span>`}
+    <span class="mw-cb">
+      <span class="mw-ct">${c.private ? "🔒 " : ""}${esc(c.title) || "—"}</span>
+      <span class="mw-cc">${c.count != null ? c.count + " " + t(c.count === 1 ? "model" : "models") : ""}${
+        c.creator ? " · " + esc(c.creator) : ""}</span>
+    </span></button>`;
+}
+function mwRenderCols(){
+  const mine = mw.cols || [];
+  const ids = new Set(mine.map(c=> String(c.id)));
+  const linked = mwLinked.get().filter(c=> !ids.has(String(c.id)));
+  $("mwMeta").textContent = mine.length ? `${mine.length} ${t("collections")}` : "";
+  const why = !mw.colsErr ? ""
+    : mw.colsErr === "login" ? t(MW_NO_LOGIN)
+      : t("Your collections could not be read from MakerWorld.") + ` (${esc(mw.colsErr)})`;
+  $("mwGrid").innerHTML =
+    (mine.length + linked.length
+      ? mine.map(c=> mwColCard(c, false)).join("") + linked.map(c=> mwColCard(c, true)).join("")
+      : `<div class="mw-empty">${why || t("No collections yet.")}</div>`)
+    + (why && mine.length + linked.length ? `<div class="mw-empty" style="grid-column:1/-1">${why}</div>` : "")
+    + `<form class="mw-linkform" id="mwLinkForm" style="grid-column:1/-1">
+        <input class="filt-in" name="link" data-i18n-ph="Paste a collection link…"
+          placeholder="${t("Paste a collection link…")}">
+        <button class="wbtn" type="submit">${t("Open")}</button>
+        ${mw.loggedIn && !mw.colsErr ? `<button class="wbtn" type="button" data-refresh="1">${
+          t("Refresh")}</button>` : ""}
+        <div class="mw-note">${t("Any collection opens from its link, e.g. makerworld.com/en/collections/35678497 - also someone else's public one. Opened ones are kept in this list, in this browser.")}</div>
+      </form>`;
+}
+/* Channels I follow: the feed of what is new from all of them, then each one */
+async function mwLoadFollow(fresh){
+  const tok = ++mw.tok;
+  mw.hits = []; mw.total = 0;
+  $("mwMoreBar").classList.remove("on");
+  mwRenderCrumb();
+  if(!mw.fol || fresh) $("mwGrid").innerHTML = `<div class="mw-empty">${t("Loading…")}</div>`;
+  else mwRenderFollow();
+  try{
+    const d = await mwJson("/api/mw/following");
+    if(tok !== mw.tok) return;
+    mw.fol = d.creators; mw.folErr = null;
+  }catch(e){
+    if(tok !== mw.tok) return;
+    mw.fol = mw.fol || []; mw.folErr = e.message;
+  }
+  mwRenderFollow();
+}
+function mwRenderFollow(){
+  const list = mw.fol || [];
+  $("mwMeta").textContent = list.length ? `${list.length} ${t("channels")}` : "";
+  if(mw.folErr){
+    $("mwGrid").innerHTML = `<div class="mw-empty">${mw.folErr === "login" ? t(MW_NO_LOGIN)
+      : t("The channels you follow could not be read from MakerWorld.") + ` (${esc(mw.folErr)})`}</div>`;
+    return;
+  }
+  $("mwGrid").innerHTML = `<button class="mw-card mw-feedcard" type="button" data-feed="1">
+      <span class="mw-feedicon">✦</span>
+      <span class="mw-cb"><span class="mw-ct">${t("New from your channels")}</span>
+        <span class="mw-cc">${t("the latest models of everyone you follow")}</span></span></button>`
+    + (list.length ? list.map(c=>
+    `<button class="mw-card mw-creator" type="button" data-creator="${esc(c.uid)}"
+        data-title="${esc(c.name)}">
+      ${c.avatar ? `<img src="${esc(c.avatar)}" alt="" loading="lazy">` : `<span class="mw-noimg"></span>`}
+      <span class="mw-cb"><span class="mw-ct">${esc(c.name)}</span>
+        <span class="mw-cc">${fmtK(c.fans)} ${t("followers")}</span></span></button>`).join("")
+      : `<div class="mw-empty">${t("You do not follow any channels yet.")}</div>`);
+}
+
+function mwOpenSub(kind, id, title){
+  mw.sub = {kind, id: +id, title: title || ""};
+  mwLoad(false);
+}
+function mwRenderCrumb(){
+  const box = $("mwCrumb"), s = mw.sub;
+  const open = s && mwPersonal();
+  box.hidden = !open;
+  if(!open){ box.innerHTML = ""; return; }
+  const n = s.total != null
+    ? `${s.total} ${t(s.total === 1 ? "model" : "models")}` : "";
+  const link = s.kind === "col" ? `https://makerworld.com/collections/${s.id}`
+             : s.kind === "creator" ? s.url : null;
+  box.innerHTML = `<button class="wbtn" type="button" data-up="1">← ${
+      t(mw.nav === MW_MINE ? "My collections" : "Channels I follow")}</button>
+    <b>${esc(s.title) || "…"}</b>
+    <span class="meta">${[n, s.kind === "creator" && s.fans != null
+      ? `${fmtK(s.fans)} ${t("followers")}` : ""].filter(Boolean).join(" · ")}</span>
+    ${link ? `<a class="mw-link" href="${esc(link)}" target="_blank"
+       rel="noopener noreferrer">${t("Open on MakerWorld")} ↗</a>` : ""}`;
+}
+$("mwCrumb").addEventListener("click", e=>{
+  if(e.target.closest("[data-up]")){ mw.sub = null; mwLoad(false); }
+});
+
+function mwRenderGrid(){
+  if(mw.sub) mwRenderCrumb();
+  const hits = mw.hits.filter(h=> !h.nsfw);
+  // inside a collection or channel the line above the grid already counts them
+  $("mwMeta").textContent = mw.total && !mw.sub ? `${fmtK(mw.total)} ${t("models")}` : "";
+  $("mwGrid").innerHTML = hits.length ? hits.map(h=>
+    `<button class="mw-card" type="button" data-mw="${h.id}">
+      ${h.cover ? `<img src="${esc(h.cover)}" alt="" loading="lazy">` : `<span class="mw-noimg"></span>`}
+      <span class="mw-cb">
+        <span class="mw-ct">${esc(h.title)}</span>
+        <span class="mw-cc">${esc(h.creator)}</span>
+        <span class="mw-stats"><span title="${t("likes")}">♥ ${fmtK(h.likes)}</span>
+          <span title="${t("printed")}">⎙ ${fmtK(h.prints)}</span></span>
+      </span></button>`).join("")
+    : `<div class="mw-empty">${t(mw.q ? "Nothing found."
+        : !mw.sub ? "Nothing here right now."
+        : mw.sub.kind === "col" ? "This collection is empty."
+        : mw.sub.kind === "creator" ? "This channel has no models yet."
+        : "Nothing new from the channels you follow.")}</div>`;
+  const left = mw.total - mw.hits.length;
+  $("mwMoreBar").classList.toggle("on", left > 0 && mw.hits.length > 0);
+  $("mwMoreMeta").textContent = left > 0 ? `${mw.hits.length} ${t("of")} ${fmtK(mw.total)}` : "";
+}
+$("mwNavs").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-nav]");
+  if(!b) return;
+  mw.nav = b.dataset.nav; mw.q = ""; $("mwQ").value = ""; mw.sub = null;
+  mwRenderNavs(); mwLoad(false);
+});
+$("mwSearch").addEventListener("submit", e=>{
+  e.preventDefault();
+  mw.q = $("mwQ").value.trim(); mw.sub = null;
+  mwRenderNavs(); mwLoad(false);
+  $("mwQ").blur();                  // closes the keyboard on a phone
+});
+$("mwMore").addEventListener("click", ()=> mwLoad(true));
+$("mwGrid").addEventListener("click", e=>{
+  if(e.target.closest("[data-retry]")){ mwLoad(false); return; }
+  if(e.target.closest("[data-refresh]")){ mwLoadCols(true); return; }
+  const un = e.target.closest("[data-unpin]");
+  if(un){
+    mwLinked.put(mwLinked.get().filter(c=> String(c.id) !== un.dataset.unpin));
+    mwRenderCols(); return;
+  }
+  const col = e.target.closest("[data-col]");
+  if(col){ mwOpenSub("col", col.dataset.col, col.dataset.title); return; }
+  const cr = e.target.closest("[data-creator]");
+  if(cr){ mwOpenSub("creator", cr.dataset.creator, cr.dataset.title); return; }
+  if(e.target.closest("[data-feed]")){ mwOpenSub("feed", 0, t("New from your channels")); return; }
+  const c = e.target.closest("[data-mw]");
+  if(c) mwOpen(+c.dataset.mw);
+});
+$("mwGrid").addEventListener("submit", async e=>{
+  if(e.target.id !== "mwLinkForm") return;
+  e.preventDefault();
+  const txt = e.target.elements.link.value;
+  const m = txt.match(/collections\/(\d+)/) || txt.match(/^\s*(\d{3,})\s*$/);
+  if(!m){ toast(t("That is not a collection link."), true); return; }
+  const id = +m[1];
+  // looked up once here, so the list can show its name and pictures
+  try{
+    const d = await mwJson(`/api/mw/collection/${id}`);
+    const card = {id, title: d.title, count: d.total, covers: d.covers, creator: d.creator};
+    if(!(mw.cols || []).some(c=> c.id === id))
+      mwLinked.put([card, ...mwLinked.get().filter(c=> c.id !== id)]);
+    mwOpenSub("col", id, d.title);
+  }catch(err){
+    toast(t(err.message === "private" ? "This collection is private."
+          : err.message === "not found" ? "This collection does not exist (any more)."
+          : "MakerWorld did not answer."), true);
+  }
+});
+
+/* one model */
+async function mwOpen(id, fromHash){
+  if(!id) return;
+  if(VIEW.sec !== "makerworld") go("makerworld", "browse", fromHash);
+  const h = "#makerworld/browse/" + id;
+  if(location.hash !== h){
+    history[fromHash ? "replaceState" : "pushState"](null, "", h);
+    mw.pushed = !fromHash;
+  }
+  mw.allProfiles = false;
+  $("mwListCard").hidden = true;
+  const box = $("mwDetail");
+  box.hidden = false;
+  box.innerHTML = `<button class="wbtn mw-back" type="button" data-back="1">← ${t("Back")}</button>
+    <div class="mw-empty">${t("Loading…")}</div>`;
+  window.scrollTo(0, 0);
+  try{
+    const d = (await mwJson("/api/mw/design/" + id)).design;
+    if(location.hash !== h) return;          // navigated away meanwhile
+    mw.detail = d;
+    mwRenderDetail();
+  }catch(e){
+    if(location.hash !== h) return;
+    box.innerHTML = `<button class="wbtn mw-back" type="button" data-back="1">← ${t("Back")}</button>
+      <div class="mw-empty">${t(e.message === "not found"
+        ? "This model is no longer on MakerWorld." : "MakerWorld did not answer.")}
+        <a class="mw-link" href="${mwModelUrl(id)}" target="_blank" rel="noopener noreferrer">${
+          t("Open on MakerWorld")} ↗</a></div>`;
+  }
+}
+function mwClose(fromHash){
+  $("mwDetail").hidden = true;
+  $("mwDetail").innerHTML = "";
+  $("mwListCard").hidden = false;
+  mw.detail = null;
+  if(!fromHash){
+    // back to where the model was opened from, when this page put it there
+    if(mw.pushed){ mw.pushed = false; history.back(); return; }
+    history.replaceState(null, "", "#makerworld/browse");
+  }
+  mw.pushed = false;
+  if(!mw.hits.length) mwLoad(false);
+}
+addEventListener("hashchange", ()=>{
+  const m = location.hash.match(/^#makerworld\/browse(?:\/(\d+))?$/);
+  if(!m) return;
+  if(m[1] && (!mw.detail || String(mw.detail.id) !== m[1])) mwOpen(+m[1], true);
+  else if(!m[1] && !$("mwDetail").hidden){ mw.pushed = false; mwClose(true); }
+});
+
+function mwMatch(f, amsKnown){
+  const sw = c => c ? `<span class="sw" style="--sw:#${esc(c)}"></span>` : "";
+  if(f.ams){
+    const a = f.ams, who = a.name ? " · " + esc(a.name) : "";
+    if(a.short) return `<span class="mw-m short" title="${t("might not be enough left")}">${
+      sw(a.color)}${t("Slot")} ${esc(a.slot)} · ${t("only")} ${Math.round(a.grams_left)} g ${t("left")}</span>`;
+    return a.level === "same"
+      ? `<span class="mw-m same">✓ ${t("Slot")} ${esc(a.slot)}${who}</span>`
+      : `<span class="mw-m close" title="${t("same material, similar colour")}">${
+          sw(a.color)}≈ ${t("Slot")} ${esc(a.slot)}${who}</span>`;
+  }
+  if(f.shelf){
+    const s = f.shelf;
+    return `<span class="mw-m shelf" title="${t(s.level === "same" ? "same colour" : "similar colour")}">${
+      sw(s.color)}${t("on the shelf")}: ${esc(s.name)}${
+      s.left_g != null ? ` · ${Math.round(s.left_g)} g` : ""}</span>`;
+  }
+  return amsKnown ? `<span class="mw-m none">${t("not in stock")}</span>`
+                  : `<span class="mw-m shelf">${t("not on the shelf")}</span>`;
+}
+function mwProfile(p, d){
+  const pm = d.printer_model || "";
+  const badge = p.for_printer === "native"
+      ? `<span class="tag tag-fit">${t("for")} ${esc(pm)}</span>`
+    : p.for_printer === "adapted"
+      ? `<span class="tag tag-info" title="${t("sliced by the author for another printer, re-sliced by Bambu for yours")}">${
+          t("adapted for")} ${esc(pm)}</span>`
+    : p.for_printer === "compatible"
+      ? `<span class="tag tag-info" title="${t("the figures are the author's, for their printer")}">${
+          esc(p.printer || "")} · ${t("compatible with")} ${esc(pm)}</span>`
+    : p.printer ? `<span class="tag">${esc(p.printer)}</span>` : "";
+  const colours = new Set(p.filaments.map(f=> f.color)).size;
+  const facts = [
+    p.minutes != null ? "⏱ " + fmtMin(p.minutes) : "",
+    p.weight_g != null ? Math.round(p.weight_g) + " g" : "",
+    p.filaments.length > 1 ? colours + " " + t("colours") : "",
+    p.plates > 1 ? p.plates + " " + t("plates") : "",
+    p.prints ? "⎙ " + fmtK(p.prints) : "",
+    p.rating != null ? "★ " + p.rating : "",
+  ].filter(Boolean);
+  return `<div class="mw-prof${p.all_loaded ? " fit" : ""}">
+    ${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : `<span class="mw-noimg"></span>`}
+    <div style="min-width:0">
+      <div class="mw-ph"><span class="mw-pt">${esc(p.title) || t("Profile")}</span>${badge}${
+        p.all_loaded ? `<span class="tag tag-fit">${t("all in the AMS")}</span>` : ""}</div>
+      <div class="mw-pm">${facts.map(x=> `<span>${x}</span>`).join("")}</div>
+      <div class="mw-fils">${p.filaments.length ? p.filaments.map(f=>
+        `<div class="mw-fil">
+          <span class="sw" style="--sw:${f.color ? "#" + esc(f.color) : "transparent"}"
+            title="${f.color ? "#" + esc(f.color) : ""}"></span>
+          <span>${esc(f.type) || "?"}</span>
+          <span class="fg">${f.grams != null ? Math.round(f.grams) + " g" : ""}</span>
+          ${mwMatch(f, d.ams_known)}
+        </div>`).join("")
+        : `<div class="mw-note">${t("no filament list for this profile")}</div>`}</div>
+      <div class="mw-acts"><a class="mw-link" href="${mwModelUrl(d.id, p.profile_id)}"
+        target="_blank" rel="noopener noreferrer">${t("Open this profile on MakerWorld")} ↗</a></div>
+    </div>
+  </div>`;
+}
+function mwRenderDetail(){
+  const d = mw.detail;
+  if(!d) return;
+  const pics = d.pictures.length ? d.pictures : (d.cover ? [{thumb:d.cover, full:d.cover}] : []);
+  const profs = mw.allProfiles ? d.profiles : d.profiles.slice(0, 6);
+  const fits = d.profiles.filter(p=> p.for_printer).length;
+  $("mwDetail").innerHTML = `
+    <button class="wbtn mw-back" type="button" data-back="1">← ${t("Back")}</button>
+    <div class="mw-top">
+      <div>
+        ${pics.length ? `<img class="mw-main" id="mwMain" src="${esc(pics[0].full)}"
+            data-full="${esc(pics[0].full)}" alt="">` : ""}
+        ${pics.length > 1 ? `<div class="mw-thumbs">${pics.map((p, i)=>
+          `<button type="button" data-pic="${esc(p.full)}"${i ? "" : ' class="on"'}>
+             <img src="${esc(p.thumb)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
+      </div>
+      <div class="mw-info">
+        <h2 class="mw-title">${esc(d.title)}</h2>
+        <div class="mw-by">${t("by")} ${esc(d.creator) || "?"}${
+          d.license ? ` · <span title="${t("licence")}">${esc(d.license)}</span>` : ""}</div>
+        <div class="mw-stats">
+          <span>♥ ${fmtK(d.likes)}</span><span>⎙ ${fmtK(d.prints)} ${t("printed")}</span>
+          <span>⤓ ${fmtK(d.downloads)}</span><span>☆ ${fmtK(d.collections)}</span>
+        </div>
+        ${d.printed_here ? `<div class="tag tag-new">${t("printed here")} ${d.printed_here}×</div>` : ""}
+        ${d.tags.length || d.categories.length ? `<div class="mw-tags">${
+          d.categories.concat(d.tags).map(x=> `<span>${esc(x)}</span>`).join("")}</div>` : ""}
+        ${d.summary ? `<div class="mw-sum" id="mwSum">${esc(d.summary)}</div>
+          <button class="mw-more-txt" type="button" data-sum="1">${t("Show more")}</button>` : ""}
+        <div class="mw-acts">
+          <a class="wbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer"
+             style="text-decoration:none">${t("Open on MakerWorld")} ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="mw-sub">${t("Print profiles")} (${d.profiles.length})${
+      fits ? ` · ${fits} ${t("for")} ${esc(d.printer_model || "")}` : ""}</div>
+    ${d.ams_known ? "" : `<div class="mw-note" style="margin:-4px 0 10px">${
+      t("The printer is not connected, so the AMS is not compared - only the shelf.")}</div>`}
+    <div class="mw-profs">${profs.map(p=> mwProfile(p, d)).join("")
+      || `<div class="mw-empty">${t("This model has no print profiles.")}</div>`}</div>
+    ${d.profiles.length > profs.length ? `<button class="wbtn" type="button" data-allp="1"
+        style="margin-top:10px">${t("Show all profiles")} (${d.profiles.length})</button>` : ""}
+    <div class="mw-note">${t("Colours are compared with what the AMS reports right now and with the spools on the Filament page. Printing still happens from Bambu Studio or Bambu Handy.")}</div>`;
+  // a description short enough to show whole needs no "more"
+  const sum = $("mwSum");
+  if(sum && sum.scrollHeight <= sum.clientHeight + 4){
+    sum.classList.add("open");
+    const b = $("mwDetail").querySelector("[data-sum]");
+    if(b) b.remove();
+  }
+}
+$("mwDetail").addEventListener("click", e=>{
+  if(e.target.closest("[data-back]")){ mwClose(false); return; }
+  const pic = e.target.closest("[data-pic]");
+  if(pic){
+    $("mwMain").src = pic.dataset.pic; $("mwMain").dataset.full = pic.dataset.pic;
+    $("mwDetail").querySelectorAll("[data-pic]").forEach(b=> b.classList.toggle("on", b === pic));
+    return;
+  }
+  if(e.target.id === "mwMain"){
+    $("mwLbImg").src = e.target.dataset.full; $("mwLightbox").hidden = false; return;
+  }
+  if(e.target.closest("[data-sum]")){
+    const open = $("mwSum").classList.toggle("open");
+    e.target.closest("[data-sum]").textContent = t(open ? "Show less" : "Show more");
+    return;
+  }
+  if(e.target.closest("[data-allp]")){ mw.allProfiles = true; mwRenderDetail(); }
+});
+function mwLbClose(){ $("mwLightbox").hidden = true; $("mwLbImg").src = ""; }
+$("mwLbClose").addEventListener("click", mwLbClose);
+$("mwLightbox").addEventListener("click", e=>{ if(e.target.id !== "mwLbImg") mwLbClose(); });
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape" && !$("mwLightbox").hidden) mwLbClose();
+});
+
+/* the print history: a picture and a way into the tab for each MakerWorld print */
+const mwBriefs = {};            // design_id -> {title, cover, creator}, or null
+const mwPending = new Set();    // asked for, not fetched yet by the server
+let mwBriefBusy = false, mwBriefTries = 0;
+async function mwFillBriefs(){
+  if(mwBriefBusy) return;
+  const ids = [...new Set((histRows || []).map(r=> String(r.design_id || "")))]
+    .filter(x=> /^\d+$/.test(x) && !(x in mwBriefs) && !mwPending.has(x));
+  if(!ids.length) return;
+  mwBriefBusy = true;
+  let d = null;
+  try{ d = await (await fetch("/api/mw/briefs?ids=" + ids.slice(0, 200).join(","))).json(); }
+  catch(_){}
+  mwBriefBusy = false;
+  if(!d || !d.ok) return;
+  const pend = new Set(d.pending || []);
+  let added = false;
+  for(const id of ids){
+    if(d.briefs[id]){ mwBriefs[id] = d.briefs[id]; added = true; }
+    else if(pend.has(id)) mwPending.add(id);
+    else mwBriefs[id] = null;       // gone from MakerWorld: stop asking
+  }
+  if(added) renderPrints(histRows, printsCur);
+  // the server fetches a few at a time, so a long history fills in over rounds
+  if(mwPending.size && ++mwBriefTries < 25)
+    setTimeout(()=>{ mwPending.clear(); mwFillBriefs(); }, 1200);
+}
+function mwBriefBlock(r, url){
+  const b = mwBriefs[String(r.design_id)];
+  return `<div>
+    <h4>MakerWorld</h4>
+    ${b ? `<div class="mw-brief">${b.cover ? `<img src="${esc(b.cover)}" alt="" loading="lazy"
+        data-mw="${esc(r.design_id)}">` : ""}
+      <div><b>${esc(b.title)}</b><span>${t("by")} ${esc(b.creator) || "?"}</span></div></div>` : ""}
+    <div class="mw-acts" style="margin-top:0">
+      <button class="wbtn" type="button" data-mw="${esc(r.design_id)}">${t("Show in the app")}</button>
+      <a class="mw-link" href="${url}" target="_blank" rel="noopener noreferrer">${
+        t("View on MakerWorld")} ↗</a>
+    </div>
+  </div>`;
+}
+
 /* ---------- navigation ----------
    Four sections, each with its own views. One map drives the second-level bar,
    the routing and the address bar, so a view cannot exist in one and be missing
@@ -5857,6 +6652,7 @@ const NAV = {
   prints:   [["history","History"], ["statistics","Statistics"]],
   filament: [["inventory","Inventory"], ["purchases","Purchases"]],
   workshop: [["maintenance","Maintenance"], ["notes","Notes"]],
+  makerworld: [["browse","Discover"]],
   // reached by the gear, not by the section bar: it is about the app, not
   // about the printer, and it has its own tabs inside
   settings: [["page","Settings"]],
@@ -5877,6 +6673,7 @@ const ON_SHOW = {
   "filament/purchases": ()=>{ loadFilaments(); },
   "workshop/maintenance": ()=>{ loadMaint(); },
   "workshop/notes":     ()=>{ loadNotes(); },
+  "makerworld/browse":  ()=>{ mwShow(); },
   "settings/page":      ()=>{ loadSettings(); },
 };
 function go(sec, view, replace){

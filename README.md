@@ -55,8 +55,22 @@ quote can never come out under the real cost.
 **Print history** that stays useful. Rename jobs, group the plates of one model
 under a collapsible header with its own subtotals, override the grams, close a
 print the app missed the end of, delete test prints. Jobs sliced from MakerWorld
-link back to the model. An expandable panel per print shows everything known
-about it.
+show the model's picture and open it on the MakerWorld tab. An expandable panel
+per print shows everything known about it.
+
+**MakerWorld, inside the app.** Browse trending models and the categories, search,
+and open a model's page: pictures, description, and every print profile with its
+time, weight and filaments. Profiles made or re-sliced for your printer come
+first, and each filament is checked against what is loaded in the AMS and what
+is on the shelf — *Slot 2 ✓*, *similar colour in Slot 3*, *on the shelf: Sunlu
+PLA Red*, or *not in stock* — so you know before opening the slicer whether you
+can print it today. **My collections** shows the collections of your MakerWorld
+account — the same Bambu account the Cloud sign-in uses — including private
+ones. Any collection also opens from its link, and ones opened that way are
+kept in the list. **Channels I follow** lists the creators you follow, opens each
+one's models, and has a feed of what is new from all of them. Printing itself still happens in Bambu Studio or Bambu Handy.
+This tab needs internet: the NAS asks `api.bambulab.com`, and the browser loads
+the pictures from MakerWorld's image server.
 
 **Filament inventory.** Every spool ever seen, named in full from its RFID colour
 code (`PLA Basic · Jade White`), and remembered long after it is used up.
@@ -70,7 +84,10 @@ typed.
 sliced file off the printer's USB drive and records the layer height, profile,
 infill, supports, model height and exact filament weight — none of which any MQTT
 frame or cloud response contains. It reads about 150 KB of a file that may be
-hundreds of megabytes.
+hundreds of megabytes. For a running print the file is read once, early on, for
+the one figure the printer never reports: how many **filament changes** the
+print makes. The live view shows them next to the layer — `3 / 12`, with how
+many are still to come.
 
 **USB drive overview.** What is on the stick, how full it is, and which print each
 file belongs to.
@@ -378,6 +395,14 @@ Everything the dashboard does is a plain HTTP endpoint.
 | `POST /api/filaments/left` | Correct a spool's remaining grams. |
 | `POST /api/control` | Pause / resume / stop / light / speed. |
 | `POST /api/cloud/refresh` | Trigger a cloud enrichment pass. |
+| `GET /api/mw/navs` | MakerWorld: Trending and the categories. |
+| `GET /api/mw/browse?nav=&q=&offset=` | MakerWorld: one page of a category, or of a search. |
+| `GET /api/mw/design/<id>` | One model, its profiles, and each filament matched against the AMS and the shelf. |
+| `GET /api/mw/briefs?ids=` | Title and picture for the models in the print history. |
+| `GET /api/mw/collections` | Your MakerWorld collections (needs the Cloud sign-in). |
+| `GET /api/mw/collection/<id>?offset=` | One collection and a page of its models. |
+| `GET /api/mw/following` | The channels your MakerWorld account follows (needs the Cloud sign-in). |
+| `GET /api/mw/creator/<uid>?offset=` | One channel and a page of its models. |
 | `GET /api/diag` | What the app is writing, and how often. |
 
 ---
@@ -391,6 +416,7 @@ Everything the dashboard does is a plain HTTP endpoint.
 | `storage.py` | One store, three backends (SQLite / MariaDB / MySQL). |
 | `gcode_meta.py` | Reads slicer metadata off the printer's USB drive over FTPS. |
 | `filament_catalog.py` | Colour-code → colour-name table and the order-confirmation parser. |
+| `makerworld.py` | Reads MakerWorld through the API behind the website, cached, reduced to a shape of our own. Self-test for the offline parts. |
 | `dashboard.html` | The entire frontend — HTML, CSS, JS, i18n. No build step, no external assets. |
 | `bootstrap.py` · `config_store.py` · `settings_schema.py` | The connection file, the settings store, and the one table describing every setting. |
 | `setup_wizard.py` · `setup.html` | First-run setup, served instead of the dashboard when there is no connection on file. |
@@ -423,6 +449,7 @@ assets, which matters on a NAS with no internet access.
 | Uploading a PDF says **"pypdf is not installed"** | It must go in the app's venv: `./venv/bin/python3 -m pip install pypdf`. Or paste the invoice text instead. |
 | Live view spins, no picture | The printer serves **one** camera client at a time — close the Handy app and Bambu Studio. If it stays wedged, power-cycle the printer and re-enable LAN Mode Live View. |
 | Controls do nothing / "printer not connected" | Recording is **Off**; controls need a live connection. |
+| **My collections** or **Channels I follow** is empty or says the login expired | `./venv/bin/python3 tools/why_no_collections.py` (from the app folder) makes the same call with the stored Cloud sign-in and says what came back. An expired login is fixed by signing in again under Settings → Cloud. Meanwhile any collection still opens from its link. |
 | **HMS 0500_0500_0001_0007** after a control | The firmware rejected the command. Nothing was written and nothing is damaged — this is why the gcode-based controls ship off. |
 | Garbled `°` / `€` / umlauts after editing | A file was round-tripped through PowerShell. Re-edit with a UTF-8-aware tool. |
 

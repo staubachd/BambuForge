@@ -40,6 +40,7 @@ import backup
 import bootstrap
 import filament_catalog
 import gcode_meta
+import makerworld
 import power_providers
 import config_store
 import settings_schema
@@ -712,6 +713,7 @@ def on_message(client, userdata, msg):
     state["cost"] = _cost_block()
     _track_print(state)
     _maybe_persist_print(state)
+    _live_changes(state)
     # surface the saved label / cloud title on the live tile so it matches history
     _sn = _print_row.get("stored") or {}
     if state.get("job") and state["job"].get("task_id") == _print_row.get("job_id"):
@@ -1347,14 +1349,18 @@ def _filament_stats() -> dict:
     # Likely duplicates: same colour and same material, one side named from an
     # RFID read and the other not. Suggested, never applied - two genuinely
     # different blacks look identical by this test, and merging them silently
-    # would be worse than leaving two rows. Naming the stray also clears it.
+    # would be worse than leaving two rows. Naming the stray also clears it, and
+    # so does turning the suggestion down.
     suggest = []
     named = [o for o in out if o.get("color") and (o.get("color_name") or o.get("product"))]
     for o in out:
         if o.get("color_name") or o.get("product") or not o.get("color"):
             continue
+        declined = (known.get(o["fkey"]) or {}).get("not_dupe_of")
         for n in named:
             if n["fkey"] == o["fkey"] or n["color"] != o["color"]:
+                continue
+            if n["fkey"] == declined:
                 continue
             if (n.get("type") or "").upper() != (o.get("type") or "").upper():
                 continue
@@ -1852,6 +1858,75 @@ def slicer_worker():
             _slicer_kick.set()
 
 
+# --- filament changes of the running print --------------------------------------
+# The printer never says how many filament changes a print makes, or how many
+# are left. The sliced file does (gcode_meta.parse_changes), so for a running
+# print it is read once, early - unlike the rest of the slicer data, which waits
+# for the print to end. What is written is the slicer block only, which the MQTT
+# loop never touches, and the finished-print pass then finds it already read.
+LIVE_SLICE_DELAY = 30.0      # after the job starts: the row exists, the file is open
+LIVE_SLICE_RETRY = 90.0
+LIVE_SLICE_TRIES = 2
+_live_slice = {"job_id": None, "change_layers": None, "changes": None,
+               "tries": 0, "next_at": 0.0, "busy": False, "done": None}
+
+
+def _live_slice_read(job_id: str) -> None:
+    """Background: the running print's change list, from its row if it has one
+    already (an app restart mid-print), otherwise from the drive."""
+    got = None
+    counted = True
+    try:
+        row = store.get_print(job_id)
+        if not row:
+            counted = False            # not recorded yet; not the file's fault
+        else:
+            meta = _slice_block(row, full=True) or {}
+            if "change_layers" not in meta and _slicer_apply(row):
+                meta = _slice_block(store.get_print(job_id) or {}, full=True) or {}
+            if "change_layers" in meta:
+                got = meta
+    except Exception as e:
+        print(f"[slicer] live read of {job_id} failed: {e}")
+    finally:
+        if _live_slice["job_id"] == job_id:
+            if got:
+                _live_slice.update(change_layers=got["change_layers"],
+                                   changes=got.get("changes"))
+                print(f"[slicer] {job_id}: {got.get('changes')} filament change(s) in this print")
+            else:
+                _live_slice["tries"] += 1 if counted else 0
+                _live_slice["next_at"] = time.time() + LIVE_SLICE_RETRY
+        _live_slice["busy"] = False
+
+
+def _live_changes(state: dict) -> None:
+    """Put `fil_changes` = {done, total} on a running job, reading the file for
+    it once in the background. Silent when it is not known."""
+    job = state.get("job") or {}
+    tid = str(job.get("task_id") or "")
+    if not tid or tid == "0" or job.get("state") not in ACTIVE_STATES:
+        return
+    now = time.time()
+    if _live_slice["job_id"] != tid:
+        _live_slice.update(job_id=tid, change_layers=None, changes=None, tries=0,
+                           next_at=now + LIVE_SLICE_DELAY, done=None)
+    if _live_slice["change_layers"] is None:
+        if (SLICER_CFG.get("enabled") and not _live_slice["busy"]
+                and _live_slice["tries"] < LIVE_SLICE_TRIES and now >= _live_slice["next_at"]):
+            _live_slice["busy"] = True
+            threading.Thread(target=_live_slice_read, args=(tid,), daemon=True,
+                             name="live-slice").start()
+        return
+    # a partial MQTT frame carries no layer; keep the last count rather than
+    # flicker back to nothing
+    done = gcode_meta.changes_done(_live_slice["change_layers"], job.get("layer"))
+    if done is not None:
+        _live_slice["done"] = done
+    if _live_slice["done"] is not None:
+        job["fil_changes"] = {"done": _live_slice["done"], "total": _live_slice["changes"]}
+
+
 _cloud_client = None
 _cloud_kick = threading.Event()   # set when a print ends -> sync without waiting
 
@@ -2002,19 +2077,24 @@ def api_history():
     return jsonify(store.history(hours=hours))
 
 
-def _slice_block(row: dict):
+def _slice_block(row: dict, full: bool = False):
     """The stored slicer metadata as a dict, or None.
 
     Kept as JSON in one column so a newly interesting field needs no migration;
-    unpacked here so the page never has to parse it.
+    unpacked here so the page never has to parse it. The per-layer change list
+    is left out unless asked for: only the running print needs it, and a
+    history page of multicolour prints would otherwise carry every one of them.
     """
     raw = row.get("slice_json")
     if not raw:
         return None
     try:
-        return json.loads(raw)
+        d = json.loads(raw)
     except (TypeError, ValueError):
         return None
+    if not full and isinstance(d, dict):
+        d.pop("change_layers", None)
+    return d
 
 
 # Listing the drive means opening a connection to the printer, so the answer is
@@ -2695,6 +2775,32 @@ def api_filament_merge():
     return jsonify({"ok": True, "from": src, "into": dst or None, "recosted": recosted})
 
 
+@app.route("/api/filaments/not-dupe", methods=["POST"])
+def api_filament_not_dupe():
+    """Turn down a duplicate suggestion: `from` is not the same filament as
+    `into`. Nothing about usage or cost changes - the suggestion just stops."""
+    data = request.get_json(force=True, silent=True) or {}
+    src = (data.get("from") or "").strip()
+    dst = (data.get("into") or "").strip()
+    shape = r"[A-Za-z0-9._-]{1,24}\|([0-9A-Fa-f]{6}|\?)"
+    if not re.fullmatch(shape, src) or not re.fullmatch(shape, dst):
+        return jsonify({"ok": False, "error": "not a filament identity"}), 400
+    try:
+        if src not in {f["fkey"] for f in store.all_filaments()}:
+            # known only from the print history: give it a row to remember this on
+            sku, _, hexc = src.partition("|")
+            store.upsert_filament(
+                src, filament_id=sku if sku.upper().startswith("GF") else None,
+                type=None if sku.upper().startswith("GF") else sku,
+                color=filament_catalog.norm_color(hexc))
+        store.set_filament_not_dupe(src, dst)
+    except Exception as e:
+        print(f"[filament] dismiss failed: {e}")
+        return jsonify({"ok": False, "error": str(e)[:300]}), 500
+    print(f"[filament] {src} is not {dst}: suggestion dismissed")
+    return jsonify({"ok": True, "from": src, "into": dst})
+
+
 @app.route("/api/purchases", methods=["POST"])
 def api_purchase_add():
     """Log one order line. Everything is optional except a product or colour to
@@ -3005,6 +3111,278 @@ def api_cloud_refresh():
         return jsonify({"ok": True, "updated": n})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)[:200]}), 502
+
+
+# ---- MakerWorld ---------------------------------------------------------------
+# Browsing happens in the app; what the app adds over the website is that it
+# knows what is loaded and what is on the shelf, so every profile of a model can
+# say which spools it would use.
+
+def _rgb(hexc: str | None):
+    try:
+        return tuple(int(hexc[i:i + 2], 16) for i in (0, 2, 4))
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+def _colour_gap(a: str | None, b: str | None) -> float | None:
+    """How different two colours look, 0 (same) to ~765. The "redmean"
+    weighting: plain RGB distance calls dark blues and greys closer than they
+    look, and this is cheap enough to run per tray per filament."""
+    x, y = _rgb(a), _rgb(b)
+    if not x or not y:
+        return None
+    rm = (x[0] + y[0]) / 2
+    dr, dg, db = x[0] - y[0], x[1] - y[1], x[2] - y[2]
+    return ((2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db) ** 0.5
+
+
+# gap thresholds: "that one", "near enough". Profiles name colours loosely -
+# a "black" is as often #101010 as #000000 - so "same" is not "identical".
+MW_SAME, MW_CLOSE = 60.0, 120.0
+
+
+def _mw_level(gap: float | None) -> str | None:
+    if gap is None:
+        return None
+    return "same" if gap <= MW_SAME else ("close" if gap <= MW_CLOSE else None)
+
+
+def _mw_trays() -> list[dict]:
+    """What is loaded right now, named the way the AMS card names it."""
+    with _state_lock:
+        ams = json.loads(json.dumps(_state.get("ams") or {}))
+    units = ams.get("units") or []
+    out = []
+    for ui, u in enumerate(units):
+        for tr in u.get("trays") or []:
+            if not tr.get("type"):
+                continue
+            label = (chr(65 + ui) if len(units) > 1 else "") + str((tr.get("id") or 0) + 1)
+            out.append({**tr, "label": label})
+    for tr in ams.get("external") or []:
+        if tr.get("type"):
+            out.append({**tr, "label": "Ext"})
+    for tr in out:
+        fk = _canon_fkey(filament_catalog.key(tr.get("filament_id"), tr.get("color"),
+                                              tr.get("type")))
+        v, p, c = _FIL_NAMES.get(fk, (None, None, None))
+        tr["name"] = " ".join(x for x in (v, p, c) if x) or None
+    return out
+
+
+def _mw_match(filaments: list[dict], trays: list[dict], shelf: list[dict]) -> list[dict]:
+    """For each filament a profile uses: the loaded spool that fits it best, and
+    failing that, one on the shelf. Type has to agree; colour decides between
+    candidates. A tray is handed out once, the closest pairs first, so a
+    four-colour print does not claim the same white spool four times."""
+    pairs = []
+    for fi, f in enumerate(filaments):
+        for ti, tr in enumerate(trays):
+            if (tr.get("type") or "").upper() != (f.get("type") or "").upper():
+                continue
+            gap = _colour_gap(f.get("color"), tr.get("color"))
+            if _mw_level(gap):
+                pairs.append((gap, fi, ti))
+    pairs.sort()
+    got, used = {}, set()
+    for gap, fi, ti in pairs:
+        if fi in got or ti in used:
+            continue
+        got[fi] = (gap, ti)
+        used.add(ti)
+    out = []
+    for fi, f in enumerate(filaments):
+        m = dict(f)
+        if fi in got:
+            gap, ti = got[fi]
+            tr = trays[ti]
+            m["ams"] = {"slot": tr["label"], "color": tr.get("color"), "name": tr.get("name"),
+                        "level": _mw_level(gap), "grams_left": tr.get("grams_left"),
+                        "short": (tr.get("grams_left") is not None and f.get("grams") is not None
+                                  and tr["grams_left"] < f["grams"])}
+        else:
+            best = None
+            for s in shelf:
+                if (s.get("type") or "").upper() != (f.get("type") or "").upper():
+                    continue
+                gap = _colour_gap(f.get("color"), s.get("color"))
+                if _mw_level(gap) and (best is None or gap < best[0]):
+                    best = (gap, s)
+            if best:
+                s = best[1]
+                m["shelf"] = {"name": s["name"], "color": s.get("color"),
+                              "level": _mw_level(best[0]), "left_g": s.get("left_g")}
+        out.append(m)
+    return out
+
+
+def _mw_shelf() -> list[dict]:
+    """Spools that are known, not loaded, and not used up."""
+    try:
+        rows = _filament_stats()["filaments"]
+    except Exception as e:
+        print(f"[mw] no shelf to compare against: {e}")
+        return []
+    out = []
+    for f in rows:
+        if f.get("loaded") or not f.get("color") or not f.get("type"):
+            continue
+        left = f.get("left_g")
+        if left is not None and left <= 0:
+            continue
+        if left is None and not f.get("bought_g"):
+            continue      # never bought, only ever printed with: not known to be here
+        name = " ".join(x for x in (f.get("vendor"), f.get("product"), f.get("color_name"))
+                        if x) or f"{f['type']} #{f['color']}"
+        out.append({"type": f["type"], "color": f["color"], "name": name, "left_g": left})
+    return out
+
+
+def _mw_fail(e: Exception):
+    print(f"[mw] {e}")
+    code = {"not found": 404, "login": 401, "private": 403}.get(str(e), 502)
+    return jsonify({"ok": False, "error": str(e)[:200]}), code
+
+
+def _mw_token() -> str | None:
+    """The Bambu Cloud login the app already has for the print history. The
+    same account is the MakerWorld account, so it also opens your collections."""
+    return CLOUD_CFG.get("token") or None
+
+
+@app.route("/api/mw/navs")
+def api_mw_navs():
+    try:
+        return jsonify({"ok": True, "navs": makerworld.navs(),
+                        "logged_in": bool(_mw_token())})
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/collections")
+def api_mw_collections():
+    tok = _mw_token()
+    if not tok:
+        return jsonify({"ok": False, "error": "login"}), 401
+    if request.args.get("fresh"):
+        makerworld.forget_mine()
+    try:
+        return jsonify({"ok": True, "collections": makerworld.my_collections(tok)})
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/collection/<int:cid>")
+def api_mw_collection(cid: int):
+    try:
+        offset = int(request.args.get("offset") or 0)
+    except ValueError:
+        offset = 0
+    tok = _mw_token()
+    try:
+        return jsonify({"ok": True, **makerworld.collection(cid, tok, offset)})
+    except makerworld.MWError as e:
+        # an expired login must not hide a collection anyone could read
+        if tok and str(e) == "login":
+            try:
+                return jsonify({"ok": True, **makerworld.collection(cid, None, offset)})
+            except makerworld.MWError as e2:
+                return _mw_fail(e2)
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/browse")
+def api_mw_browse():
+    try:
+        offset = int(request.args.get("offset") or 0)
+    except ValueError:
+        offset = 0
+    keyword = (request.args.get("q") or "").strip() or None
+    nav = (request.args.get("nav") or "").strip() or None
+    tok = _mw_token() if nav == makerworld.FEED_NAV else None
+    if nav == makerworld.FEED_NAV and not tok:
+        return jsonify({"ok": False, "error": "login"}), 401
+    try:
+        return jsonify({"ok": True, **makerworld.browse(nav=nav, keyword=keyword,
+                                                         offset=offset, token=tok)})
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/following")
+def api_mw_following():
+    """The channels the logged-in account follows. The login is only needed to
+    know which account that is; the list itself is public on MakerWorld."""
+    tok = _mw_token()
+    if not tok:
+        return jsonify({"ok": False, "error": "login"}), 401
+    try:
+        offset = int(request.args.get("offset") or 0)
+    except ValueError:
+        offset = 0
+    try:
+        return jsonify({"ok": True, **makerworld.following(makerworld.my_uid(tok), offset)})
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/creator/<int:uid>")
+def api_mw_creator(uid: int):
+    try:
+        offset = int(request.args.get("offset") or 0)
+    except ValueError:
+        offset = 0
+    try:
+        return jsonify({"ok": True, **makerworld.creator(uid, offset)})
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+
+
+@app.route("/api/mw/design/<int:did>")
+def api_mw_design(did: int):
+    try:
+        d = makerworld.design(did, printer=CFG.get("model") or None)
+    except makerworld.MWError as e:
+        return _mw_fail(e)
+    trays, shelf = _mw_trays(), _mw_shelf()
+    # with the printer offline the AMS is unknown, not empty - the page must
+    # not report every colour as missing because of that
+    with _state_lock:
+        d["ams_known"] = bool((_state.get("ams") or {}).get("units"))
+    for p in d["profiles"]:
+        p["filaments"] = _mw_match(p["filaments"], trays, shelf)
+        p["all_loaded"] = bool(p["filaments"]) and all(f.get("ams") for f in p["filaments"])
+    # what has been printed of this model here already
+    try:
+        mine = [r for r in store.all_prints() if str(r.get("design_id") or "") == str(did)]
+    except Exception:
+        mine = []
+    d["printed_here"] = len(mine)
+    d["printer_model"] = CFG.get("model") or None
+    return jsonify({"ok": True, "design": d})
+
+
+@app.route("/api/mw/briefs")
+def api_mw_briefs():
+    """Title and cover for the models in the print history. Cached ones answer
+    at once; a handful of new ones are fetched per call, so a long history
+    fills in over a few refreshes instead of stalling one of them."""
+    ids = []
+    for x in (request.args.get("ids") or "").split(","):
+        if x.strip().isdigit() and x.strip() not in ids:
+            ids.append(x.strip())
+    out, fetched = {}, 0
+    for did in ids[:200]:
+        if not makerworld.cached(did):
+            if fetched >= 8:
+                continue
+            fetched += 1
+        b = makerworld.brief(did)
+        if b:
+            out[did] = b
+    return jsonify({"ok": True, "briefs": out,
+                    "pending": [d for d in ids if d not in out and not makerworld.cached(d)]})
 
 
 @app.route("/api/prints/filament", methods=["POST"])
@@ -3591,6 +3969,29 @@ GO2RTC_PID = os.path.join(HERE, "go2rtc.pid")
 _go2rtc_proc = None
 
 
+def _pid_alive(pid: int) -> bool:
+    """Is this process still running? Sending signal 0 is the POSIX probe, but
+    on Windows signal 0 is CTRL_C_EVENT: it sends Ctrl+C to the whole console,
+    which stops whatever started the app (and the test runner with it)."""
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        return True
+    import ctypes
+    k32 = ctypes.windll.kernel32
+    h = k32.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION
+    if not h:
+        return False
+    try:
+        code = ctypes.c_ulong()
+        ok = k32.GetExitCodeProcess(h, ctypes.byref(code))
+        return bool(ok) and code.value == 259  # STILL_ACTIVE
+    finally:
+        k32.CloseHandle(h)
+
+
 def _reap_previous_go2rtc() -> bool:
     """Stop a go2rtc left behind by an earlier run. True if one was there."""
     try:
@@ -3600,9 +4001,7 @@ def _reap_previous_go2rtc() -> bool:
         return False
     if pid <= 0:
         return False
-    try:
-        os.kill(pid, 0)                      # still alive?
-    except OSError:
+    if not _pid_alive(pid):
         os.path.exists(GO2RTC_PID) and os.unlink(GO2RTC_PID)
         return False
     print(f"[cam] a go2rtc from an earlier run is still holding its ports "
@@ -3614,9 +4013,7 @@ def _reap_previous_go2rtc() -> bool:
         return False
     for _ in range(20):                      # up to 10s for it to let go
         time.sleep(0.5)
-        try:
-            os.kill(pid, 0)
-        except OSError:
+        if not _pid_alive(pid):
             break
     else:
         # SIGKILL on the NAS; Windows has no such signal, and os.kill there

@@ -568,6 +568,77 @@ def parse_plate_name(model_raw: bytes | None, plate: int | None) -> str | None:
     return None
 
 
+def parse_changes(plate, meta: dict) -> dict:
+    """How many filament changes the print makes, and in which layers.
+
+    slice_info says which filaments each layer range uses
+    (`<layer_filament_list filament_list="0 2" layer_ranges="0 120,140 200"/>`,
+    filament indexes 0-based) and which nozzle each filament is mapped to
+    (`filament_maps`, 1-based). It does not give the count, so it is worked out
+    the way the printer has to do it: per nozzle, a change is loading a filament
+    that nozzle does not already hold. Going from one nozzle to the other on an
+    X2D swaps nozzles, not spools, and is not counted; neither is the first load
+    of a nozzle. Within a layer each filament is printed once, starting with the
+    one already loaded and ending on one the next layer needs - the order the
+    slicer picks to save changes, so the count is the slicer's, give or take.
+    """
+    lists = plate.find("layer_filament_lists")
+    if lists is None:
+        return {}
+    maps = [int(x) for x in (meta.get("filament_maps") or "").split() if x.isdigit()]
+    by_layer: dict = {}
+    for lf in lists.findall("layer_filament_list"):
+        fils = {int(x) for x in (lf.get("filament_list") or "").split() if x.isdigit()}
+        if not fils:
+            continue
+        for rng in (lf.get("layer_ranges") or "").split(","):
+            ab = rng.split()
+            if len(ab) != 2 or not all(x.isdigit() for x in ab):
+                continue
+            a, b = int(ab[0]), int(ab[1])
+            if b < a or b - a > 50000:        # nonsense, not a print
+                continue
+            for i in range(a, b + 1):
+                by_layer.setdefault(i, set()).update(fils)
+    if not by_layer:
+        return {}
+
+    def nozzle(f):
+        return maps[f] if f < len(maps) else 1
+
+    layers = sorted(by_layer)
+    loaded: dict = {}                          # nozzle -> filament it holds
+    per_layer = []
+    for n, i in enumerate(layers):
+        after = by_layer.get(layers[n + 1], set()) if n + 1 < len(layers) else set()
+        groups: dict = {}
+        for f in sorted(by_layer[i]):
+            groups.setdefault(nozzle(f), []).append(f)
+        count = 0
+        for noz, fs in groups.items():
+            cur = loaded.get(noz)
+            if cur is None:
+                count += len(fs) - 1           # the first load is not a change
+            else:
+                count += len(fs) - (1 if cur in fs else 0)
+            # the layer ends on a filament the next one needs, when it can
+            ends = [f for f in fs if f != cur or len(fs) == 1]
+            keep = [f for f in ends if f in after]
+            loaded[noz] = (keep or ends)[0]
+        if count:
+            per_layer.append([i, count])
+    return {"changes": sum(c for _, c in per_layer), "change_layers": per_layer}
+
+
+def changes_done(change_layers, layer) -> int | None:
+    """Changes already made once the printer reports `layer` (1-based, as MQTT
+    counts): those in the layers before it. The current layer's own are still
+    to come - which is what "pending" means while it prints."""
+    if change_layers is None or layer is None:
+        return None
+    return sum(c for i, c in change_layers if i < int(layer))
+
+
 def parse(settings_raw: bytes | None, slice_raw: bytes | None,
           model_raw: bytes | None = None, header_raw: bytes | None = None) -> dict:
     """The handful of facts worth keeping, from the two config members.
@@ -630,6 +701,7 @@ def parse(settings_raw: bytes | None, slice_raw: bytes | None,
             obj = plate.find("object")
             if obj is not None:
                 out["object"] = _s(obj.get("name"))
+            out.update(parse_changes(plate, meta))
         head = root.find("header")
         if head is not None:
             for item in head.findall("header_item"):
@@ -789,4 +861,29 @@ if __name__ == "__main__":       # a self-test against the captured sample
     assert abs(got["layers"] * got["layer_h"] - got["height_mm"]) > 25, (
         "this sample no longer demonstrates the variable-layer-height case it "
         "was captured for")
+    # one filament the whole way (layer 707 prints nothing): no changes
+    assert got["changes"] == 0 and got["change_layers"] == [], got
+
+    def _changes(lists, maps="1 1 1 1"):
+        xml = ('<plate><metadata key="filament_maps" value="%s"/><layer_filament_lists>%s'
+               '</layer_filament_lists></plate>') % (maps, "".join(
+                   f'<layer_filament_list filament_list="{f}" layer_ranges="{r}"/>'
+                   for f, r in lists))
+        return parse_changes(ET.fromstring(xml), {"filament_maps": maps})
+
+    # two colours on one nozzle, both in layers 10-12: each layer starts with
+    # the colour the last one ended on, so one change per shared layer - white
+    # to red, red to white, white to red - and one back to white for layer 13
+    two = _changes([("0", "0 12,13 20"), ("1", "10 12")])
+    assert two["change_layers"] == [[10, 1], [11, 1], [12, 1], [13, 1]], two
+    assert two["changes"] == 4
+    # the same two colours on the X2D's two nozzles: a nozzle swap, no change
+    assert _changes([("0", "0 12,13 20"), ("1", "10 12")], "1 2")["changes"] == 0
+    # a colour stripe: one change in, one change back
+    stripe = _changes([("0", "0 4,8 9"), ("1", "5 7")])
+    assert stripe["change_layers"] == [[5, 1], [8, 1]], stripe
+    assert changes_done(stripe["change_layers"], 5) == 0     # layer 5 still to do
+    assert changes_done(stripe["change_layers"], 6) == 1
+    assert changes_done(stripe["change_layers"], 9) == 2
+    assert changes_done(None, 5) is None
     print("ok")

@@ -128,9 +128,11 @@ LATE_COLUMNS = {
     # "there were N grams left on <date>". Not an override of the computed
     # figure but an anchor for it: prints and purchases after that moment still
     # move it, so the correction does not go stale the next time anything prints.
+    # not_dupe_of: a duplicate suggestion the user turned down, so it stays gone
     "filaments": {"vendor": "VARCHAR(64)", "alias_of": "VARCHAR(64)",
                   "price_per_kg": "FLOAT",
-                  "left_anchor_g": "FLOAT", "left_anchor_at": "DOUBLE"},
+                  "left_anchor_g": "FLOAT", "left_anchor_at": "DOUBLE",
+                  "not_dupe_of": "VARCHAR(64)"},
     # notes shipped before they had categories
     "notes": {"category": "VARCHAR(60)"},
 }
@@ -199,7 +201,8 @@ PRINT_IMMUTABLE = {"job_id", "started_at", "label", "design_title",
 # every past print (see app._filament_stats).
 FILAMENT_COLS = ["fkey", "filament_id", "code", "vendor", "product", "color",
                  "color_name", "type", "is_bambu", "alias_of", "price_per_kg",
-                 "left_anchor_g", "left_anchor_at", "first_seen", "last_seen"]
+                 "left_anchor_g", "left_anchor_at", "not_dupe_of",
+                 "first_seen", "last_seen"]
 
 # What was bought, as opposed to what was used. Kept as one row per order LINE
 # (not per spool) so an order of 3 spools stays one editable, deletable entry.
@@ -708,6 +711,20 @@ class Storage:
         """
         conn, cur = self._cursor()
         cur.execute(f"UPDATE filaments SET alias_of={self.ph} WHERE fkey={self.ph}",
+                    (target or None, fkey))
+        n = cur.rowcount
+        if self.backend == "sqlite":
+            conn.commit()
+        else:
+            cur.close(); conn.close()
+        return n > 0
+
+    def set_filament_not_dupe(self, fkey: str, target: str | None) -> bool:
+        """Turn down the suggestion that `fkey` is the same filament as `target`
+        (None withdraws that). Remembered per pair, so a different named row
+        that later matches is still offered."""
+        conn, cur = self._cursor()
+        cur.execute(f"UPDATE filaments SET not_dupe_of={self.ph} WHERE fkey={self.ph}",
                     (target or None, fkey))
         n = cur.rowcount
         if self.backend == "sqlite":

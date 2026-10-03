@@ -16,6 +16,9 @@ import app
 
 c = app.app.test_client()
 mine = []
+# not a name anyone would use: the tests run on a copy of the real database,
+# whose own notes must not be counted along with the ones made here
+CAT = "t-notecat-maintenance"
 
 
 def note(**kw):
@@ -41,22 +44,22 @@ def categories():
 start = categories()
 
 # --- a category exists because a note says so -------------------------------
-a = note(title="Bed levelling", body="every 20 prints", category="Maintenance")
-assert by_id(a)["category"] == "Maintenance"
-assert "Maintenance" in categories()
+a = note(title="Bed levelling", body="every 20 prints", category=CAT)
+assert by_id(a)["category"] == CAT
+assert CAT in categories()
 print("a category comes into being with the note that names it")
 
 # two notes, one category - not two categories that happen to match
-b = note(title="Belt tension", category="Maintenance")
+b = note(title="Belt tension", category=CAT)
 assert len([n for n in c.get("/api/notes").get_json()["notes"]
-            if n.get("category") == "Maintenance"]) == 2
+            if n.get("category") == CAT]) == 2
 print("two notes share one category")
 
 # --- and stops existing when the last note leaves it ------------------------
 c.post("/api/notes", json={"id": b, "title": "Belt tension", "category": "Setup"})
 assert by_id(b)["category"] == "Setup"
 c.post("/api/notes/delete", json={"id": a})
-assert "Maintenance" not in categories(), \
+assert CAT not in categories(), \
     "the category outlived its last note - something is keeping a list"
 print("the last note leaving takes the category with it")
 

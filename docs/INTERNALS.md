@@ -143,21 +143,21 @@ one test, and only the third has anything to do with SQL:
 | **dialect** — the only genuinely database-specific SQL | **5** | yes, and that is the whole list |
 
 The five live in one table, `DIALECTS` at
-[storage.py:253](../storage.py#L253) — one row per backend, and adding a backend is
+[storage.py:256](../storage.py#L256) — one row per backend, and adding a backend is
 filling one in:
 
 | key | sqlite | MariaDB / MySQL | used at |
 |--|--|--|--|
-| `auto` | `AUTOINCREMENT` | `AUTO_INCREMENT` | [storage.py:281](../storage.py#L281) |
-| `blob` | `BLOB` | `LONGBLOB` | [storage.py:282](../storage.py#L282) |
-| `inline_index` | separate `CREATE INDEX` after | inline in `CREATE TABLE` | [storage.py:329](../storage.py#L329) |
-| `columns` | `PRAGMA table_info` | `information_schema.COLUMNS` | [storage.py:425](../storage.py#L425) |
-| `upsert` | `REPLACE INTO` | `REPLACE INTO` | [storage.py:927](../storage.py#L927), [storage.py:938](../storage.py#L938) |
+| `auto` | `AUTOINCREMENT` | `AUTO_INCREMENT` | [storage.py:284](../storage.py#L284) |
+| `blob` | `BLOB` | `LONGBLOB` | [storage.py:285](../storage.py#L285) |
+| `inline_index` | separate `CREATE INDEX` after | inline in `CREATE TABLE` | [storage.py:332](../storage.py#L332) |
+| `columns` | `PRAGMA table_info` | `information_schema.COLUMNS` | [storage.py:428](../storage.py#L428) |
+| `upsert` | `REPLACE INTO` | `REPLACE INTO` | [storage.py:944](../storage.py#L944), [storage.py:955](../storage.py#L955) |
 
 A sixth key, `server`, is not about SQL: it says whether the backend is reached
 over TCP with a connection per call (and so needs no explicit commit), which is
 the lifecycle question, and it is what the connect branch at
-[storage.py:283](../storage.py#L283) tests.
+[storage.py:286](../storage.py#L286) tests.
 
 Two things make this smaller than it looks. There is **no
 `ON DUPLICATE KEY UPDATE` anywhere** — the `prints` and `filaments` upserts are
@@ -184,7 +184,7 @@ So, concretely:
   differs), `BYTEA`, a separate `CREATE INDEX`, `INSERT … ON CONFLICT DO UPDATE`
   for those two statements, and a slightly different information_schema query.
   `rowcount` is a bonus: Postgres counts matched rows natively, so the
-  `CLIENT.FOUND_ROWS` workaround at [storage.py:299](../storage.py#L299) is not
+  `CLIENT.FOUND_ROWS` workaround at [storage.py:302](../storage.py#L302) is not
   needed. The work that is **not** visible in a grep is type strictness —
   sqlite and MySQL accept `None` or `""` into a `FLOAT`, Postgres does not — and
   finding those needs the test suite run against a live server, not reasoning
@@ -453,5 +453,75 @@ A few behaviours are non-obvious because the printer's raw data is messy:
   the Raw printer data view comes from scanning `bambu_state.py` for the keys it
   reads (`.get("…")`), so it can never drift out of sync — add a field to the parser
   and it turns green automatically.
+
+- **Filament changes are counted from slice_info, not reported.** Neither MQTT
+  nor the cloud says how many changes a print makes. slice_info.config lists,
+  per layer range, which filaments print there (`layer_filament_lists`, 0-based
+  indexes) and which nozzle each filament is on (`filament_maps`, 1-based).
+  `gcode_meta.parse_changes` replays that per nozzle: a change is loading a
+  filament the nozzle does not hold, and each layer starts with the loaded one
+  and ends on one the next layer needs - the order the slicer picks, so two
+  colours sharing layers cost one change per layer, not two. Moving to the
+  X2D's other nozzle is a nozzle swap and is not counted, nor is a nozzle's
+  first load. For the running print the file is read once, 30 s in
+  (`_live_changes`, on the MQTT path but in a thread, two tries at most), and
+  `done` is the changes in layers before the one MQTT reports. It is not a
+  `FORMAT` bump: only a running print needs it, and a bump would re-read the
+  whole history from the drive. The per-layer list stays out of `/api/prints`.
+
+- **MakerWorld is read, not framed.** makerworld.com sends
+  `X-Frame-Options: SAMEORIGIN` and answers anything that is not a browser with a
+  Cloudflare challenge, so an iframe cannot work. `makerworld.py` reads the API
+  behind the site (`api.bambulab.com`: search, category listings, one design);
+  those calls need no login. None of it is documented, so everything is reduced
+  to a small shape of our own at that one boundary, and the page never sees a
+  raw payload. The author's description is HTML, and it reaches the page as
+  text only.
+  - **Images** come from `makerworld.bblmw.com`, which resizes on request. The
+    originals are several MB and are served as `application/octet-stream`;
+    `?x-oss-process=image/resize,w_N/format,webp` returns a proper `image/webp`
+    a few hundred times smaller, and the browser loads it directly.
+  - **Profiles.** An author slices for one printer and Bambu re-slices for the
+    others (`otherCompatibilityModelInfo`). For the configured `model` those
+    re-sliced figures replace the author's (*adapted*). A printer that is only
+    listed as compatible, with no figures of its own, is marked *compatible*.
+  - **Matching** is material first, then the "redmean" colour distance: 60 or
+    less is the same colour, 120 or less is similar. Profiles name colours
+    loosely (a "black" is as often `#101010` as `#000000`). Each tray is handed
+    out once, closest pairs first. An offline printer means the AMS is
+    *unknown*, and the page says so instead of calling every colour missing.
+  - **Caching.** Listings are kept for 10 minutes and designs for 24 hours. A
+    404 is cached too: a model removed since it was printed would otherwise be
+    asked for on every look at the history. `/api/mw/briefs` fetches at most 8
+    uncached models per call and returns the rest as `pending`, so a long
+    history fills in over a few quick rounds instead of stalling one request.
+  - **Collections.** Your own list is `GET /v1/design-service/my/favorites/listlite`,
+    read with the Cloud sign-in's token (the same Bambu account is the
+    MakerWorld account). It was found by what the API admits to - a login-only
+    401 where other guesses got a 404 - and its answer is documented nowhere, so
+    it is read for either plausible shape: the collections themselves
+    (`_find_collections` looks for a list of objects with an id and a title), or
+    bare ids, which are then opened one by one (`_resolve`, parallel, at most
+    60) and dropped if they do not open as a collection. An answer it cannot
+    read is reported as such, never shown as "no collections".
+    `my/design/favoriteslist` looks like the list but is not: it needs a
+    `designId` and answers which of your collections hold that model.
+    `tools/why_no_collections.py` shows what the account side answers. One
+    collection is `favorites/<id>` (title, `designCnt`, up to four
+    `designCover`s) plus `favorites/<id>/designs?offset&limit`; public ones
+    answer without a login, private ones with 403 until they are read as their
+    owner. Answers read with a token are cached apart from anonymous ones, and
+    an expired token is retried anonymously, so it never hides a public
+    collection. The token stays on the server.
+  - **Channels you follow** need the login only to learn which account is
+    yours: `design-user-service/my/profile` gives the uid (`_uid_of` looks for
+    it rather than trusting one key). Who a uid follows is public
+    (`design-user-service/user/<uid>/follows`, what a MakerWorld profile page
+    shows), and so are a creator's models (`design-service/published/<uid>/design`,
+    whose hits carry `coverUrl` where listings say `cover`). The feed of new
+    models from all of them is the `Following` category of the ordinary listing
+    call - the one category sent with the token; every other one stays
+    anonymous and shared in the cache. Avatars live on `public-cdn.bblmw.com`,
+    which resizes the same way (1.2 MB down to 4 KB).
 
 ---

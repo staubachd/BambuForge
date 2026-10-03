@@ -27,13 +27,14 @@ const ctx = {
   fmtDur: (a, b) => (a && b ? Math.round((b - a) / 60) + " min" : "—"),
   swatch: c => `<i data-c="${c}"></i>`,
   filName: f => f.product || f.type || "?",
+  mwBriefs: {},       // the pictures looked up for the history; none yet here
 };
 vm.createContext(ctx);
 // detailRow leans on these; grabbed from the page rather than stubbed, so the
 // panel is exercised with the real precedence and the real formatting
 for (const fn of ["function fmtLH(", "function lhOf(", "function fmtMin(",
                   "function sliceBlock(", "function slotLine(",
-                  "function detailRow("]) {
+                  "function mwBriefBlock(", "function detailRow("]) {
   vm.runInContext(grab(fn), ctx);
 }
 const detail = r => vm.runInContext("detailRow(" + JSON.stringify(r) + ", '€')", ctx);
@@ -48,6 +49,15 @@ if (!/makerworld\.com\/models\/424242/.test(h))
   throw new Error("no link for a print that has a model id: " + h.slice(0, 300));
 if (!/profileId-7/.test(h)) throw new Error("the plate is missing from the link");
 console.log("a model print links to:", h.match(/https:\/\/makerworld[^"']+/)[0]);
+if (!/data-mw="424242"/.test(h))
+  throw new Error("no way to open the model on the MakerWorld tab");
+// and once its picture has been looked up, the panel shows it
+ctx.mwBriefs["424242"] = {title: "Bracket <v2>", cover: "https://x/c.webp", creator: "me"};
+h = detail({...BASE, design_id: "424242"});
+if (!/Bracket &lt;v2&gt;/.test(h) || !/https:\/\/x\/c\.webp/.test(h))
+  throw new Error("the model's title and picture are not shown (or not escaped)");
+delete ctx.mwBriefs["424242"];
+console.log("it opens on the MakerWorld tab, with the model's picture once known");
 
 // --- a self-sliced print links to nothing ----------------------------------
 h = detail({...BASE});

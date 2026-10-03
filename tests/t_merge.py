@@ -39,6 +39,11 @@ def rows():
 
 a_print("m-a", A, 300.0)
 a_print("m-b", B, 120.0)
+# Price the fixture the way the app would have. A merge re-costs with the
+# configured price, which is whatever the database this runs on says - so a
+# made-up 20/kg would "change" on the way back even though nothing is wrong.
+app._recost_filament(A)
+app._recost_filament(B)
 before = rows()
 assert A in before and B in before, "the fixture did not produce two identities"
 assert before[A]["grams"] == 300.0 and before[B]["grams"] == 120.0

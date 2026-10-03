@@ -104,6 +104,14 @@ assert 'getattr(signal, "SIGKILL"' in src, (
     "Windows and takes the camera thread with it")
 print("SIGKILL is looked up, not assumed")
 
+# --- and signal 0 is not used as a liveness probe --------------------------
+# On Windows signal 0 is CTRL_C_EVENT: os.kill(pid, 0) sends Ctrl+C to the
+# whole console, which silently ended the test runner right after this test.
+assert src.count("os.kill(pid, 0)") == 1, (
+    "os.kill(pid, 0) outside the POSIX branch of _pid_alive - on Windows that "
+    "is Ctrl+C to the console")
+print("liveness is checked without sending Ctrl+C on Windows")
+
 # --- the retry loop backs off ----------------------------------------------
 i = src.index("def go2rtc_worker(")
 body = src[i:src.index("\ndef ", i + 10)]

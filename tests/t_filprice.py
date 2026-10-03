@@ -77,7 +77,8 @@ assert d["ok"] and d["price_per_kg"] is None, d
 back = app._filament_price_per_kg(
     {"slotId": 0, "filamentId": "GFL99", "filamentType": "PLA"}, {}, FKEY)
 assert back[1] != "set by hand", "clearing did not release the filament"
-assert abs(cost_of("A") - 250/1000*back[0]) < 1e-6, "history was not re-costed on clear"
+# with no price configured that is 0/kg, and a zero cost is stored as "unknown"
+assert abs((cost_of("A") or 0) - 250/1000*back[0]) < 1e-6, "history was not re-costed on clear"
 print("history followed the clear:", cost_of("A"), "at", back[0], "/kg")
 
 # --- a merged identity is priced by whichever row survived ---
