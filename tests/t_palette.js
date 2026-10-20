@@ -40,7 +40,57 @@ for (const file of ["dashboard.html"]) {
   console.log(`\n${file}`);
   for (const [name, t] of Object.entries(themes)) {
     BRAND = BRAND || t["--brand"]; STONE = STONE || t["--brand-ink"];
+    checkPairs(file, name, t);
+  }
+  // A pale colour cannot be text on a light ground. That used to be asserted as
+  // "the brand colour is never --accent", which was a PROXY for the real rule
+  // and wrong for any pair whose brand colour is a mid-tone: #3447AA is 8:1 on
+  // white and makes a perfectly good accent. The real rule is the contrast of
+  // whatever is actually used as text, which the pairs above already cover - so
+  // what is left to state is that the fill/ink split is honest.
+  for (const [name, t] of Object.entries(themes)) checkAccent(name, t);
 
+  console.log("  no colour hardcoded outside the token blocks");
+}
+
+// The ModelForge look is a second palette laid over the first. The same pairs
+// have to hold for it, in both themes, with its tokens merged the way the
+// cascade merges them: forge-dark sits on forge-light, which sits on classic.
+{
+  const html = fs.readFileSync(_src("dashboard.html"), "utf8");
+  const base = html.match(/<style>([\s\S]*?)<\/style>/)[1];
+  const forge = (html.match(/<style id="look-forge">([\s\S]*?)<\/style>/) || [])[1];
+  if (!forge) throw new Error("the forge look's style block is gone");
+  const cl = tokens(base, ":root:root"), cd = tokens(base, ':root:root[data-theme="dark"]');
+  const fl = tokens(forge, ":root:root[data-look=forge]");
+  const fd = tokens(forge, ':root:root[data-look=forge][data-theme="dark"]');
+  const themes = {"forge light": {...cl, ...fl}, "forge dark": {...cl, ...cd, ...fl, ...fd}};
+  console.log("\ndashboard.html, forge look");
+  for (const [name, t] of Object.entries(themes)) {
+    checkPairs("dashboard.html", name, t);
+    checkAccent(name, t);
+    // its own extra token: the lighter accent it uses for links on dark
+    const r = ratio(t["--accent-fg"], t["--surface"]);
+    if (r < 4.5) throw new Error(`${name}: --accent-fg is ${r.toFixed(2)}:1 on the card`);
+    for (const s of ["--accent", "--good", "--warn", "--danger", "--info", "--text-3"]) {
+      const c = ratio(t[s], t["--surface-2"]);
+      if (c < 3.0) throw new Error(`${name}: ${s} is ${c.toFixed(2)}:1 on the state chip`);
+    }
+  }
+}
+
+function checkAccent(name, t){
+  const asText = ratio(t["--accent"], t["--surface"]);
+  const asFill = ratio(t["--brand-ink"], t["--brand"]);
+  console.log(`  ${name}: accent as text ${asText.toFixed(1)}:1, ` +
+              `fill ${t["--brand"]} with ${t["--brand-ink"]} on it ${asFill.toFixed(1)}:1`);
+  // a colour too pale to be text must not be the one carrying links
+  if (asText < 4.5)
+    throw new Error(`${name}: --accent ${t["--accent"]} is only ${asText.toFixed(2)}:1 ` +
+                    "on the card - it cannot carry links or the active subnav");
+}
+
+function checkPairs(file, name, t){
     // every pair the stylesheet actually renders together
     const pairs = [
       ["body text",        t["--text"],      t["--bg"],       4.5],
@@ -73,25 +123,6 @@ for (const file of ["dashboard.html"]) {
         throw new Error(`${file} ${name}: ${what} is ${r.toFixed(2)}:1, needs ${min} (${fg} on ${bg})`);
     }
     console.log(`  ${name}: all ${pairs.length} pairs pass`);
-  }
-  // A pale colour cannot be text on a light ground. That used to be asserted as
-  // "the brand colour is never --accent", which was a PROXY for the real rule
-  // and wrong for any pair whose brand colour is a mid-tone: #3447AA is 8:1 on
-  // white and makes a perfectly good accent. The real rule is the contrast of
-  // whatever is actually used as text, which the pairs above already cover - so
-  // what is left to state is that the fill/ink split is honest.
-  for (const [name, t] of Object.entries(themes)) {
-    const asText = ratio(t["--accent"], t["--surface"]);
-    const asFill = ratio(t["--brand-ink"], t["--brand"]);
-    console.log(`  ${name}: accent as text ${asText.toFixed(1)}:1, ` +
-                `fill ${t["--brand"]} with ${t["--brand-ink"]} on it ${asFill.toFixed(1)}:1`);
-    // a colour too pale to be text must not be the one carrying links
-    if (asText < 4.5)
-      throw new Error(`${name}: --accent ${t["--accent"]} is only ${asText.toFixed(2)}:1 ` +
-                      "on the card - it cannot carry links or the active subnav");
-  }
-
-  console.log("  no colour hardcoded outside the token blocks");
 }
 
 // The state pill is a neutral chip with the state's colour as its TEXT and

@@ -150,14 +150,18 @@ print(f"replace for real: {real['deleted']} deleted, {real['inserted']} written,
 # --- what it refuses --------------------------------------------------------
 for bad, why in [
     ({"app": "something-else", "format": 1, "tables": {}}, "another app's file"),
-    ({"app": "bambu-monitor", "tables": {}}, "no format version"),
-    ({"app": "bambu-monitor", "format": 999, "tables": {}}, "a newer format"),
-    ({"app": "bambu-monitor", "format": 1}, "no tables"),
-    ({"app": "bambu-monitor", "format": 1, "tables": {"passwords": []}}, "an unknown table"),
+    ({"app": "bambuforge", "tables": {}}, "no format version"),
+    ({"app": "bambuforge", "format": 999, "tables": {}}, "a newer format"),
+    ({"app": "bambuforge", "format": 1}, "no tables"),
+    ({"app": "bambuforge", "format": 1, "tables": {"passwords": []}}, "an unknown table"),
     ("not even a dict", "a string"),
 ]:
     assert backup.check(bad), f"{why} was accepted as a backup"
 print("refused: another app's file, a missing or future format, an unknown table")
+# a file written before the rename to BambuForge still says "bambu-monitor"
+assert backup.check({"app": "bambu-monitor", "format": 1, "tables": {}}) is None, \
+    "a backup from before the rename is refused"
+print("a pre-rename bambu-monitor backup is still accepted")
 
 # --- and the endpoints agree with the module -------------------------------
 # the earlier restore deliberately did NOT bring the access code back, so put
@@ -167,7 +171,7 @@ r = c.get("/api/backup")
 assert r.status_code == 200 and "attachment" in r.headers.get("Content-Disposition", "")
 assert ".json" in r.headers["Content-Disposition"]
 served = json.loads(r.data)
-assert served["app"] == "bambu-monitor" and served["counts"]["prints"] > 0
+assert served["app"] == "bambuforge" and served["counts"]["prints"] > 0
 assert "SECRET123" not in r.data.decode(), "the download leaked the access code"
 assert "SECRET123" in c.get("/api/backup?secrets=1").data.decode(), \
     "?secrets=1 did not include them"

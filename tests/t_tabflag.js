@@ -30,7 +30,7 @@ const constant = name => {
 const ctx = {
   t: s => s,
   document: {hidden: false, title: ""},
-  BASE_TITLE: "Bambu X2D",
+  BASE_TITLE: "BambuForge",
   FAV_DEFAULT: "default-icon",
   setFavicon: v => { ctx.favicon = v; },
   drawFavicon: (state, pct) => `${state}:${Math.round(pct)}`,
@@ -125,7 +125,7 @@ if (ctx.favicon === "default-icon") throw new Error("a running print has the pla
 tab({state_label: "Idle"});
 if (ctx.favicon !== "default-icon")
   throw new Error("an idle printer keeps a badged icon: " + ctx.favicon);
-if (title() !== "Bambu X2D") throw new Error("an idle tab is not plain: " + title());
+if (title() !== "BambuForge") throw new Error("an idle tab is not plain: " + title());
 console.log("idle -> plain title and plain icon");
 
 // --- and the work is skipped when nothing changed --------------------------

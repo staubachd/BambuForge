@@ -1,11 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-look="forge">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bambu X2D Monitor</title>
-<!-- inline SVG favicon: cyan printer glyph on Proton grey (no external asset) -->
-<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJCMkEzMyIvPjxyZWN0IHg9IjEwLjUiIHk9IjUuNSIgd2lkdGg9IjExIiBoZWlnaHQ9IjYuNSIgcng9IjEuNSIgZmlsbD0iIzQ1QTFGRiIvPjxyZWN0IHg9IjYiIHk9IjExIiB3aWR0aD0iMjAiIGhlaWdodD0iOC41IiByeD0iMi41IiBmaWxsPSIjNDVBMUZGIi8+PGNpcmNsZSBjeD0iMjEuNSIgY3k9IjE1IiByPSIxLjUiIGZpbGw9IiMyQjJBMzMiLz48cmVjdCB4PSI5LjUiIHk9IjE3IiB3aWR0aD0iMTMiIGhlaWdodD0iOSIgcng9IjEuNSIgZmlsbD0iIzQ1QTFGRiIvPjxyZWN0IHg9IjEyIiB5PSIyMC40IiB3aWR0aD0iOCIgaGVpZ2h0PSIxLjUiIHJ4PSIuNzUiIGZpbGw9IiMyQjJBMzMiLz48cmVjdCB4PSIxMiIgeT0iMjMiIHdpZHRoPSI1LjUiIGhlaWdodD0iMS41IiByeD0iLjc1IiBmaWxsPSIjMkIyQTMzIi8+PC9zdmc+">
+<title>BambuForge</title>
+<!-- inline SVG favicon: the X2D as an isometric block, red top on two greys,
+     dark window in front ("1a" from the Claude Design favicon sheet) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBvbHlnb24gcG9pbnRzPSIxNiwzIDI3LDkuNSAxNiwxNiA1LDkuNSIgZmlsbD0iI2VjMzAxMyIvPjxwb2x5Z29uIHBvaW50cz0iNSw5LjUgMTYsMTYgMTYsMjkgNSwyMi41IiBmaWxsPSIjY2ZjY2M1Ii8+PHBvbHlnb24gcG9pbnRzPSIxNiwxNiAyNyw5LjUgMjcsMjIuNSAxNiwyOSIgZmlsbD0iIzhhODc3ZiIvPjxwb2x5Z29uIHBvaW50cz0iNywxMi42OCAxNCwxNi44MiAxNCwyNS44MiA3LDIxLjY4IiBmaWxsPSIjMjAxZTFkIi8+PC9zdmc+">
+<!-- IBM Plex, the typeface of the look; without it the page falls back to the
+     system sans and mono and stays fully usable -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   /* ---------- design tokens ---------- */
   :root{
@@ -1192,14 +1198,357 @@
   .upd:not(:empty)::before{content:"·"; margin:0 6px; opacity:.5}
   section{margin-top:16px}
 </style>
+<!-- ============================================================
+     The look in use: ModelForge's studio style - warm near-black panels, one
+     blue accent, IBM Plex Sans for words and Plex Mono for figures and the
+     small uppercase labels. It is the top layer over the two above it, which
+     still describe the earlier looks and supply everything this does not
+     restate.
+
+     Everything here is scoped to :root:root[data-look=forge] - the attribute
+     sits on <html> in the markup - one step heavier than the :root:root layer,
+     so it wins without !important and without depending on where it sits.
+     ============================================================ -->
+<style id="look-forge">
+  :root:root[data-look=forge]{
+    /* light: not part of ModelForge, which is dark only - the same warm greys
+       inverted to paper, with the accent deepened until it reads as text */
+    --bg:#f3f2ee; --bg-2:#ebe9e3;
+    --surface:#fbfaf7; --surface-2:#f1efe9;
+    --border:#e2dfd7; --border-strong:#cfccc4;
+    --track:#e6e3db;
+    --text:#1c1c1a; --text-2:#3a3935; --text-3:#6f6c66; --faint:#9a978f;
+    --accent:#2d6cb8; --accent-2:#245ea3; --accent-fg:#2d6cb8; --accent-soft:rgba(45,108,184,.10);
+    --accent-ink:#ffffff;
+    --brand:#2d6cb8; --brand-ink:#ffffff;
+    --on-status:#ffffff;
+    --good:#1d7d3e; --warn:#a35f00; --danger:#c5353e; --info:#2d6cb8;
+    --good-soft:rgba(29,125,62,.11); --warn-soft:rgba(163,95,0,.11);
+    --danger-soft:rgba(197,53,62,.10);
+    --shadow:none; --shadow-lg:0 12px 36px rgba(28,28,26,.14);
+    --s-noz0:#2d6cb8; --s-noz1:#1d7d3e; --s-bed:#c26300; --s-chamber:#7652ac;
+    --s-power:#c5353e;
+    --stripe:rgb(0 0 0 / .035);
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+    color-scheme:light;
+  }
+  :root:root[data-look=forge][data-theme="dark"]{
+    /* ModelForge's own values (its oklch accents, converted to hex so the
+       charts can hand them straight to SVG) */
+    --bg:#141413; --bg-2:#10100f;
+    --surface:#1c1c1a; --surface-2:#232320;
+    --border:#2e2d2a; --border-strong:#3a3935;
+    --track:#2e2d2a;
+    --text:#ecebe6; --text-2:#cfccc5; --text-3:#9a978f; --faint:#6f6c66;
+    --accent:#5894e0; --accent-2:#67a4f1; --accent-fg:#81b4f6; --accent-soft:rgba(88,148,224,.14);
+    /* ModelForge puts white on its blue; that is 3.1:1, so ink is dark here */
+    --accent-ink:#141413;
+    --brand:#5894e0; --brand-ink:#141413;
+    --on-status:#141413;
+    --good:#5bbd74; --warn:#eeb154; --danger:#ef6567; --info:#81b4f6;
+    --good-soft:rgba(91,189,116,.13); --warn-soft:rgba(238,177,84,.13);
+    --danger-soft:rgba(239,101,103,.14);
+    --shadow:none; --shadow-lg:0 24px 64px rgb(0 0 0 / .5);
+    --s-noz0:#5894e0; --s-noz1:#5bbd74; --s-bed:#ff9f43; --s-chamber:#b093e5;
+    --s-power:#ef6567;
+    --stripe:rgb(255 255 255 / .035);
+    color-scheme:dark;
+  }
+
+  /* --- ground and type --- */
+  :root:root[data-look=forge] body{font-family:var(--sans); font-size:14.5px; line-height:1.5;
+    font-variant-numeric:tabular-nums}
+  :root:root[data-look=forge] body::before{background:none}
+  [data-look=forge] *{scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent}
+  [data-look=forge] ::selection{background:color-mix(in srgb, var(--accent) 40%, transparent)}
+  :root:root[data-look=forge] :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* --- masthead: isometric mark, two-weight wordmark, mono status chips --- */
+  :root:root[data-look=forge] .logo{width:auto; height:auto; background:none; border:0;
+    box-shadow:none; border-radius:0}
+  :root:root[data-look=forge] .logo svg{display:block}
+  :root:root[data-look=forge] .brand{gap:10px}
+  :root:root[data-look=forge] .brand h1{font-size:19px; font-weight:600; letter-spacing:-.015em; line-height:1}
+  :root:root[data-look=forge] .brand h1 span{font-weight:400; color:var(--text-3)}
+  :root:root[data-look=forge] .brand .sub{font-family:var(--mono); font-size:11.5px; margin-top:4px}
+  :root:root[data-look=forge] .sections{background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:4px}
+  :root:root[data-look=forge] .sections button{font-size:14px; font-weight:500; color:var(--text-3);
+    border-radius:7px; padding:7px 14px}
+  :root:root[data-look=forge] .sections button:hover{color:var(--text); background:none}
+  :root:root[data-look=forge] .sections button.on{background:var(--surface-2); color:var(--text); box-shadow:none}
+  :root:root[data-look=forge] .pill{font-family:var(--mono); font-size:12px; font-weight:400;
+    color:var(--text-2); background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:8px; padding:7px 12px; box-shadow:none}
+  :root:root[data-look=forge] .recwrap{padding:4px 6px 4px 10px}
+  :root:root[data-look=forge] .hbtn{cursor:pointer}
+  :root:root[data-look=forge] .hbtn:hover{border-color:var(--faint)}
+  :root:root[data-look=forge] .hbtn.has-warn{color:var(--warn);
+    border-color:color-mix(in srgb, var(--warn) 55%, transparent)}
+  :root:root[data-look=forge] .icon-btn{width:36px; height:36px; border-radius:9px;
+    background:var(--surface-2); border:1px solid var(--border-strong); color:var(--text-2); box-shadow:none}
+  :root:root[data-look=forge] .icon-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
+  :root:root[data-look=forge] .icon-btn.led-on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
+
+  /* --- second level: tabs on a rule, the active one a raised fill --- */
+  :root:root[data-look=forge] .subnav{gap:4px; padding:0 0 10px; margin:16px 0 20px}
+  :root:root[data-look=forge] .subnav.empty{padding:0; margin:8px 0 0}
+  :root:root[data-look=forge] .subnav button{font-size:13px; font-weight:500; color:var(--text-3);
+    border:0; margin:0; border-radius:8px; padding:6px 11px}
+  :root:root[data-look=forge] .subnav button:hover{color:var(--text)}
+  :root:root[data-look=forge] .subnav button.on{background:var(--surface-2); color:var(--text); font-weight:600}
+  :root:root[data-look=forge] .subnav .sub-note{font-family:var(--mono); font-size:11.5px}
+  :root:root[data-look=forge] .settabs{gap:4px; padding-bottom:8px}
+  :root:root[data-look=forge] .settabs button{border:0; margin:0; border-radius:8px; padding:6px 10px;
+    font-weight:500; color:var(--text-3)}
+  :root:root[data-look=forge] .settabs button.on{background:var(--surface-2); color:var(--text); font-weight:600}
+
+  /* --- panels, and the darker wells set into them --- */
+  :root:root[data-look=forge] .card{background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; box-shadow:none; padding:18px 20px}
+  :root:root[data-look=forge] .card-head{margin-bottom:14px}
+  :root:root[data-look=forge] .card-head h3,
+  :root:root[data-look=forge] .sub-head,
+  :root:root[data-look=forge] .mw-sub,
+  :root:root[data-look=forge] .det h4,
+  :root:root[data-look=forge] .dupes h4{
+    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--text-3)}
+  :root:root[data-look=forge] .dupes h4{color:var(--warn)}
+  :root:root[data-look=forge] .card-head .meta{font-family:var(--mono); font-size:11.5px}
+  :root:root[data-look=forge] .spool,
+  :root:root[data-look=forge] .det,
+  :root:root[data-look=forge] .note,
+  :root:root[data-look=forge] .mw-prof,
+  :root:root[data-look=forge] .chip{background:var(--bg); border:1px solid var(--border);
+    border-radius:10px; box-shadow:none}
+  :root:root[data-look=forge] .spool .donut-hole{background:var(--bg)}
+  /* the loaded slot, the way ModelForge marks the current version */
+  :root:root[data-look=forge] .spool.active{border-color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 7%, var(--bg)); box-shadow:inset 3px 0 0 var(--accent)}
+  :root:root[data-look=forge] .spool.active .donut-hole{background:color-mix(in srgb, var(--accent) 7%, var(--bg))}
+  :root:root[data-look=forge] .spool.low{border-color:color-mix(in srgb, var(--warn) 60%, transparent)}
+  :root:root[data-look=forge] .spool.active .slot-badge{background:var(--accent); color:var(--accent-ink)}
+  :root:root[data-look=forge] .slot-badge{font-family:var(--mono); font-weight:500; border-radius:5px;
+    background:var(--surface-2); border-color:var(--border-strong)}
+  :root:root[data-look=forge] .note.editing{border-color:var(--accent); background:var(--accent-soft)}
+  :root:root[data-look=forge] .warn{background:var(--bg); border:1px solid var(--border);
+    border-left:2px solid var(--warn); border-radius:8px; color:var(--text-2)}
+  :root:root[data-look=forge] .warn.is-acked{border-left-color:var(--good)}
+  :root:root[data-look=forge] .stage{background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    font-family:var(--mono); font-size:12px}
+  :root:root[data-look=forge] .errbar{background:color-mix(in srgb, var(--danger) 14%, var(--surface));
+    border:1px solid color-mix(in srgb, var(--danger) 50%, transparent); color:var(--danger);
+    font-family:var(--mono); font-size:12px; font-weight:500; border-radius:10px}
+  :root:root[data-look=forge] .dupes{background:color-mix(in srgb, var(--warn) 8%, var(--bg));
+    border-color:color-mix(in srgb, var(--warn) 45%, transparent); border-radius:10px}
+  :root:root[data-look=forge] .draft{border-radius:10px}
+  :root:root[data-look=forge] .selbar,
+  :root:root[data-look=forge] .day-filter{border-radius:10px;
+    border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
+
+  /* --- small uppercase mono labels, ModelForge's signature --- */
+  :root:root[data-look=forge] .meta-label,
+  :root:root[data-look=forge] .kpi .kl,
+  :root:root[data-look=forge] .ctrl-lbl,
+  :root:root[data-look=forge] .chip .k,
+  :root:root[data-look=forge] .cost-col-h,
+  :root:root[data-look=forge] .draft-head,
+  :root:root[data-look=forge] .ring-state,
+  :root:root[data-look=forge] .head-stats .hs-label,
+  :root:root[data-look=forge] .htab tr.divider td{
+    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--text-3)}
+  :root:root[data-look=forge] .temp-label{font-family:var(--mono); font-size:11.5px; font-weight:500;
+    letter-spacing:.04em}
+  :root:root[data-look=forge] .legend span{font-family:var(--mono); font-size:11.5px; font-weight:400}
+  :root:root[data-look=forge] .legend i{border-radius:2px}
+
+  /* --- figures in Plex Mono --- */
+  :root:root[data-look=forge] .kpi .kv,
+  :root:root[data-look=forge] .pwr-now,
+  :root:root[data-look=forge] .meta-val,
+  :root:root[data-look=forge] .hs-val,
+  :root:root[data-look=forge] #pct,
+  :root:root[data-look=forge] .ring-pct,
+  :root:root[data-look=forge] .temp-val,
+  :root:root[data-look=forge] .htab .num,
+  :root:root[data-look=forge] .row .v,
+  :root:root[data-look=forge] .donut-hole,
+  :root:root[data-look=forge] .cline .lc,
+  :root:root[data-look=forge] .cline .la,
+  :root:root[data-look=forge] .cost-last .cl-tot,
+  :root:root[data-look=forge] .det .dl .v,
+  :root:root[data-look=forge] .det .slot .sg,
+  :root:root[data-look=forge] .dtab .num,
+  :root:root[data-look=forge] .hexchip,
+  :root:root[data-look=forge] .warn code,
+  :root:root[data-look=forge] .conn-v,
+  :root:root[data-look=forge] #rawBox,
+  :root:root[data-look=forge] .err-sub,
+  :root:root[data-look=forge] .spool-left,
+  :root:root[data-look=forge] .mbar .mv,
+  :root:root[data-look=forge] .mnt-due,
+  :root:root[data-look=forge] .grp-sum,
+  :root:root[data-look=forge] .upd{
+    font-family:var(--mono); font-variant-numeric:tabular-nums}
+  :root:root[data-look=forge] .kpi .kv{font-size:26px; font-weight:500; letter-spacing:-.02em}
+  :root:root[data-look=forge] .temp-val{font-weight:500; letter-spacing:-.02em}
+  :root:root[data-look=forge] .ring-pct, :root:root[data-look=forge] #pct{font-weight:500}
+  :root:root[data-look=forge] .pwr-now{font-weight:500}
+  :root:root[data-look=forge] .meta-val{font-size:15px; font-weight:500}
+  :root:root[data-look=forge] .job-name,
+  :root:root[data-look=forge] .idle-h,
+  :root:root[data-look=forge] .mw-title{font-weight:600; letter-spacing:-.01em}
+  :root:root[data-look=forge] .spool-type,
+  :root:root[data-look=forge] .note-h,
+  :root:root[data-look=forge] .grp-name{font-weight:600}
+  :root:root[data-look=forge] .ring-track{stroke:var(--track)}
+  :root:root[data-look=forge] .axis-txt{font-family:var(--mono); font-size:10.5px}
+
+  /* --- chips and status tags: round, outlined in their own colour --- */
+  :root:root[data-look=forge] .statepill{background:color-mix(in srgb, currentColor 10%, transparent);
+    border:1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius:20px;
+    font-size:12px; font-weight:500; padding:3px 11px}
+  :root:root[data-look=forge] .tag,
+  :root:root[data-look=forge] .badge,
+  :root:root[data-look=forge] .note-cat,
+  :root:root[data-look=forge] .pill-state,
+  :root:root[data-look=forge] .mw-m{border-radius:20px; font-weight:500; font-size:11px;
+    padding:1px 8px; border:1px solid color-mix(in srgb, currentColor 40%, transparent)}
+  :root:root[data-look=forge] .mw-tags span{border-radius:20px; background:transparent;
+    border-color:var(--border-strong)}
+
+  /* --- buttons --- */
+  :root:root[data-look=forge] .wbtn,
+  :root:root[data-look=forge] .ctrl-btn{background:var(--surface-2); border:1px solid var(--border-strong);
+    color:var(--text); border-radius:9px; box-shadow:none; font-weight:500; font-size:13px; padding:6px 13px}
+  :root:root[data-look=forge] .ctrl-btn{padding:8px 14px}
+  :root:root[data-look=forge] .wbtn:hover:not(:disabled),
+  :root:root[data-look=forge] .ctrl-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
+  :root:root[data-look=forge] .wbtn.ack-btn{background:var(--accent); border-color:transparent;
+    color:var(--accent-ink); font-weight:600}
+  :root:root[data-look=forge] .wbtn.ack-btn:hover{background:var(--accent-2); border-color:transparent; color:var(--accent-ink)}
+  :root:root[data-look=forge] .ctrl-btn.danger{background:none; color:var(--danger); border-color:var(--border-strong)}
+  :root:root[data-look=forge] .ctrl-btn.danger:hover{background:none; color:var(--danger); border-color:var(--danger)}
+  /* segmented controls: a sunken well, the chosen part raised out of it */
+  :root:root[data-look=forge] .seg,
+  :root:root[data-look=forge] .ranges{background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:9px; padding:2px; gap:2px}
+  :root:root[data-look=forge] .seg button,
+  :root:root[data-look=forge] .ranges button{font-family:var(--sans); color:var(--text-3);
+    border-radius:7px; font-weight:500}
+  :root:root[data-look=forge] .seg button:hover,
+  :root:root[data-look=forge] .ranges button:hover{color:var(--text)}
+  :root:root[data-look=forge] .seg button.on,
+  :root:root[data-look=forge] .ranges button.on{background:var(--surface-2); color:var(--text);
+    font-weight:600; box-shadow:none}
+  :root:root[data-look=forge] #speedSeg button.on{background:var(--accent-soft); color:var(--accent-fg)}
+  /* filter pills: outlined, the chosen one raised with an accent edge */
+  :root:root[data-look=forge] .note-cats button,
+  :root:root[data-look=forge] .mw-navs button,
+  :root:root[data-look=forge] .temp-set,
+  :root:root[data-look=forge] .assign-btn{background:transparent; border:1px solid var(--border-strong);
+    border-radius:20px; color:var(--text-2); box-shadow:none; font-weight:500}
+  :root:root[data-look=forge] .assign-btn{text-transform:none; letter-spacing:0; font-size:11px}
+  :root:root[data-look=forge] .note-cats button:hover,
+  :root:root[data-look=forge] .mw-navs button:hover,
+  :root:root[data-look=forge] .temp-set:hover,
+  :root:root[data-look=forge] .assign-btn:hover{color:var(--text); border-color:var(--faint)}
+  :root:root[data-look=forge] .note-cats button.on,
+  :root:root[data-look=forge] .mw-navs button.on,
+  :root:root[data-look=forge] .mw-navs button.mine.on{background:var(--surface-2); color:var(--text);
+    border-color:var(--accent); box-shadow:none}
+  :root:root[data-look=forge] .mw-navs button.mine{color:var(--accent-fg);
+    border-color:color-mix(in srgb, var(--accent) 50%, transparent)}
+  /* accent as text takes ModelForge's lighter tint on the dark ground */
+  :root:root[data-look=forge] .mw-link,
+  :root:root[data-look=forge] .reorder,
+  :root:root[data-look=forge] .warn a,
+  :root:root[data-look=forge] .note-body a,
+  :root:root[data-look=forge] .linkbtn,
+  :root:root[data-look=forge] .mw-more-txt,
+  :root:root[data-look=forge] .htab .nm .mw-h{color:var(--accent-fg)}
+
+  /* --- form fields: sunken into the page ground --- */
+  :root:root[data-look=forge] .filt-in,
+  :root:root[data-look=forge] .buy-paste,
+  :root:root[data-look=forge] .note-title-in,
+  :root:root[data-look=forge] .set-row input[type=text],
+  :root:root[data-look=forge] .set-row input[type=password],
+  :root:root[data-look=forge] .set-row select,
+  :root:root[data-look=forge] .mtx input,
+  :root:root[data-look=forge] .draft input,
+  :root:root[data-look=forge] .nm-input{background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:8px; color:var(--text)}
+  :root:root[data-look=forge] .filt-in{padding:7px 10px}
+  :root:root[data-look=forge] .nm-input{border-color:var(--accent)}
+  :root:root[data-look=forge] .filt-in::placeholder,
+  :root:root[data-look=forge] .buy-paste::placeholder,
+  :root:root[data-look=forge] .note-title-in::placeholder{color:var(--faint)}
+  :root:root[data-look=forge] .filt-in:focus,
+  :root:root[data-look=forge] .buy-paste:focus,
+  :root:root[data-look=forge] .note-title-in:focus,
+  :root:root[data-look=forge] .set-row input:focus,
+  :root:root[data-look=forge] .set-row select:focus,
+  :root:root[data-look=forge] .mtx input:focus,
+  :root:root[data-look=forge] .draft input:focus{border-color:var(--accent)}
+
+  /* --- tables --- */
+  :root:root[data-look=forge] .htab th{font-family:var(--mono); font-size:11px; font-weight:500;
+    letter-spacing:.05em; text-transform:uppercase; color:var(--text-3); border-bottom-color:var(--border-strong)}
+  :root:root[data-look=forge] .htab th.srt.on{color:var(--accent-fg)}
+  :root:root[data-look=forge] .htab tr:hover td{background:var(--surface-2)}
+  :root:root[data-look=forge] .htab tr.grp td{background:var(--bg)}
+  :root:root[data-look=forge] .dtab th{font-family:var(--mono); font-size:11px; font-weight:500;
+    letter-spacing:.05em; text-transform:uppercase}
+
+  /* --- MakerWorld cards: picture over a hatched placeholder, like the library --- */
+  :root:root[data-look=forge] .mw-card{background:var(--bg); border:1px solid var(--border); border-radius:14px}
+  :root:root[data-look=forge] .mw-card:hover{border-color:var(--border-strong); transform:none}
+  :root:root[data-look=forge] .mw-card img,
+  :root:root[data-look=forge] .mw-card .mw-noimg{border-bottom:1px solid var(--border)}
+  :root:root[data-look=forge] .mw-noimg,
+  :root:root[data-look=forge] .mw-main,
+  :root:root[data-look=forge] .dropzone{background-color:var(--bg);
+    background-image:repeating-linear-gradient(135deg, var(--stripe) 0 8px, transparent 8px 16px)}
+  :root:root[data-look=forge] .mw-card .mw-ct{font-weight:600}
+  :root:root[data-look=forge] .mw-card .mw-cc,
+  :root:root[data-look=forge] .mw-stats{font-family:var(--mono); font-size:11px}
+  :root:root[data-look=forge] .mw-feedcard{border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
+  :root:root[data-look=forge] .dropzone{border:1px dashed var(--faint); border-radius:10px}
+  :root:root[data-look=forge] .dropzone:hover,
+  :root:root[data-look=forge] .dropzone.over{border-color:var(--accent)}
+  :root:root[data-look=forge] #liveWrap{border-radius:10px; border:1px solid var(--border)}
+
+  /* --- floating layers --- */
+  :root:root[data-look=forge] .modal{background:rgb(8 8 7 / .65)}
+  :root:root[data-look=forge] .mw-lb{background:rgba(0,0,0,.82)}
+  :root:root[data-look=forge] .modal-card{background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:14px; padding:22px 24px; box-shadow:var(--shadow-lg)}
+  :root:root[data-look=forge] .hpanel{border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  :root:root[data-look=forge] .tip{background:var(--surface-2); border-radius:8px;
+    font-family:var(--mono); font-size:11.5px}
+  :root:root[data-look=forge] .toast{background:var(--surface-2); border-radius:10px; font-weight:500}
+</style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="logo">🖨️</div>
+      <div class="logo">
+        <!-- the X2D as an isometric block, ModelForge-style: red top, two greys,
+             the dark window in the front face. Same drawing as the favicon. -->
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <polygon points="16,3 27,9.5 16,16 5,9.5" fill="#ec3013"/>
+          <polygon points="5,9.5 16,16 16,29 5,22.5" fill="#cfccc5"/>
+          <polygon points="16,16 27,9.5 27,22.5 16,29" fill="#8a877f"/>
+          <polygon points="7,12.68 14,16.82 14,25.82 7,21.68" fill="#201e1d"/>
+        </svg>
+      </div>
       <div>
-        <h1>Bambu&nbsp;X2D</h1>
+        <h1>Bambu<span>Forge</span></h1>
         <div class="sub" id="serial">—</div>
       </div>
     </div>
@@ -2398,7 +2747,7 @@ function setLang(l){
     const v = await (await fetch("/api/version")).json();
     if(!v.dashboard) return;
     const when = new Date(v.dashboard*1000).toLocaleString();
-    console.log("[bambu-monitor] dashboard.html served from " + when);
+    console.log("[bambuforge] dashboard.html served from " + when);
     const el = $("serial");
     if(el) el.title = "dashboard.html " + when;
   }catch(_){}
@@ -2452,9 +2801,9 @@ const STATE_TOKEN = {
    clears the moment the tab is looked at. */
 const BASE_TITLE = document.title;
 const FAV_DEFAULT = document.querySelector('link[rel="icon"]').href;
-// drawn on Big Stone, so these are the light end of the palette
-const FAV_COLOR = {Printing:"#45a1ff", Paused:"#ffbd4f", Finished:"#54ffbd",
-                   Failed:"#ff9aa2", Preparing:"#80b4ff", Slicing:"#80b4ff"};
+// drawn on a dark disc, so these are the dark theme's status colours
+const FAV_COLOR = {Printing:"#5894e0", Paused:"#eeb154", Finished:"#5bbd74",
+                   Failed:"#ef6567", Preparing:"#81b4f6", Slicing:"#81b4f6"};
 const DONE_STATES = ["Finished", "Failed"];
 const favCanvas = document.createElement("canvas");
 favCanvas.width = favCanvas.height = 32;
@@ -2466,7 +2815,7 @@ function drawFavicon(state, pct){
   // a dark disc under everything, so the mark reads on a light *and* a dark tab
   // strip without knowing which one the browser is using
   g.beginPath(); g.arc(16, 16, 15.5, 0, Math.PI*2);
-  g.fillStyle = "#2b2a33"; g.fill();   // Proton grey, in both themes
+  g.fillStyle = "#1c1c1a"; g.fill();   // the panel grey, in both themes
   g.beginPath(); g.arc(16, 16, 11, 0, Math.PI*2);
   g.lineWidth = 6; g.strokeStyle = "rgba(255,255,255,.20)"; g.stroke();
   if(state === "Printing" || state === "Paused" || state === "Preparing"){

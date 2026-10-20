@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Bambu X2D Monitor - single-process app: a background MQTT thread keeps the
+BambuForge - single-process app: a background MQTT thread keeps the
 latest normalized printer state, and Flask serves a live dashboard.
 
     python app.py            # serves http://localhost:8770
@@ -2923,7 +2923,7 @@ def api_backup():
     secrets = request.args.get("secrets") in ("1", "true", "yes")
     images = request.args.get("images") not in ("0", "false", "no")
     data = backup.export(store, include_secrets=secrets, include_images=images)
-    name = f"bambu-monitor-{datetime.now().strftime('%Y%m%d-%H%M')}.json"
+    name = f"bambuforge-{datetime.now().strftime('%Y%m%d-%H%M')}.json"
     body = json.dumps(data, indent=1, ensure_ascii=False, default=str)
     print(f"[backup] exported {sum(data['counts'].values())} row(s)"
           + (" INCLUDING credentials" if secrets else ""))

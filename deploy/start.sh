@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bambu Monitor launcher for Synology DSM.
+# BambuForge launcher for Synology DSM.
 # Idempotent: safe to run at boot AND as a periodic watchdog (every 5 min) -
 # it (re)starts the app only if it isn't already running. Uses a pidfile +
 # kill -0 check, which is busybox/POSIX-safe on DSM (pgrep -f is not reliable).
@@ -7,9 +7,9 @@
 # DSM setup: Control Panel -> Task Scheduler
 #   1) Triggered Task -> User-defined script -> Event: Boot-up,  User: root
 #   2) Scheduled Task  -> repeat every 5 minutes,                User: root
-#   Both run:  sh /volume1/apps/bambu-monitor/start.sh
+#   Both run:  sh /volume1/apps/bambuforge/deploy/start.sh
 
-APP_DIR=/volume1/apps/bambu-monitor
+APP_DIR=/volume1/apps/bambuforge
 PY="$APP_DIR/venv/bin/python3"
 PIDFILE="$APP_DIR/app.pid"
 
@@ -31,6 +31,6 @@ if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE" 2>/dev/null)" 2>/dev/null; the
 fi
 
 cd "$APP_DIR" || exit 1
-echo "$(date '+%Y-%m-%d %H:%M:%S') starting bambu-monitor" >> "$APP_DIR/app.log"
+echo "$(date '+%Y-%m-%d %H:%M:%S') starting bambuforge" >> "$APP_DIR/app.log"
 nohup "$PY" "$APP_DIR/app.py" >> "$APP_DIR/app.log" 2>&1 &
 echo $! > "$PIDFILE"

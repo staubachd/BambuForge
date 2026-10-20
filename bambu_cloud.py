@@ -16,7 +16,7 @@ import urllib.request
 
 API = "https://api.bambulab.com"
 WEB = "https://bambulab.com"
-UA = "bambu-monitor/1.0"
+UA = "bambuforge/1.0"
 
 
 class CloudError(RuntimeError):

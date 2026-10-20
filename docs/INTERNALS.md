@@ -1,4 +1,4 @@
-# Bambu Monitor — internals
+# BambuForge — internals
 
 Notes for anyone changing the code. None of this is needed to *run* the app —
 see the [README](../README.md) for that. It is kept because each of these was

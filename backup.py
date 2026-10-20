@@ -36,6 +36,10 @@ from datetime import datetime
 import settings_schema
 
 FORMAT = 1
+# what a backup calls this app. It was "bambu-monitor" before the rename to
+# BambuForge, and files written then have to stay restorable.
+APP_ID = "bambuforge"
+APP_IDS = (APP_ID, "bambu-monitor")
 
 # table -> the columns that identify a row, for deciding what a merge may skip.
 # Order matters on restore: a note_image points at a note, so notes go first.
@@ -91,7 +95,7 @@ def export(store, include_secrets: bool = False, include_images: bool = True) ->
 
     return {
         "format": FORMAT,
-        "app": "bambu-monitor",
+        "app": APP_ID,
         "created_at": time.time(),
         "created_at_human": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "counts": counts,
@@ -112,8 +116,8 @@ def check(data) -> str | None:
     """Why this cannot be restored, or None if it can."""
     if not isinstance(data, dict):
         return "that is not a backup file"
-    if data.get("app") != "bambu-monitor":
-        return f"this is not a Bambu Monitor backup (app={data.get('app')!r})"
+    if data.get("app") not in APP_IDS:
+        return f"this is not a BambuForge backup (app={data.get('app')!r})"
     fmt = data.get("format")
     if not isinstance(fmt, int):
         return "the file has no format version"

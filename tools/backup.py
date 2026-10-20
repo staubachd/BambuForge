@@ -7,7 +7,7 @@ scheduler at, so it happens whether or not anyone remembers.
     python tools/backup.py export                      # into ./backups
     python tools/backup.py export --out /volume1/backup --keep 30
     python tools/backup.py export --secrets            # include credentials
-    python tools/backup.py show    backups/bambu-monitor-20260831-2137.json
+    python tools/backup.py show    backups/bambuforge-20260831-2137.json
     python tools/backup.py restore backups/....json            # says what it WOULD do
     python tools/backup.py restore backups/....json --apply
     python tools/backup.py restore backups/....json --mode replace --apply
@@ -18,8 +18,8 @@ where you are already upset about something.
 On a Synology, Task Scheduler > Create > Scheduled Task > User-defined script,
 daily, as root:
 
-    /volume1/apps/bambu-monitor/venv/bin/python3 \\
-        /volume1/apps/bambu-monitor/tools/backup.py export \\
+    /volume1/apps/bambuforge/venv/bin/python3 \\
+        /volume1/apps/bambuforge/tools/backup.py export \\
         --out /volume1/backup/bambu --keep 30
 
 Put --out somewhere Hyper Backup already covers and the print history is part
@@ -65,7 +65,7 @@ if cmd == "export":
     except OSError as e:
         die(f"cannot write to {out_dir}: {e}")
 
-    name = f"bambu-monitor-{time.strftime('%Y%m%d-%H%M%S')}.json"
+    name = f"bambuforge-{time.strftime('%Y%m%d-%H%M%S')}.json"
     path = os.path.join(out_dir, name)
     # written to a temporary name and moved into place, so a backup that is
     # interrupted never leaves a half-file that looks like a good one
@@ -80,7 +80,10 @@ if cmd == "export":
         print("  this file CONTAINS the printer access code and account passwords")
 
     if keep > 0:
-        old = sorted(glob.glob(os.path.join(out_dir, "bambu-monitor-*.json")))
+        # files from before the rename are still named bambu-monitor-*, and
+        # sort before every bambuforge-* one, so they are the first to go
+        old = (sorted(glob.glob(os.path.join(out_dir, "bambu-monitor-*.json")))
+               + sorted(glob.glob(os.path.join(out_dir, "bambuforge-*.json"))))
         for p in old[:-keep]:
             os.unlink(p)
             print(f"  removed {os.path.basename(p)}")

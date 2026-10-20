@@ -1,4 +1,4 @@
--- Bambu Monitor: database + app user, for MariaDB or MySQL.
+-- BambuForge: database + app user, for MariaDB or MySQL.
 -- Run this ONCE, as the server's root user (e.g. via phpMyAdmin, or the CLI).
 -- The application creates its own tables on first start; this only provisions the
 -- database and a least-privilege user.

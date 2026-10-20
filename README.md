@@ -1,4 +1,4 @@
-# Bambu Monitor
+# BambuForge
 
 A self-hosted dashboard for the **Bambu Lab X2D** that answers the question the
 printer never does: *what did that print actually cost?*
@@ -147,7 +147,7 @@ you at all:
 
 ```bash
 git clone <this repo>
-cd bambu-monitor
+cd bambuforge
 pip install -r requirements.txt
 python app.py
 ```
@@ -191,7 +191,7 @@ hand.
 #### 3. Copy the app onto the NAS
 
 Create or reuse a shared folder and copy the project to
-**`/volume1/apps/bambu-monitor`**. File Station drag-and-drop is fine.
+**`/volume1/apps/bambuforge`**. File Station drag-and-drop is fine.
 
 > Putting it elsewhere is fine too — edit `APP_DIR` at the top of
 > [`deploy/start.sh`](deploy/start.sh) to match. Nothing else hardcodes a path.
@@ -201,7 +201,7 @@ Create or reuse a shared folder and copy the project to
 Enable SSH (**Control Panel → Terminal & SNMP → Enable SSH service**), then:
 
 ```sh
-cd /volume1/apps/bambu-monitor
+cd /volume1/apps/bambuforge
 /var/packages/Python3.9/target/usr/bin/python3.9 -m venv venv
 ./venv/bin/python3 -m pip install --upgrade pip
 ./venv/bin/python3 -m pip install -r requirements.txt
@@ -235,7 +235,7 @@ Press `Ctrl+C` once you have seen live data.
 user `root`, event **Boot-up**:
 
 ```sh
-sh /volume1/apps/bambu-monitor/deploy/start.sh
+sh /volume1/apps/bambuforge/deploy/start.sh
 ```
 
 Then add a second, **scheduled** task running the same line every 5 minutes as a
@@ -303,10 +303,14 @@ in and stores a token.
 
 ## Updating
 
+> Still installed under `/volume1/apps/bambu-monitor`, from before the rename to
+> BambuForge? Move it once first:
+> [Moving from the old folder](deploy/DEPLOY.md#moving-from-the-old-folder-bambu-monitor).
+
 Copy the changed files over, then:
 
 ```sh
-sh /volume1/apps/bambu-monitor/deploy/start.sh restart
+sh /volume1/apps/bambuforge/deploy/start.sh restart
 ```
 
 `restart` kills the running instance and **waits for it to exit** before starting
@@ -361,8 +365,8 @@ table first and says how many rows that will delete.
 For a backup that happens on its own, point the Synology task scheduler at:
 
 ```sh
-/volume1/apps/bambu-monitor/venv/bin/python3 \
-    /volume1/apps/bambu-monitor/tools/backup.py export \
+/volume1/apps/bambuforge/venv/bin/python3 \
+    /volume1/apps/bambuforge/tools/backup.py export \
     --out /volume1/backup/bambu --keep 30
 ```
 

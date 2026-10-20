@@ -29,7 +29,7 @@ import urllib.request
 
 API = "https://api.bambulab.com"
 SITE = "https://makerworld.com"
-UA = "bambu-monitor/1.0"
+UA = "bambuforge/1.0"
 
 LIST_TTL = 10 * 60          # listings move; ten minutes is fresh enough
 DESIGN_TTL = 24 * 3600      # a model's page rarely changes within a day
