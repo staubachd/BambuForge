@@ -6,6 +6,12 @@
 # Files that MUST stay LF even on Windows checkouts - they run on the Synology
 # (Linux); CRLF would break the shebang / shell parsing.
 *.sh   text eol=lf
+# The app runs on the NAS too, and the JS tests cut functions out of
+# dashboard.html by splitting on "\n" and looking for a bare "}" line - a CRLF
+# checkout makes every line end in "\r" and those tests loop forever.
+*.html text eol=lf
+*.js   text eol=lf
+*.py   text eol=lf
 
 # Binary / data files Git should never touch line endings on.
 *.db     binary
