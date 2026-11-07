@@ -53,30 +53,25 @@ for (const file of ["dashboard.html"]) {
   console.log("  no colour hardcoded outside the token blocks");
 }
 
-// The ModelForge look is a second palette laid over the first. The same pairs
-// have to hold for it, in both themes, with its tokens merged the way the
-// cascade merges them: forge-dark sits on forge-light, which sits on classic.
+// The Kammer look keeps its tokens in the base sheet (read above), and its
+// component layer must still exist and must not bring a palette of its own -
+// a second set of tokens in the layer is how the two drifted apart before.
 {
   const html = fs.readFileSync(_src("dashboard.html"), "utf8");
+  const kammer = (html.match(/<style id="look-kammer">([\s\S]*?)<\/style>/) || [])[1];
+  if (!kammer) throw new Error("the kammer look's style block is gone");
+  if (/\[data-look=kammer\](?:\[data-theme="dark"\])?\{[^}]*--bg:/.test(kammer))
+    throw new Error("the kammer layer defines its own palette again");
+  if (!/<html[^>]*data-look="kammer"/.test(html))
+    throw new Error("<html> does not carry data-look=kammer - the look would not apply");
   const base = html.match(/<style>([\s\S]*?)<\/style>/)[1];
-  const forge = (html.match(/<style id="look-forge">([\s\S]*?)<\/style>/) || [])[1];
-  if (!forge) throw new Error("the forge look's style block is gone");
-  const cl = tokens(base, ":root:root"), cd = tokens(base, ':root:root[data-theme="dark"]');
-  const fl = tokens(forge, ":root:root[data-look=forge]");
-  const fd = tokens(forge, ':root:root[data-look=forge][data-theme="dark"]');
-  const themes = {"forge light": {...cl, ...fl}, "forge dark": {...cl, ...cd, ...fl, ...fd}};
-  console.log("\ndashboard.html, forge look");
-  for (const [name, t] of Object.entries(themes)) {
-    checkPairs("dashboard.html", name, t);
-    checkAccent(name, t);
-    // its own extra token: the lighter accent it uses for links on dark
+  for (const [name, sel] of [["light", ":root:root"], ["dark", ':root:root[data-theme="dark"]']]) {
+    const t = tokens(base, sel);
+    // the lighter accent used for links on dark
     const r = ratio(t["--accent-fg"], t["--surface"]);
     if (r < 4.5) throw new Error(`${name}: --accent-fg is ${r.toFixed(2)}:1 on the card`);
-    for (const s of ["--accent", "--good", "--warn", "--danger", "--info", "--text-3"]) {
-      const c = ratio(t[s], t["--surface-2"]);
-      if (c < 3.0) throw new Error(`${name}: ${s} is ${c.toFixed(2)}:1 on the state chip`);
-    }
   }
+  console.log("\nkammer look: layer present, tokens live in the base sheet only");
 }
 
 function checkAccent(name, t){
