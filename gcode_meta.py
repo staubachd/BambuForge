@@ -627,7 +627,26 @@ def parse_changes(plate, meta: dict) -> dict:
             loaded[noz] = (keep or ends)[0]
         if count:
             per_layer.append([i, count])
-    return {"changes": sum(c for _, c in per_layer), "change_layers": per_layer}
+    return {"changes": sum(c for _, c in per_layer), "change_layers": per_layer,
+            "layer_fils": layer_fils(by_layer)}
+
+
+def layer_fils(by_layer: dict) -> list:
+    """Which filaments each run of layers uses, as [[first, last, [ids]], ...].
+
+    The ids are the slicer's filament ids (1-based, as `<filament id=...>` has
+    them), so a colour is one lookup away. Consecutive layers with the same set
+    are one run - a two-colour print of 400 layers is a handful of entries, not
+    400 - which is what lets the running print's colour column travel with every
+    state frame."""
+    out: list = []
+    for i in sorted(by_layer):
+        ids = sorted(f + 1 for f in by_layer[i])
+        if out and out[-1][2] == ids and out[-1][1] == i - 1:
+            out[-1][1] = i
+        else:
+            out.append([i, i, ids])
+    return out
 
 
 def changes_done(change_layers, layer) -> int | None:
@@ -885,5 +904,9 @@ if __name__ == "__main__":       # a self-test against the captured sample
     assert changes_done(stripe["change_layers"], 5) == 0     # layer 5 still to do
     assert changes_done(stripe["change_layers"], 6) == 1
     assert changes_done(stripe["change_layers"], 9) == 2
+    # the runs of layers and which filaments they use, 1-based like <filament id>
+    assert stripe["layer_fils"] and all(len(r) == 3 for r in stripe["layer_fils"]), stripe
+    assert layer_fils({1: {0}, 2: {0}, 3: {0, 1}, 4: {1}, 6: {1}}) == \
+        [[1, 2, [1]], [3, 3, [1, 2]], [4, 4, [2]], [6, 6, [2]]]
     assert changes_done(None, 5) is None
     print("ok")

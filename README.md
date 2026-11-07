@@ -51,6 +51,9 @@ a rule chain — a price you typed beats one learned from your invoices, which b
 a brand × material matrix — and finished jobs carry the exact grams the slicer
 computed. Every print row shows power, material and total, always rounded up, so a
 quote can never come out under the real cost.
+While a print runs, the Now page shows what it has cost so far and what it
+will come to: power from the plug, material from the sliced file's grams scaled
+by progress (marked as an estimate), next to the last print of the same model.
 
 **Print history** that stays useful. Rename jobs, group the plates of one model
 under a collapsible header with its own subtotals, override the grams, close a

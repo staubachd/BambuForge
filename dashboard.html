@@ -1597,6 +1597,306 @@
     :root:root[data-look=kammer] *{transition:none !important}
   }
 
+  /* ============ Printer · Now ============ */
+  #v-printer-now .now-hero{grid-column:span 7}
+  #v-printer-now .now-hero.solo{grid-column:span 12}
+  #v-printer-now .now-cost{grid-column:span 5}
+  #v-printer-now .temps-row,
+  #v-printer-now .now-ams{grid-column:span 12}
+  #v-printer-now .now-tchart{grid-column:span 8}
+  #v-printer-now .now-pchart{grid-column:span 4}
+  /* no plug, no power card: the temperature chart takes the row */
+  #v-printer-now:has(#powerCard[style*="none"]) .now-tchart{grid-column:span 12}
+  @media (max-width:1180px){
+    #v-printer-now .now-hero, #v-printer-now .now-cost,
+    #v-printer-now .now-tchart, #v-printer-now .now-pchart{grid-column:span 12}
+  }
+
+  /* the job */
+  :root:root[data-look=kammer] .now-hero{display:flex; gap:28px; align-items:stretch;
+    flex-wrap:nowrap; padding:28px}
+  .stack-wrap{flex:none; width:68px; display:flex}
+  .layer-stack{flex:1; display:flex; flex-direction:column; gap:3px; min-height:380px;
+    padding:8px; background:var(--bg); border:1px solid var(--border); border-radius:4px}
+  .layer-stack .ls{flex:1 1 0; min-height:3px; display:flex; gap:1px; border-radius:1px}
+  .layer-stack .ls i{flex:1; border-radius:1px; background:var(--track)}
+  .layer-stack .ls.now{outline:1px solid var(--accent); outline-offset:1px}
+  :root:root[data-look=kammer] .now-hero .hero-info{flex:1; min-width:0; display:flex;
+    flex-direction:column; gap:16px}
+  .hero-tags{display:flex; gap:8px; flex-wrap:wrap}
+  :root:root[data-look=kammer] .now-hero .job-name{font-size:30px; line-height:1.15; margin:0}
+  :root:root[data-look=kammer] .now-hero .mw-link{margin-top:6px; font-size:14px}
+  .hero-pct-row{display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap}
+  :root:root[data-look=kammer] .hero-pct{font-family:var(--mono); font-size:88px; line-height:.9;
+    font-weight:500; letter-spacing:-.05em; color:var(--text)}
+  :root:root[data-look=kammer] .hero-pct #pct{font-size:inherit; font-weight:inherit}
+  .hero-pct .u{font-size:40px; color:var(--text-2); margin-left:2px}
+  .hero-eta{color:var(--text-2); font-size:15px; line-height:1.45; padding-bottom:6px}
+  .hero-eta b{color:var(--text); font-weight:700}
+  .hero-bar{height:4px}
+  .hero-bar .fill{transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  :root:root[data-look=kammer] .now-hero .hero-meta{display:grid; gap:14px 20px; margin:0;
+    grid-template-columns:repeat(auto-fit, minmax(118px, 1fr))}
+  .now-hero .meta-wide{grid-column:1 / -1}
+  :root:root[data-look=kammer] .now-hero .meta-val{font-size:17px}
+  :root:root[data-look=kammer] .now-hero .meta-text{font-family:var(--sans); font-size:15px;
+    font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .meta-sub{font-size:12.5px; color:var(--text-3)}
+  .meta-sub:empty{display:none}
+  :root:root[data-look=kammer] .now-hero .job-ctrl{margin-top:auto; padding-top:14px;
+    border-top:1px solid var(--border); flex-wrap:wrap; gap:8px; align-items:center}
+  :root:root[data-look=kammer] .now-hero .ctrl-speed{margin-left:auto; display:flex; gap:10px;
+    align-items:center; flex-wrap:wrap}
+
+  /* what it costs */
+  :root:root[data-look=kammer] .now-cost{display:flex; flex-direction:column; gap:18px; padding:28px}
+  :root:root[data-look=kammer] .now-cost .card-head{margin:0}
+  .cn-w{margin-left:auto; font-family:var(--mono)}
+  .cn-figs{display:flex; gap:28px; flex-wrap:wrap; align-items:flex-end}
+  .cn-big{font-family:var(--mono); font-size:56px; line-height:1; font-weight:500;
+    letter-spacing:-.04em; color:var(--accent-fg)}
+  .cn-proj{font-family:var(--mono); font-size:28px; line-height:1.1; font-weight:500}
+  .cn-split{display:flex; height:10px; gap:2px; border-radius:2px; overflow:hidden}
+  .cn-split .cn-mat{background:var(--text)}
+  .cn-split .cn-pow{background:var(--accent)}
+  .cn-rows{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0 24px}
+  .cn-row{display:flex; justify-content:space-between; gap:14px; padding:10px 0;
+    border-bottom:1px solid var(--border); font-size:14px; color:var(--text-2)}
+  .cn-row:last-child{border-bottom:0}
+  .cn-v{font-family:var(--mono); color:var(--text); white-space:nowrap}
+  .cn-sub{font-size:13.5px; font-weight:600; color:var(--text); margin-bottom:2px}
+  .cn-sp{display:inline-flex; align-items:center; gap:8px; min-width:0}
+  .cn-sp i{flex:none; width:10px; height:10px; border-radius:2px;
+    box-shadow:inset 0 0 0 1px rgba(127,127,127,.45)}
+  .cn-spools:empty{display:none}
+  .cn-last{display:flex; justify-content:space-between; gap:12px; padding:13px 16px;
+    background:var(--bg); border:1px solid var(--border); border-radius:4px;
+    font-size:14px; color:var(--text-2)}
+  .cn-note{margin-top:auto; font-size:13px; color:var(--text-3)}
+
+  /* the heaters */
+  .temps-row{display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr))}
+  :root:root[data-look=kammer] .temps-row .temp{display:flex; flex-direction:column; gap:12px;
+    padding:20px 22px; position:relative}
+  :root:root[data-look=kammer] .temps-row .temp-label{display:flex; align-items:center; gap:8px}
+  .temps-row .tsw{width:10px; height:10px; border-radius:2px; flex:none}
+  :root:root[data-look=kammer] .temps-row .temp-val{font-size:40px; margin:0; line-height:1}
+  :root:root[data-look=kammer] .temps-row .bar{height:8px}
+  :root:root[data-look=kammer] .temps-row .temp-sub{margin:0; font-size:13px; color:var(--text-2)}
+  :root:root[data-look=kammer] .temps-row .temp-set{position:absolute; top:16px; right:16px}
+
+  /* the AMS: each spool's colour as a column filled to what is left */
+  :root:root[data-look=kammer] .now-ams .spools{grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px}
+  :root:root[data-look=kammer] .spools .spool{align-items:stretch; padding:0; gap:0; overflow:hidden;
+    min-height:132px}
+  :root:root[data-look=kammer] .spools .spool > div:last-child{padding:14px 16px; min-width:0}
+  :root:root[data-look=kammer] .spools .donut{width:56px; height:auto; border-radius:0; align-self:stretch;
+    padding:10px; background:linear-gradient(to top, var(--fc) 0 calc(var(--pct) * 1%), transparent 0)
+      content-box, var(--bg);
+    border-right:1px solid var(--border)}
+  :root:root[data-look=kammer] .spools .donut::before,
+  :root:root[data-look=kammer] .spools .donut::after{display:none}
+  :root:root[data-look=kammer] .spools .donut-hole{inset:auto 6px 6px; top:auto; height:auto;
+    border-radius:2px; padding:1px 0; font-size:11px; background:var(--surface); color:var(--text)}
+  :root:root[data-look=kammer] .spools .spool.active .donut-hole{background:var(--surface)}
+  :root:root[data-look=kammer] .spools .donut-hole{display:block; text-align:center; font-family:var(--mono)}
+  :root:root[data-look=kammer] .spools .donut-hole span{font-size:inherit; color:var(--text-2); margin-left:1px}
+  :root:root[data-look=kammer] .temps-row .bar>.mark{background:var(--text); opacity:.9; top:-3px; height:14px}
+
+  /* the charts, legend under the plot */
+  :root:root[data-look=kammer] #v-printer-now .legend{margin:12px 0 0}
+
+  @media (max-width:900px){
+    :root:root[data-look=kammer] .now-hero{gap:16px; padding:20px}
+    .stack-wrap{width:40px}
+    .layer-stack{min-height:300px; padding:5px; gap:2px}
+    :root:root[data-look=kammer] .hero-pct{font-size:64px}
+    .hero-pct .u{font-size:28px}
+    :root:root[data-look=kammer] .now-hero .job-name{font-size:24px}
+    .cn-big{font-size:44px}
+  }
+
+  /* ============ shared: a status chip with a mark, figures as KPI tiles ============ */
+  .st-chip{display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 9px;
+    border-radius:12px; border:1px solid var(--border-strong); color:var(--text-2);
+    font-family:var(--sans); font-size:12.5px; font-weight:600}
+  .st-chip.ok{border-color:color-mix(in srgb, var(--good) 45%, transparent); color:var(--good)}
+  :root:root[data-look=kammer] .kpi .kl{font-size:13px}
+  :root:root[data-look=kammer] .kpi .ks{font-size:13px; color:var(--text-3)}
+
+  /* ============ Printer · Hardware ============ */
+  #v-printer-machine .hw-fans{grid-column:span 7}
+  #v-printer-machine .hw-mach{grid-column:span 5; grid-row:span 2}
+  #v-printer-machine .hw-ai{grid-column:span 7}
+  :root:root[data-look=kammer] #v-printer-machine .row{padding:11px 0; gap:16px}
+  :root:root[data-look=kammer] #v-printer-machine .row .k{font-size:14px; min-width:150px}
+  :root:root[data-look=kammer] #v-printer-machine .row .v{font-size:14px}
+  :root:root[data-look=kammer] #v-printer-machine .row .track{height:8px}
+  :root:root[data-look=kammer] #v-printer-machine .row .track > span{background:var(--text)}
+  @media (max-width:1180px){
+    #v-printer-machine .hw-fans, #v-printer-machine .hw-mach, #v-printer-machine .hw-ai{grid-column:span 12; grid-row:auto}
+  }
+
+  /* ============ Printer · USB drive: the fill as the headline ============ */
+  :root:root[data-look=kammer] .drive-cap{display:flex; flex-direction:column; gap:12px; margin:4px 0 22px}
+  :root:root[data-look=kammer] .drive-cap-l{order:-1; margin:0; gap:22px; align-items:baseline; flex-wrap:wrap}
+  :root:root[data-look=kammer] .drive-cap-l span{font-size:14px}
+  :root:root[data-look=kammer] .drive-cap-l span:first-child b{font-family:var(--mono); font-size:40px;
+    font-weight:500; letter-spacing:-.03em; color:var(--text); margin-right:6px}
+  :root:root[data-look=kammer] .drive-bar{height:12px; border-radius:2px; background:var(--track)}
+  :root:root[data-look=kammer] .drive-bar>span{background:var(--text); border-radius:2px}
+  :root:root[data-look=kammer] .drive-sum{font-size:13.5px; color:var(--text-2); margin:0 0 8px}
+  :root:root[data-look=kammer] .dtab{font-size:14px}
+  :root:root[data-look=kammer] .dtab th{font-size:12.5px; font-weight:500; padding:10px 12px 10px 0;
+    border-bottom:1px solid var(--border-strong)}
+  :root:root[data-look=kammer] .dtab td{padding:12px 12px 12px 0}
+  :root:root[data-look=kammer] .dtab .fn{font-family:var(--mono); font-size:13px}
+
+  /* ============ Printer · Raw data ============ */
+  :root:root[data-look=kammer] #rawBox{background:var(--bg); border:1px solid var(--border);
+    border-radius:4px; font-size:13px; line-height:1.75; padding:18px 20px; max-height:none}
+  :root:root[data-look=kammer] #rawBox .rk-on{color:var(--accent-fg); font-weight:600}
+  :root:root[data-look=kammer] #rawBox .rk-off{color:var(--text-3)}
+  :root:root[data-look=kammer] #rawBox .rv{color:var(--text-2)}
+  :root:root[data-look=kammer] .raw-legend .sw-on{background:var(--accent-fg)}
+  :root:root[data-look=kammer] .raw-legend .sw-off{background:var(--text-3)}
+
+  /* ============ Live: the picture, the figures in a strip under it ============ */
+  :root:root[data-look=kammer] #v-live-camera .card{padding:0; overflow:hidden}
+  :root:root[data-look=kammer] #v-live-camera .card-head{padding:18px 24px; margin:0}
+  :root:root[data-look=kammer] #liveWrap{border-radius:0; border:0; max-height:72vh}
+  :root:root[data-look=kammer] .live-strip{margin:0; display:grid; gap:0;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); border-top:1px solid var(--border)}
+  :root:root[data-look=kammer] .live-strip .hs{flex-direction:column; align-items:flex-start; gap:2px;
+    padding:16px 22px; border-right:1px solid var(--border)}
+  :root:root[data-look=kammer] .live-strip .hs:last-child{border-right:0}
+  :root:root[data-look=kammer] .live-strip .hs-val{font-family:var(--mono); font-size:20px; font-weight:500}
+
+  /* ============ Prints · History ============ */
+  .kpi-strip{display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr))}
+  .kpi-strip:empty{display:none}
+  :root:root[data-look=kammer] .kpi-strip .kpi{padding:18px 20px}
+  :root:root[data-look=kammer] .kpi-strip .kv{font-size:28px}
+  :root:root[data-look=kammer] .htab .num{font-family:var(--mono)}
+
+  /* ============ Prints · Statistics ============ */
+  :root:root[data-look=kammer] .stat-kpis .kpis{gap:1px; background:var(--border); border:1px solid var(--border);
+    border-radius:6px; overflow:hidden; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr))}
+  :root:root[data-look=kammer] .stat-kpis .kpi{background:var(--surface); padding:22px 24px; gap:4px}
+  :root:root[data-look=kammer] .stat-kpis .kv{font-size:34px; white-space:nowrap}
+  :root:root[data-look=kammer] .stat-kpis .kpi.lead .kv{font-size:44px; color:var(--accent-fg)}
+  .mleg{display:flex; gap:14px; margin-left:auto}
+  .mleg > span{display:inline-flex; align-items:center; gap:6px}
+  .mleg i{width:10px; height:10px; border-radius:2px; display:inline-block}
+  .mleg .mk-mat, .mcol .mm{background:var(--text)}
+  .mleg .mk-pow, .mcol .mp{background:var(--accent)}
+  .mcols{display:flex; align-items:flex-end; gap:14px; min-height:260px; overflow-x:auto; padding-top:6px}
+  .mcol{flex:1 1 0; min-width:54px; display:flex; flex-direction:column; align-items:center; gap:7px}
+  .mcol .mv{font-family:var(--mono); font-size:12.5px; color:var(--text-2); white-space:nowrap}
+  .mcol .mstack{width:100%; max-width:64px; display:flex; flex-direction:column; justify-content:flex-end; gap:2px}
+  .mcol .mstack span{display:block; border-radius:2px}
+  .mcol .ml{font-weight:600; font-size:13.5px}
+  .mcol .mn{font-size:12px; color:var(--text-3)}
+  :root:root[data-look=kammer] .tmodels{display:flex; flex-direction:column}
+  :root:root[data-look=kammer] .tmodel{display:grid; grid-template-columns:28px minmax(0,1fr) auto 80px;
+    gap:14px; align-items:center; padding:11px 0; border-bottom:1px solid var(--border)}
+  :root:root[data-look=kammer] .tmodel:last-child{border-bottom:0}
+  .tmodel .ti{font-family:var(--mono); color:var(--text-3); font-size:13px}
+  .tmodel .tn{display:flex; flex-direction:column; gap:7px; min-width:0}
+  .tmodel .tnn{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .tmodel .tbar{height:4px; background:var(--track); border-radius:2px; overflow:hidden}
+  .tmodel .tbar span{display:block; height:100%; background:var(--text)}
+  :root:root[data-look=kammer] .tmodel .tc{font-family:var(--mono); font-size:13px; color:var(--text-2); white-space:nowrap}
+  .tmodel .tv{font-family:var(--mono); font-weight:600; text-align:right; white-space:nowrap}
+  #statRules .row .k{min-width:0}
+  .dear-name{font-size:21px; font-weight:800; font-stretch:112%}
+  .dear-cost{font-family:var(--mono); font-size:34px; margin:4px 0}
+
+  /* ============ Filament · Inventory and Purchases ============ */
+  :root:root[data-look=kammer] .htab .swatch{width:32px; height:32px;
+    box-shadow:inset 0 0 0 8px rgba(0,0,0,.18), 0 0 0 1px var(--border-strong)}
+  :root:root[data-look=kammer] .fname .fn-txt b{font-weight:700}
+  :root:root[data-look=kammer] .fname .fn-sub{font-size:13px; color:var(--text-2)}
+  :root:root[data-look=kammer] #v-filament-inventory .kpis,
+  :root:root[data-look=kammer] #v-prints-statistics .cost-grid{gap:20px}
+  :root:root[data-look=kammer] .dropzone{min-height:140px; border-radius:6px}
+
+  /* ============ Workshop · Maintenance ============ */
+  .mnt-sum{display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); margin:0 0 18px}
+  .mnt-sum .ms{display:flex; flex-direction:column; gap:3px; padding:16px 18px;
+    border:1px solid var(--border); border-radius:6px; background:var(--bg)}
+  .mnt-sum .kl{font-size:13px; color:var(--text-2)}
+  .mnt-sum .kv{font-family:var(--mono); font-size:32px; line-height:1.1}
+  .mnt-sum .ks{font-size:13px; color:var(--text-3); min-height:18px}
+  .mnt-sum .ms-due.on{border-color:color-mix(in srgb, var(--danger) 50%, transparent)}
+  .mnt-sum .ms-due.on .kv{color:var(--danger)}
+  .mnt-sum .ms-soon.on .kv{color:var(--warn)}
+  :root:root[data-look=kammer] .mnt-row{grid-template-columns:28px minmax(0,2fr) minmax(120px,2fr) 190px auto;
+    gap:18px; padding:16px 0}
+  .mnt-ic{display:grid; place-items:center}
+  :root:root[data-look=kammer] .mnt-name{font-size:15px; font-weight:700}
+  :root:root[data-look=kammer] .mnt-sub{font-size:13px; color:var(--text-2)}
+  :root:root[data-look=kammer] .mnt-iv{cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px}
+  :root:root[data-look=kammer] .mnt-bar{height:8px; border-radius:2px; background:var(--track)}
+  :root:root[data-look=kammer] .mnt-bar>span{border-radius:2px}
+  :root:root[data-look=kammer] .mnt-due{font-family:var(--mono); font-size:14px}
+  :root:root[data-look=kammer] .mnt-overdue .mnt-done{border-color:var(--danger)}
+  @media (max-width:760px){
+    :root:root[data-look=kammer] .mnt-row{grid-template-columns:28px 1fr auto; row-gap:8px}
+    :root:root[data-look=kammer] .mnt-row .mnt-bar{grid-column:2 / -1; order:5}
+    :root:root[data-look=kammer] .mnt-row .mnt-due{text-align:left}
+  }
+
+  /* ============ Workshop · Notes: a compact composer, the notes in columns ============ */
+  :root:root[data-look=kammer] .note-new{padding:14px; border:1px solid var(--border); border-radius:6px;
+    background:var(--bg); margin-bottom:18px}
+  :root:root[data-look=kammer] .notes{display:block; columns:3 300px; column-gap:16px}
+  :root:root[data-look=kammer] .note{break-inside:avoid; margin:0 0 16px; padding:18px 20px;
+    border-radius:6px; background:var(--surface-2)}
+  :root:root[data-look=kammer] .note-h{font-size:16px; font-weight:700; font-stretch:110%}
+  :root:root[data-look=kammer] .note-body{font-size:14.5px}
+  :root:root[data-look=kammer] .note-cats button{min-height:36px; padding:0 14px; border-radius:4px;
+    font-size:13.5px}
+  :root:root[data-look=kammer] .note-cats button.on{background:var(--surface-2); color:var(--text);
+    border-color:var(--accent)}
+
+  /* ============ MakerWorld ============ */
+  :root:root[data-look=kammer] .mw-grid{gap:16px}
+  :root:root[data-look=kammer] .mw-card{border-radius:6px; overflow:hidden; background:var(--surface-2)}
+  :root:root[data-look=kammer] .mw-card .mw-ct{font-size:15px; font-weight:700}
+  :root:root[data-look=kammer] .mw-navs button{min-height:36px; border-radius:4px; padding:0 14px}
+
+  /* ============ Settings: sections down the side ============ */
+  .set-layout{display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap; margin-top:16px}
+  .set-main{flex:999 1 520px; min-width:0}
+  :root:root[data-look=kammer] .set-layout .settabs{flex:1 1 180px; max-width:220px; flex-direction:column;
+    align-items:stretch; gap:2px; padding:0; border:0; position:sticky; top:16px}
+  :root:root[data-look=kammer] .set-layout .settabs button{text-align:left; min-height:40px;
+    padding:0 12px; border-radius:4px; font-size:14.5px; color:var(--text-2)}
+  :root:root[data-look=kammer] .set-layout .settabs button:hover{background:var(--surface-2); color:var(--text)}
+  :root:root[data-look=kammer] .set-layout .settabs button.on{background:var(--surface-2); color:var(--text);
+    box-shadow:inset 2px 0 0 var(--accent)}
+  :root:root[data-look=kammer] .set-field{padding:18px 0}
+  :root:root[data-look=kammer] .set-lbl{font-size:14.5px; color:var(--text)}
+  :root:root[data-look=kammer] .set-row input[type=text],
+  :root:root[data-look=kammer] .set-row input[type=password],
+  :root:root[data-look=kammer] .set-row select{min-height:42px; max-width:440px; border-radius:4px}
+  :root:root[data-look=kammer] .set-note{font-size:13px; color:var(--text-2)}
+  @media (max-width:760px){
+    :root:root[data-look=kammer] .set-layout .settabs{max-width:none; flex-direction:row; overflow-x:auto;
+      position:static; flex-wrap:nowrap}
+    :root:root[data-look=kammer] .set-layout .settabs button{white-space:nowrap}
+  }
+
+  /* The base sheet folds half-width cards to full width below 1450px of
+     WINDOW. With the rail taking 248px of it, two columns still fit down to
+     about 1180px, so they stay two until then. */
+  @media (min-width:1181px) and (max-width:1450px){
+    :root:root[data-look=kammer] .span-6{grid-column:span 6}
+    :root:root[data-look=kammer] .span-4{grid-column:span 4}
+    :root:root[data-look=kammer] .span-3{grid-column:span 3}
+    :root:root[data-look=kammer] .span-8{grid-column:span 8}
+  }
   /* ============ tablet: a narrower rail ============ */
   @media (max-width:1200px){
     .rail{width:216px}
@@ -1744,39 +2044,45 @@
   <nav class="subnav" id="subnav"></nav>
 
   <!-- ============ PRINTER · Now ============
-       The job and the camera side by side: the camera used to be a tab of its
-       own, which is why remaining time had to be repeated into its caption. -->
+       The job and what it costs side by side, then the four heaters, the AMS,
+       and the two charts. The camera has a section of its own (Live). -->
   <div class="dash view on" id="v-printer-now">
-    <section class="card hero span-4">
-      <!-- nothing is printing: an empty ring at 0% is not information, so the
+    <!-- the job: a column of the print's layers growing in the colours they are
+         printed in, the job, its percent and what is left, the controls -->
+    <section class="card hero now-hero" id="nowHero">
+      <!-- nothing is printing: an empty column at 0% is not information, so the
            panel reports what the printer is and what it last did instead -->
       <div class="idle" id="idleWrap" style="display:none">
         <div class="idle-h" id="idleState">—</div>
         <div class="idle-sub" id="idleSub"></div>
         <div class="idle-last" id="idleLast"></div>
       </div>
-      <div class="ring-wrap" id="ringWrap">
-        <svg class="ring" viewBox="0 0 150 150">
-          <circle class="ring-track" cx="75" cy="75" r="64"/>
-          <circle class="ring-prog" id="ringProg" cx="75" cy="75" r="64"
-                  stroke-dasharray="402" stroke-dashoffset="402"/>
-        </svg>
-        <div class="ring-center">
-          <div>
-            <div class="ring-pct"><span id="pct">—</span><span>%</span></div>
-            <div class="ring-state" id="ringState"></div>
-          </div>
-        </div>
+      <!-- the layer column: one line per slice of layers, bottom up -->
+      <div class="stack-wrap" id="ringWrap">
+        <div class="layer-stack" id="layerStack" role="img"></div>
       </div>
       <div class="hero-info" id="heroInfo">
-        <span class="statepill" id="statePill">—</span>
-        <div class="job-name" id="jobName">No active job</div>
-        <a class="mw-link" id="mwLink" target="_blank" rel="noopener noreferrer" style="display:none"><span data-i18n="View on MakerWorld">View on MakerWorld</span> ↗</a>
+        <div class="hero-tags">
+          <span class="statepill" id="statePill">—</span>
+        </div>
+        <div>
+          <div class="job-name" id="jobName">No active job</div>
+          <a class="mw-link" id="mwLink" target="_blank" rel="noopener noreferrer" style="display:none"><span data-i18n="View on MakerWorld">View on MakerWorld</span> ↗</a>
+        </div>
+        <div class="hero-pct-row">
+          <div class="hero-pct"><span id="pct">—</span><span class="u">%</span></div>
+          <div class="hero-eta">
+            <div><span data-i18n="Remaining">Remaining</span> <b id="eta">—</b></div>
+            <div><span data-i18n="Ends">Ends</span> <b id="endTime">—</b></div>
+          </div>
+        </div>
+        <div class="bar hero-bar"><span class="fill" id="heroBar"></span></div>
         <div class="hero-meta">
           <div class="meta-item"><span class="meta-label" data-i18n="Layer">Layer</span><span class="meta-val" id="layers">—</span></div>
-          <div class="meta-item"><span class="meta-label" data-i18n="Remaining">Remaining</span><span class="meta-val" id="eta">—</span></div>
-          <div class="meta-item"><span class="meta-label" data-i18n="Ends">Ends</span><span class="meta-val" id="endTime">—</span></div>
+          <div class="meta-item"><span class="meta-label" data-i18n="Filament changes">Filament changes</span><span class="meta-val" id="heroChanges">—</span><span class="meta-sub" id="heroChangesSub"></span></div>
+          <div class="meta-item"><span class="meta-label" data-i18n="Layer height">Layer height</span><span class="meta-val" id="heroLh">—</span></div>
           <div class="meta-item"><span class="meta-label" data-i18n="Speed">Speed</span><span class="meta-val" id="spd">—</span></div>
+          <div class="meta-item meta-wide"><span class="meta-label" data-i18n="Profile">Profile</span><span class="meta-val meta-text" id="heroProfile">—</span></div>
         </div>
         <div class="stage" id="stage"></div>
         <div class="errbar" id="errBar" style="display:none"></div>
@@ -1796,81 +2102,103 @@
       </div>
     </section>
 
-  <section class="span-4 temps-2x2 compact">
-    <!-- 2x2 order: Nozzle 1 | Nozzle 2  /  Bed | Chamber -->
-    <div class="card temp">
-      <div class="temp-label"><span id="noz0Label" data-i18n="Nozzle 1">Nozzle 1</span> <span class="badge" id="noz0Badge" style="display:none">active</span></div>
-      <div class="temp-val"><span id="noz0">—</span><span class="deg">°C</span></div>
-      <div class="bar"><span class="fill" id="noz0Fill"></span><span class="mark" id="noz0Mark"></span></div>
-      <div class="temp-sub" id="noz0Sub">—</div>
-    </div>
-    <div class="card temp">
-      <div class="temp-label"><span id="noz1Label" data-i18n="Nozzle 2">Nozzle 2</span> <span class="badge" id="noz1Badge" style="display:none">active</span></div>
-      <div class="temp-val"><span id="noz1">—</span><span class="deg">°C</span></div>
-      <div class="bar"><span class="fill" id="noz1Fill"></span><span class="mark" id="noz1Mark"></span></div>
-      <div class="temp-sub" id="noz1Sub">—</div>
-    </div>
-    <div class="card temp">
-      <button class="temp-set" data-target="bed" data-i18n="set" title="Set bed target">set</button>
-      <div class="temp-label" data-i18n="Bed">Bed</div>
-      <div class="temp-val"><span id="bed">—</span><span class="deg">°C</span></div>
-      <div class="bar"><span class="fill" id="bedFill"></span><span class="mark" id="bedMark"></span></div>
-      <div class="temp-sub" id="bedSub">—</div>
-    </div>
-    <div class="card temp">
-      <button class="temp-set" data-target="chamber" data-i18n="set" title="Set chamber target">set</button>
-      <div class="temp-label" data-i18n="Chamber">Chamber</div>
-      <div class="temp-val"><span id="chamber">—</span><span class="deg">°C</span></div>
-      <div class="bar"><span class="fill" id="chamberFill"></span><span class="mark" id="chamberMark"></span></div>
-      <div class="temp-sub" data-i18n="heated chamber">heated chamber</div>
-    </div>
-  </section>
-  <section class="card ams span-4" id="amsCard">
-    <div class="card-head"><h3>Filament · AMS</h3><span class="meta" id="amsMeta"></span></div>
-    <div class="spools" id="spools"></div>
-  </section>
-  <section class="card span-6">
-    <div class="chart-head">
-      <h3 class="chart-h" data-i18n="Temperatures">Temperatures</h3>
-      <span id="recPaused" style="display:none;font-size:12px;color:var(--warn);font-weight:600">⏸ paused</span>
-      <div class="ranges" id="ranges" style="margin-left:auto">
-        <button data-h="1" class="on">1h</button>
-        <button data-h="6">6h</button>
-        <button data-h="24">24h</button>
+    <!-- what this print costs, while it runs. Power is the plug's own figure for
+         this job; material so far is the sliced file's grams scaled by progress,
+         and says so. Hidden while nothing prints or nothing is known. -->
+    <section class="card now-cost" id="costNow" style="display:none" aria-labelledby="costNowH">
+      <div class="card-head"><h3 id="costNowH" data-i18n="What this print costs">What this print costs</h3>
+        <span class="chip cn-w" id="costW" style="display:none"></span></div>
+      <div class="cn-figs">
+        <div><div class="meta-label" data-i18n="So far">So far</div><div class="cn-big" id="costSoFar">—</div></div>
+        <div id="costProjWrap"><div class="meta-label" data-i18n="Projected at the end">Projected at the end</div><div class="cn-proj" id="costProj">—</div></div>
       </div>
-    </div>
-    <div class="legend" style="margin:2px 0 6px">
-      <span><i style="background:var(--s-noz0)"></i><span data-i18n="Nozzle 1">Nozzle 1</span></span>
-      <span><i style="background:var(--s-noz1)"></i><span data-i18n="Nozzle 2">Nozzle 2</span></span>
-      <span><i style="background:var(--s-bed)"></i><span data-i18n="Bed">Bed</span></span>
-      <span><i style="background:var(--s-chamber)"></i><span data-i18n="Chamber">Chamber</span></span>
-    </div>
-    <div class="chart-wrap">
-      <svg id="chart" viewBox="0 0 900 200" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block"></svg>
-      <div class="tip" id="tip"></div>
-    </div>
-    <div class="temp-sub" id="chartEmpty" style="display:none">Collecting data…</div>
-  </section>
-  <section class="card span-6" id="powerCard" style="display:none">
-    <div class="card-head"><h3 data-i18n="Power draw">Power draw</h3><span class="meta" id="powerMeta"></span>
-      <div class="ranges" id="pranges" style="margin-left:auto">
-        <button data-h="1" class="on">1h</button>
-        <button data-h="6">6h</button>
-        <button data-h="24">24h</button>
+      <div class="cn-split" id="costSplit" role="img"><span class="cn-mat"></span><span class="cn-pow"></span></div>
+      <div class="cn-rows">
+        <div class="cn-row"><span id="costMatLbl" data-i18n="Material">Material</span><span class="cn-v" id="costMat">—</span></div>
+        <div class="cn-row"><span id="costPowLbl" data-i18n="Power">Power</span><span class="cn-v" id="costPow">—</span></div>
       </div>
-    </div>
-    <div class="pwr-row">
-      <div><div class="pwr-now"><span id="powerW">—</span><span class="pwr-unit">W</span></div>
-           <div class="meta-label" data-i18n="now">now</div></div>
-      <div><div class="meta-val" id="powerToday">—</div><div class="meta-label" data-i18n="today">today</div></div>
-      <div><div class="meta-val" id="powerMonth">—</div><div class="meta-label" data-i18n="this month">this month</div></div>
-      <div><div class="meta-val" id="powerCost">—</div><div class="meta-label" data-i18n="this print">this print</div></div>
-    </div>
-    <div class="chart-wrap" style="margin-top:14px">
-      <svg id="pchart" viewBox="0 0 900 150" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block"></svg>
-      <div class="tip" id="ptip"></div>
-    </div>
-  </section>
+      <div class="cn-spools" id="costSpools"></div>
+      <div class="cn-last" id="costNowLast" style="display:none"></div>
+      <div class="cn-note" id="costNote"></div>
+    </section>
+
+    <!-- the four heaters, in a row: nozzle 1 | nozzle 2 | bed | chamber -->
+    <section class="temps-row">
+      <div class="card temp">
+        <div class="temp-label"><i class="tsw" style="background:var(--s-noz0)"></i><span id="noz0Label" data-i18n="Nozzle 1">Nozzle 1</span> <span class="badge" id="noz0Badge" style="display:none">active</span></div>
+        <div class="temp-val"><span id="noz0">—</span><span class="deg">°C</span></div>
+        <div class="bar"><span class="fill" id="noz0Fill"></span><span class="mark" id="noz0Mark"></span></div>
+        <div class="temp-sub" id="noz0Sub">—</div>
+      </div>
+      <div class="card temp">
+        <div class="temp-label"><i class="tsw" style="background:var(--s-noz1)"></i><span id="noz1Label" data-i18n="Nozzle 2">Nozzle 2</span> <span class="badge" id="noz1Badge" style="display:none">active</span></div>
+        <div class="temp-val"><span id="noz1">—</span><span class="deg">°C</span></div>
+        <div class="bar"><span class="fill" id="noz1Fill"></span><span class="mark" id="noz1Mark"></span></div>
+        <div class="temp-sub" id="noz1Sub">—</div>
+      </div>
+      <div class="card temp">
+        <button class="temp-set" data-target="bed" data-i18n="set" title="Set bed target">set</button>
+        <div class="temp-label"><i class="tsw" style="background:var(--s-bed)"></i><span data-i18n="Bed">Bed</span></div>
+        <div class="temp-val"><span id="bed">—</span><span class="deg">°C</span></div>
+        <div class="bar"><span class="fill" id="bedFill"></span><span class="mark" id="bedMark"></span></div>
+        <div class="temp-sub" id="bedSub">—</div>
+      </div>
+      <div class="card temp">
+        <button class="temp-set" data-target="chamber" data-i18n="set" title="Set chamber target">set</button>
+        <div class="temp-label"><i class="tsw" style="background:var(--s-chamber)"></i><span data-i18n="Chamber">Chamber</span></div>
+        <div class="temp-val"><span id="chamber">—</span><span class="deg">°C</span></div>
+        <div class="bar"><span class="fill" id="chamberFill"></span><span class="mark" id="chamberMark"></span></div>
+        <div class="temp-sub" data-i18n="heated chamber">heated chamber</div>
+      </div>
+    </section>
+
+    <section class="card ams now-ams" id="amsCard">
+      <div class="card-head"><h3 data-i18n="AMS · loaded">AMS · loaded</h3><span class="meta" id="amsMeta"></span></div>
+      <div class="spools" id="spools"></div>
+    </section>
+
+    <section class="card now-tchart">
+      <div class="chart-head">
+        <h3 class="chart-h" data-i18n="Temperatures">Temperatures</h3>
+        <span id="recPaused" style="display:none;font-size:12px;color:var(--warn);font-weight:600">⏸ paused</span>
+        <div class="ranges" id="ranges" style="margin-left:auto">
+          <button data-h="1" class="on">1h</button>
+          <button data-h="6">6h</button>
+          <button data-h="24">24h</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <svg id="chart" viewBox="0 0 900 200" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block"></svg>
+        <div class="tip" id="tip"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--s-noz0)"></i><span data-i18n="Nozzle 1">Nozzle 1</span></span>
+        <span><i style="background:var(--s-noz1)"></i><span data-i18n="Nozzle 2">Nozzle 2</span></span>
+        <span><i style="background:var(--s-bed)"></i><span data-i18n="Bed">Bed</span></span>
+        <span><i style="background:var(--s-chamber)"></i><span data-i18n="Chamber">Chamber</span></span>
+      </div>
+      <div class="temp-sub" id="chartEmpty" style="display:none">Collecting data…</div>
+    </section>
+    <section class="card now-pchart" id="powerCard" style="display:none">
+      <div class="card-head"><h3 data-i18n="Power draw">Power draw</h3><span class="meta" id="powerMeta"></span>
+        <div class="ranges" id="pranges" style="margin-left:auto">
+          <button data-h="1" class="on">1h</button>
+          <button data-h="6">6h</button>
+          <button data-h="24">24h</button>
+        </div>
+      </div>
+      <div class="pwr-row">
+        <div><div class="pwr-now"><span id="powerW">—</span><span class="pwr-unit">W</span></div>
+             <div class="meta-label" data-i18n="now">now</div></div>
+        <div><div class="meta-val" id="powerToday">—</div><div class="meta-label" data-i18n="today">today</div></div>
+        <div><div class="meta-val" id="powerMonth">—</div><div class="meta-label" data-i18n="this month">this month</div></div>
+        <div><div class="meta-val" id="powerCost">—</div><div class="meta-label" data-i18n="this print">this print</div></div>
+      </div>
+      <div class="chart-wrap" style="margin-top:14px">
+        <svg id="pchart" viewBox="0 0 900 150" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block"></svg>
+        <div class="tip" id="ptip"></div>
+      </div>
+    </section>
   </div>
 
   <!-- ============ PRINTER · Hardware ============
@@ -1878,17 +2206,18 @@
        it - everything you look at when the question is the printer rather than
        the print. -->
   <div class="dash view" id="v-printer-machine">
-    <section class="card span-4">
+    <section class="card hw-fans">
       <div class="card-head"><h3 data-i18n="Fans &amp; airflow">Fans &amp; airflow</h3></div>
       <div class="rows" id="fanRows"></div>
     </section>
-    <section class="card span-4">
+    <section class="card hw-mach">
       <div class="card-head"><h3 data-i18n="Machine">Machine</h3></div>
       <div class="rows" id="machineRows"></div>
     </section>
-    <section class="card span-4">
+    <section class="card hw-ai">
       <div class="card-head"><h3 data-i18n="AI monitoring">AI monitoring</h3><span class="meta" id="aiSens"></span></div>
-      <div class="chips" style="margin-top:0" id="aiChips"></div>
+      <div class="rows" id="aiChips"></div>
+      <div class="mnt-note" data-i18n="Reported by the printer; it is changed on the printer's screen or in Bambu Handy.">Reported by the printer; it is changed on the printer's screen or in Bambu Handy.</div>
     </section>
   </div>
 
@@ -1933,9 +2262,14 @@
       <div class="card-head" id="liveHead">
         <h3 data-i18n="Live view">Live view</h3>
         <span class="meta" data-i18n="printer camera">printer camera</span>
+      </div>
+      <div id="liveWrap">
+        <iframe id="liveFrame" title="Live view" allow="autoplay; fullscreen"
+                allowfullscreen frameborder="0"></iframe>
+      </div>
         <!-- repeated from the overview hero so the camera can be watched without
              switching tabs to see how far along the print is -->
-        <div class="head-stats">
+        <div class="head-stats live-strip">
           <span class="hs"><span class="hs-label" data-i18n="Layer">Layer</span><span class="hs-val" id="liveLayers">—</span></span>
           <!-- counted from the sliced file, which is read once early in the
                print; the printer itself never reports it -->
@@ -1947,11 +2281,7 @@
           <span class="hs"><span class="hs-label" data-i18n="Remaining">Remaining</span><span class="hs-val" id="liveEta">—</span></span>
           <span class="hs"><span class="hs-label" data-i18n="Ends">Ends</span><span class="hs-val" id="liveEnd">—</span></span>
         </div>
-      </div>
-      <div id="liveWrap">
-        <iframe id="liveFrame" title="Live view" allow="autoplay; fullscreen"
-                allowfullscreen frameborder="0"></iframe>
-      </div>
+
     </section>
   </div>
 
@@ -1980,6 +2310,8 @@
         <div class="tip" id="dtip"></div>
       </div>
     </section>
+    <!-- the totals of everything recorded, from the same block as Statistics -->
+    <section class="span-12 kpi-strip" id="histKpis"></section>
     <section class="card span-12">
       <div class="card-head" id="histHead">
         <h3 data-i18n="Print history">Print history</h3><span class="meta" id="histMeta"></span>
@@ -2017,8 +2349,7 @@
 
   <!-- ============ PRINTS · Statistics ============ -->
   <div class="dash view" id="v-prints-statistics">
-    <section class="card span-12">
-      <div class="card-head"><h3 data-i18n="Statistics">Statistics</h3><span class="meta" data-i18n="all recorded prints">all recorded prints</span></div>
+    <section class="span-12 stat-kpis" aria-label="Statistics">
       <div class="kpis" id="statKpis"></div>
     </section>
   <section class="card span-6" id="costCard" style="display:none">
@@ -2036,12 +2367,22 @@
     <div class="cost-last" id="costLast"></div>
   </section>
     <section class="card span-6">
-      <div class="card-head"><h3 data-i18n="Prints per month">Prints per month</h3></div>
-      <div class="mbars" id="statMonths"></div>
+      <div class="card-head"><h3 data-i18n="Cost per month">Cost per month</h3>
+        <span class="meta mleg"><span><i class="mk-mat"></i><span data-i18n="Material">Material</span></span><span><i class="mk-pow"></i><span data-i18n="Power">Power</span></span></span></div>
+      <div class="mcols" id="statMonths"></div>
     </section>
     <section class="card span-6">
       <div class="card-head"><h3 data-i18n="Top models">Top models</h3></div>
       <div class="tmodels" id="statModels"></div>
+    </section>
+    <section class="card span-6">
+      <div class="card-head"><h3 data-i18n="Where the costs come from">Where the costs come from</h3></div>
+      <div class="rows" id="statRules"></div>
+      <div class="mnt-note" data-i18n="One pricing rule beats the next: typed in, then learned from invoices, then brand × material, then the default.">One pricing rule beats the next: typed in, then learned from invoices, then brand × material, then the default.</div>
+    </section>
+    <section class="card span-6">
+      <div class="card-head"><h3 data-i18n="Dearest print">Dearest print</h3></div>
+      <div id="statDearest"></div>
     </section>
   </div>
 
@@ -2142,6 +2483,7 @@
         <h3 data-i18n="Maintenance">Maintenance</h3><span class="meta" id="maintMeta"></span>
         <a id="maintWiki" href="#" target="_blank" rel="noopener noreferrer" class="mw-h" style="margin-left:auto" data-i18n="Bambu guide ↗">Bambu guide ↗</a>
       </div>
+      <div class="mnt-sum" id="maintSum"></div>
       <div class="mnt" id="maintRows"></div>
       <div class="mnt-note" data-i18n="Bambu's X2D intervals are calendar-based (X/Y ~2 months, Z ~4 months); shown here as print-hours for ~3 h/day. Click an interval to adjust to your usage.">Bambu's X2D intervals are calendar-based (X/Y ~2 months, Z ~4 months); shown here as print-hours for ~3 h/day. Click an interval to adjust to your usage.</div>
     </section>
@@ -2163,8 +2505,10 @@
         <span class="ic">!</span>
         <span data-i18n="This page has no login: anyone who can reach the dashboard can change these, including the printer and account credentials.">This page has no login: anyone who can reach the dashboard can change these, including the printer and account credentials.</span>
       </div>
-      <nav class="settabs" id="setTabs"></nav>
-      <div id="setGroups"></div>
+      <div class="set-layout">
+        <nav class="settabs" id="setTabs" aria-label="Settings sections"></nav>
+        <div class="set-main"><div id="setGroups"></div></div>
+      </div>
       <div class="mnt-note" id="setFootnote"></div>
     </section>
   </div>
@@ -2387,9 +2731,9 @@ const DE = {
   "No warnings reported":"Keine Warnungen gemeldet", "look up ↗":"nachschlagen ↗",
   "Code":"Code",
   // print / states
-  "No active job":"Kein aktiver Druck", "Layer":"Layer", "Remaining":"Restzeit", "Ends":"Ende",
+  "No active job":"Kein aktiver Druck", "Layer":"Schicht", "Remaining":"Restzeit", "Ends":"Ende",
   "Speed":"Geschwindigkeit", "Now":"Jetzt",
-  "Idle":"Bereit", "Printing":"Printing", "Paused":"Pausiert", "Finished":"Fertig",
+  "Idle":"Bereit", "Printing":"Druckt", "Paused":"Pausiert", "Finished":"Fertig",
   "Failed":"Fehlgeschlagen", "Preparing":"Vorbereitung", "Slicing":"Slicing",
   "Unknown":"Unbekannt", "running":"läuft",
   // stages
@@ -2405,7 +2749,29 @@ const DE = {
   "Paused: filament runout":"Pausiert: Filament leer", "Paused: nozzle clog":"Pausiert: Düse verstopft",
   "Calibrating motor noise":"Motorgeräusch kalibrieren",
   // temperatures
-  "Connecting...":"Verbinde…", "Bed":"Bett", "Chamber":"Kammer", "heated chamber":"beheizte Kammer",
+  "Connecting...":"Verbinde…",
+  "Reported by the printer; it is changed on the printer's screen or in Bambu Handy.":
+    "Vom Drucker gemeldet; geändert wird es am Display oder in Bambu Handy.",
+  "Cost per month":"Kosten pro Monat", "Where the costs come from":"Woher die Kosten kommen",
+  "One pricing rule beats the next: typed in, then learned from invoices, then brand × material, then the default.":
+    "Eine Preisregel schlägt die nächste: eingetippt › aus Rechnungen › Hersteller × Material › Standard.",
+  "Dearest print":"Teuerster Druck", "Open in history":"Im Verlauf öffnen", "since":"seit",
+  "per print":"pro Druck",
+  "Material – price typed in":"Material – Preis eingetippt",
+  "Material – learned from invoices":"Material – aus Rechnungen",
+  "Material – brand × material":"Material – Hersteller × Material",
+  "Material – default price":"Material – Standardpreis",
+  "Power – measured by the plug":"Strom – von der Steckdose gemessen",
+  "Due":"Fällig", "Soon":"Bald", "Tracked print time":"Erfasste Druckzeit",
+  
+  "What this print costs":"Was dieser Druck kostet", "So far":"Bisher",
+  "Projected at the end":"Hochrechnung bei Ende", "no plug":"keine Steckdose",
+  "By spool, whole print":"Nach Spule, ganzer Druck",
+  "Last print of this model":"Letzter Druck dieses Modells",
+  "Material so far is estimated from progress and the sliced grams. Always rounded up.":
+    "Material bisher ist aus Fortschritt und den Slicer-Gramm geschätzt. Immer aufgerundet.",
+  "Always rounded up.":"Immer aufgerundet.", "AMS · loaded":"AMS · geladen", "App":"App",
+  "Bed":"Bett", "Chamber":"Kammer", "heated chamber":"beheizte Kammer",
   "Nozzle 1":"Düse 1", "Nozzle 2":"Düse 2",
   "direct drive":"Direktantrieb", "Bowden":"Bowden",
   "active":"aktiv", "Target":"Ziel", "Cooling down":"Kühlt ab",
@@ -3019,7 +3385,6 @@ addEventListener("visibilitychange", ()=>{
   }
 });
 
-const RING_C = 402; // 2*pi*64
 // the states in which a job is genuinely on the plate; anything else means the
 // Now panel should report standing state instead of a progress ring
 const BUSY_STATES = ["Printing", "Paused", "Preparing", "Slicing"];
@@ -3101,14 +3466,17 @@ async function postAck(code, ts, acked){
   }catch(_){}   // server re-pushes state via SSE, which re-renders the list
 }
 // temperature bar: fill vs a per-type scale, warm when hot, target marker
+const TEMP_SERIES = {noz0:"--s-noz0", noz1:"--s-noz1", bed:"--s-bed", chamber:"--s-chamber"};
 function setTemp(prefix, cur, target, scaleMax){
   $(prefix).textContent = cur==null ? "—" : cur;
   const fill=$(prefix+"Fill"), mark=$(prefix+"Mark");
   const pct = cur==null ? 0 : Math.max(0, Math.min(100, cur/scaleMax*100));
   fill.style.width = pct+"%";
   const hot = cur!=null && cur > 40;
+  // a hot heater fills in its own chart colour, so the bar and its line in the
+  // temperature chart are visibly the same thing
   fill.style.background = hot
-    ? "linear-gradient(90deg, var(--warn), var(--danger))"
+    ? `var(${TEMP_SERIES[prefix] || "--warn"})`
     : "var(--border-strong)";
   if(target && target>0){
     mark.style.display="block";
@@ -3261,6 +3629,101 @@ function renderAmsNow(){
     + (damp.length ? `  ·  ${t("humidity")} ${damp.map(u=> u.humidity_pct + "%").join(" / ")}` : "");
 }
 
+/* ---------- the running print's layer column ----------
+   One line per slice of layers, bottom up, so the column grows the way the
+   print does. Each line carries the colours the slicer put in those layers
+   (`layer_runs`, read from the sliced file early in the print); before that is
+   known, the printed lines take the colour of the spool feeding now. The line
+   being printed is marked. Purely a picture of figures shown in words beside
+   it, so it is one labelled image to a screen reader. */
+const STACK_LINES = 42;
+function stackColours(runs, a, b){
+  // the distinct colours used anywhere in layers a..b (0-based, inclusive)
+  const out = [];
+  for(const [r0, r1, cols] of runs || []){
+    if(r1 < a || r0 > b) continue;
+    for(const c of cols || []) if(c && !out.includes(c)) out.push(c);
+  }
+  return out.slice(0, 3);
+}
+function renderLayerStack(j, feeding){
+  const el = $("layerStack");
+  const total = +j.total_layers || 0, layer = +j.layer || 0;
+  if(!total){ el.innerHTML = ""; el.removeAttribute("aria-label"); return; }
+  const n = Math.min(STACK_LINES, total);
+  const fallback = (feeding && feeding.color) || cvar("--accent");
+  let html = "";
+  for(let k = n - 1; k >= 0; k--){
+    const a = Math.floor(k * total / n), b = Math.floor((k + 1) * total / n) - 1;
+    const done = a < layer - 1;                 // MQTT counts from 1, the slicer from 0
+    const now = layer - 1 >= a && layer - 1 <= b;
+    let cols = stackColours(j.layer_runs, a, b).map(c => "#" + c);
+    if(!cols.length) cols = [fallback];
+    const segs = (done || now)
+      ? cols.map(c => `<i style="background:${esc(c)}"></i>`).join("")
+      : "<i></i>";
+    html += `<span class="ls${done ? " done" : ""}${now ? " now" : ""}">${segs}</span>`;
+  }
+  el.innerHTML = html;
+  el.setAttribute("aria-label", `${t("Layer")} ${layer} / ${total}`);
+}
+
+/* ---------- what the running print costs ----------
+   `live_cost` from the server: power is the plug's own integral for this job;
+   material so far is the sliced file's grams scaled by progress, so it is
+   marked as an estimate; the projection needs a few percent of the print
+   behind it. Everything rounds up, like every other figure in the app. */
+function renderCostNow(s, j){
+  const card = $("costNow"), hero = $("nowHero");
+  const c = j && j.live_cost;
+  const show = !!(c && c.so_far != null);
+  card.style.display = show ? "" : "none";
+  hero.classList.toggle("solo", !show);
+  if(!show) return;
+  const cur = c.currency || "€";
+  $("costSoFar").textContent = money(c.so_far, cur);
+  $("costProjWrap").style.display = c.projected != null ? "" : "none";
+  $("costProj").textContent = c.projected != null ? money(c.projected, cur) : "—";
+  const w = (s.power || {}).watts;
+  $("costW").style.display = w != null ? "" : "none";
+  $("costW").textContent = w != null ? `${Math.round(w)} W ${t("now")}` : "";
+
+  const mat = c.material_so_far, pow = c.energy_cost;
+  const sum = (mat || 0) + (pow || 0);
+  const split = $("costSplit");
+  split.style.display = sum > 0 ? "" : "none";
+  if(sum > 0){
+    const pm = Math.round(100 * (mat || 0) / sum);
+    split.children[0].style.flex = String(pm);
+    split.children[1].style.flex = String(100 - pm);
+    split.setAttribute("aria-label", `${t("Material")} ${pm} %, ${t("Power")} ${100 - pm} %`);
+  }
+  $("costMatLbl").textContent = t("Material") + (c.grams_so_far != null
+    ? ` · ≈ ${Math.round(c.grams_so_far)} g` : "");
+  $("costMat").textContent = mat != null ? money(mat, cur) : "—";
+  $("costPowLbl").textContent = t("Power") + (c.energy_wh != null
+    ? ` · ${dec(c.energy_wh / 1000, 2)} kWh` : "");
+  $("costPow").textContent = pow != null ? money(pow, cur) : t("no plug");
+
+  const sp = c.spools || [];
+  $("costSpools").innerHTML = !sp.length ? "" :
+    `<div class="cn-sub">${t("By spool, whole print")}</div>` + sp.map(x =>
+      `<div class="cn-row"><span class="cn-sp"><i style="background:#${esc(x.color || "888888")}"></i>${
+        x.slot ? `${t("Slot")} ${x.slot} · ` : ""}${esc(x.type || "")}</span>
+        <span class="cn-v">${Math.round(x.grams)} g · ${money(x.cost, cur)}</span></div>`).join("");
+  const last = c.last_of_model;
+  $("costNowLast").style.display = last ? "" : "none";
+  if(last){
+    const when = last.ended_at ? new Date(last.ended_at*1000).toLocaleDateString([],
+      {day:"2-digit", month:"2-digit"}) : "";
+    $("costNowLast").innerHTML = `<span>${t("Last print of this model")}${when ? " (" + when + ")" : ""}</span>
+      <span class="cn-v">${money(last.cost, cur)}</span>`;
+  }
+  $("costNote").textContent = t(c.material_so_far != null
+    ? "Material so far is estimated from progress and the sliced grams. Always rounded up."
+    : "Always rounded up.");
+}
+
 function render(s){
   if(!s || !s.job) return;
   lastState = s;   // so the language switcher can re-render without new telemetry
@@ -3285,14 +3748,13 @@ function render(s){
   ledBtn.disabled = !(s.connected && s.stream_enabled !== false);
   ledBtn.title = t("Chamber light") + " · " + t(ledOn ? "on" : "off");
 
-  // hero ring + state
+  // hero: the percent, its bar, the state
   const pct = j.percent!=null ? j.percent : 0;
   $("pct").textContent = pct;
-  $("ringProg").style.strokeDashoffset = RING_C*(1 - pct/100);
   const tok = STATE_TOKEN[j.state_label] || "--text-3";
   const col = cvar(tok);
-  $("ringProg").style.stroke = col;
-  $("ringState").textContent = t(j.state_label || "");
+  $("heroBar").style.width = Math.max(0, Math.min(100, pct)) + "%";
+  $("heroBar").style.background = col;
   const pill=$("statePill");
   pill.textContent = t(j.state_label || "—");
   pill.style.color = col;
@@ -3326,6 +3788,16 @@ function render(s){
   const feeding = activeTray(s);
   $("liveFil").innerHTML = filChip(feeding);
   $("liveFil").title = trayTitle(feeding);
+  // the hero's copy of the changes, with what is still to come under it
+  $("heroChanges").textContent = $("liveChanges").textContent;
+  $("heroChangesSub").textContent = fc && fc.total
+    ? `${Math.max(0, fc.total - fc.done)} ${t("still to come")}` : "";
+  // what the sliced file says, once it has been read (early in the print)
+  const sl = j.slice || {};
+  $("heroLh").textContent = sl.layer_h ? dec(sl.layer_h, 2) + " mm" : "—";
+  $("heroProfile").textContent = sl.profile || "—";
+  $("heroProfile").title = sl.profile || "";
+  renderLayerStack(j, feeding);
   $("spd").textContent = s.speed ? (s.speed.magnitude_pct!=null ? s.speed.magnitude_pct+"%" : "—") : "—";
 
   // Printing or not decides what the panel is for: the ring and the controls
@@ -3336,6 +3808,7 @@ function render(s){
   $("ringWrap").style.display = idleState ? "none" : "";
   $("heroInfo").style.display = idleState ? "none" : "";
   if(idleState) renderIdle(j, s);
+  renderCostNow(s, idleState ? null : j);
   updateTab(j);
 
   // temps
@@ -3440,10 +3913,10 @@ function render(s){
   if(pw.watts!=null || pw.error){
     $("powerCard").style.display="";
     $("powerW").textContent = pw.watts!=null ? Math.round(pw.watts) : "—";
-    $("powerToday").textContent = pw.today_wh!=null ? (pw.today_wh/1000).toFixed(2)+" kWh" : "—";
-    $("powerMonth").textContent = pw.month_wh!=null ? (pw.month_wh/1000).toFixed(2)+" kWh" : "—";
+    $("powerToday").textContent = pw.today_wh!=null ? dec(pw.today_wh/1000, 2)+" kWh" : "—";
+    $("powerMonth").textContent = pw.month_wh!=null ? dec(pw.month_wh/1000, 2)+" kWh" : "—";
     const lastPr=(s.cost||{}).last;   // energy of the current / most recent print
-    $("powerCost").textContent = (lastPr && lastPr.wh!=null) ? (lastPr.wh/1000).toFixed(2)+" kWh" : "—";
+    $("powerCost").textContent = (lastPr && lastPr.wh!=null) ? dec(lastPr.wh/1000, 2)+" kWh" : "—";
     $("powerMeta").textContent = pw.error ? (t("plug error")+": "+pw.error) : "";
     $("powerMeta").style.color = pw.error ? "var(--danger)" : "var(--text-3)";
   } else $("powerCard").style.display="none";
@@ -3486,7 +3959,8 @@ function render(s){
   // AI monitoring
   const ai=s.ai||{};
   $("aiSens").textContent = ai.sensitivity ? t("sensitivity")+": "+ai.sensitivity : "";
-  const aiItem=(k,on)=>`<div class="chip"><span class="k">${t(k)}</span><span class="v ${on?'ok':'no'}">${t(on?"on":"off")}</span></div>`;
+  // a list, one detector a line, its state as a chip with a mark - not colour alone
+  const aiItem=(k,on)=>`<div class="row"><span class="k">${t(k)}</span><span class="v"><span class="st-chip ${on?'ok':''}">${on?"✓ ":""}${t(on?"on":"off")}</span></span></div>`;
   $("aiChips").innerHTML =
     aiItem("Spaghetti", ai.spaghetti) + aiItem("First layer", ai.first_layer) +
     aiItem("Plate marker", ai.buildplate_marker) + aiItem("Monitoring", ai.monitoring) +
@@ -4801,25 +5275,72 @@ async function loadStats(){
   statCur = cur; statDays = d.by_day || [];
   drawDayChart();
   const sr = tt.success_rate==null ? "—" : Math.round(tt.success_rate*100)+"%";
+  const kpi = ([l,v,s], i)=>`<div class="kpi${i===0 ? " lead" : ""}"><span class="kl">${t(l)}</span><span class="kv">${v}</span><span class="ks">${s}</span></div>`;
   $("statKpis").innerHTML = [
-    ["Total prints", tt.prints ?? 0, ""],
+    ["Total cost", money(tt.total_cost, cur), d.by_month && d.by_month.length
+      ? `${t("since")} ${monLabel(d.by_month[0].month)}` : ""],
+    ["Total prints", tt.prints ?? 0, tt.prints ? `Ø ${money(tt.total_cost / tt.prints, cur)} ${t("per print")}` : ""],
     ["Success rate", sr, `${tt.finished||0} ✓ · ${tt.failed||0} ✗`],
     ["Print time", durH(tt.print_seconds), `${t("avg")} ${durH(tt.avg_seconds)}`],
     ["Filament", kgF(tt.filament_g), money(tt.material_cost, cur)],
     ["Energy", kwhF(tt.energy_wh), money(tt.power_cost, cur)],
-    ["Total cost", money(tt.total_cost, cur), ""],
-  ].map(([l,v,s])=>`<div class="kpi"><span class="kl">${t(l)}</span><span class="kv">${v}</span><span class="ks">${s}</span></div>`).join("");
-  const mm=d.by_month||[], maxP=Math.max(1, ...mm.map(x=>x.prints));
-  $("statMonths").innerHTML = mm.length ? mm.map(x=>
-    `<div class="mbar"><span class="ml">${monLabel(x.month)}</span>`+
-    `<span class="mt"><span style="width:${Math.round(x.prints/maxP*100)}%"></span></span>`+
-    `<span class="mv">${x.prints}× · ${money(x.cost, cur)}</span></div>`).join("")
+  ].map(kpi).join("");
+  // the same totals as a strip above the history table
+  $("histKpis").innerHTML = [
+    ["Total prints", tt.prints ?? 0, `${tt.finished||0} ✓ · ${tt.failed||0} ✗`],
+    ["Total cost", money(tt.total_cost, cur), tt.prints ? `Ø ${money(tt.total_cost / tt.prints, cur)} ${t("per print")}` : ""],
+    ["Energy", kwhF(tt.energy_wh), money(tt.power_cost, cur)],
+    ["Filament", kgF(tt.filament_g), money(tt.material_cost, cur)],
+  ].map(([l,v,s])=>`<div class="card kpi"><span class="kl">${t(l)}</span><span class="kv">${v}</span><span class="ks">${s}</span></div>`).join("");
+
+  // cost per month, as columns: material under power, the total on top
+  const mm=d.by_month||[];
+  const maxC=Math.max(0.01, ...mm.map(x=>x.cost||0));
+  $("statMonths").innerHTML = mm.length ? mm.map(x=>{
+    const m = x.material_cost || 0, p = x.power_cost || 0;
+    const H = 180;   // px of column for the dearest month
+    return `<div class="mcol">
+      <span class="mv">${money(x.cost, cur)}</span>
+      <span class="mstack" role="img" aria-label="${esc(monLabel(x.month))}: ${t("Material")} ${money(m, cur)}, ${t("Power")} ${money(p, cur)}">
+        <span class="mp" style="height:${Math.round(p/maxC*H)}px"></span>
+        <span class="mm" style="height:${Math.round(m/maxC*H)}px"></span></span>
+      <span class="ml">${monLabel(x.month)}</span>
+      <span class="mn">${x.prints} ${t(x.prints === 1 ? "print" : "prints")}</span></div>`;
+  }).join("")
     : `<div class="temp-sub">${t("No prints recorded yet — the first one appears here as soon as it starts.")}</div>`;
+
+  // the most printed models, numbered, with a bar for what they cost
   const tm=d.top_models||[];
-  $("statModels").innerHTML = tm.length ? tm.map(x=>
-    `<div class="tmodel"><span class="tn">${esc(x.name)}</span>`+
-    `<span class="tc"><span class="cnt">${x.count}×</span> · ${kgF(x.filament_g)} · ${money(x.cost, cur)}</span></div>`).join("")
+  const maxM=Math.max(0.01, ...tm.map(x=>x.cost||0));
+  $("statModels").innerHTML = tm.length ? tm.map((x,i)=>
+    `<div class="tmodel"><span class="ti">${String(i+1).padStart(2,"0")}</span>`+
+    `<span class="tn"><span class="tnn">${esc(x.name)}</span><span class="tbar"><span style="width:${Math.round((x.cost||0)/maxM*100)}%"></span></span></span>`+
+    `<span class="tc"><span class="cnt">${x.count}×</span> · ${kgF(x.filament_g)}</span>`+
+    `<span class="tv">${money(x.cost, cur)}</span></div>`).join("")
     : `<div class="temp-sub">—</div>`;
+
+  // which pricing rule the material money came from, as shares
+  const cr = d.cost_rules || {}, crSum = Object.values(cr).reduce((a,b)=>a+(b||0), 0);
+  const share = v => crSum > 0 ? Math.round(100 * (v||0) / crSum) + " %" : "—";
+  const pm = d.power_measured || {};
+  $("statRules").innerHTML = [
+    ["Material – price typed in", share(cr.hand)],
+    ["Material – learned from invoices", share(cr.orders)],
+    ["Material – brand × material", share(cr.matrix)],
+    ["Material – default price", share(cr.default)],
+    ["Power – measured by the plug", pm.of ? `${pm.prints} / ${pm.of} ${t("prints")}` : "—"],
+  ].map(([k,v])=>`<div class="row"><span class="k">${t(k)}</span><span class="v">${v}</span></div>`).join("");
+
+  // the single dearest print
+  const dp = d.dearest;
+  $("statDearest").innerHTML = !dp ? `<div class="temp-sub">—</div>` :
+    `<div class="dear-name">${esc(dp.name)}</div>
+     <div class="dear-cost">${money(dp.cost, cur)}</div>
+     <div class="temp-sub">${dp.filament_g ? kgF(dp.filament_g) + " · " : ""}${
+       dp.started_at ? new Date(dp.started_at*1000).toLocaleDateString() : ""}</div>
+     <button class="wbtn" id="dearOpen" type="button" style="margin-top:14px">${t("Open in history")}</button>`;
+  const dOpen = $("statDearest").querySelector("#dearOpen");
+  if(dOpen) dOpen.addEventListener("click", ()=> go("prints", "history"));
 }
 
 /* ---------- tell the printer what is in a slot ----------
@@ -5949,17 +6470,34 @@ $("noteList").addEventListener("click", async e=>{
 
 /* ---------- maintenance ---------- */
 const maintCol = st => st==="overdue" ? "var(--danger)" : st==="soon" ? "var(--warn)" : "var(--good)";
+const _mic = p => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const MNT_IC = {
+  due:  _mic('<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/>'),
+  soon: _mic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  ok:   _mic('<path d="m4 12 5 5L20 6"/>'),
+};
 async function loadMaint(data){
   let d = data;
   if(!d){ try{ d = await (await fetch("/api/maintenance")).json(); }catch(_){ return; } }
   $("maintMeta").textContent = `${d.recorded_hours} h ${t("of tracked printing")}`;
   $("maintWiki").href = d.url;
-  $("maintRows").innerHTML = (d.tasks||[]).map(tk=>{
+  // the three numbers that matter before the list: how many are due, how many
+  // soon, and the hours everything is measured against
+  const tasks = d.tasks || [];
+  const nOver = tasks.filter(x => x.status === "overdue"), nSoon = tasks.filter(x => x.status === "soon");
+  $("maintSum").innerHTML =
+    `<div class="ms ms-due${nOver.length ? " on" : ""}"><span class="kl">${t("Due")}</span><span class="kv">${nOver.length}</span><span class="ks">${nOver.map(x=>esc(t(x.name))).join(", ") || "—"}</span></div>` +
+    `<div class="ms ms-soon${nSoon.length ? " on" : ""}"><span class="kl">${t("Soon")}</span><span class="kv">${nSoon.length}</span><span class="ks">${nSoon.map(x=>esc(t(x.name))).join(", ") || "—"}</span></div>` +
+    `<div class="ms"><span class="kl">${t("Tracked print time")}</span><span class="kv">${dec(d.recorded_hours || 0, 1)} h</span><span class="ks"></span></div>`;
+  $("maintRows").innerHTML = tasks.map(tk=>{
     const pct = Math.max(0, Math.min(100, tk.interval_hours ? tk.since_hours/tk.interval_hours*100 : 0));
     const due = tk.due_in_hours>0
       ? `${t("in")} ${Math.round(tk.due_in_hours)} h`
       : `${t("overdue")} ${Math.round(Math.abs(tk.due_in_hours))} h`;
-    return `<div class="mnt-row">
+    // the state as a mark as well as a colour
+    const icon = tk.status === "overdue" ? MNT_IC.due : tk.status === "soon" ? MNT_IC.soon : MNT_IC.ok;
+    return `<div class="mnt-row mnt-${esc(tk.status || "ok")}">
+      <span class="mnt-ic" style="color:${maintCol(tk.status)}">${icon}</span>
       <div>
         <div class="mnt-name"><a href="${tk.url}" target="_blank" rel="noopener noreferrer">${t(tk.name)} ↗</a></div>
         <div class="mnt-sub"><span class="mnt-iv" data-key="${tk.key}" data-iv="${tk.interval_hours}">${t("every")} ${Math.round(tk.interval_hours)} h</span> · ${tk.since_hours.toFixed(1)} h ${t("since done")}</div>

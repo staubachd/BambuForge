@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BambuForge – Mobil · Jetzt</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:#EDEBE6}a:hover{color:#FF6A2B}
+*{box-sizing:border-box}
+:focus-visible{outline:2px solid #FF6A2B;outline-offset:2px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wide{font-stretch:118%}
+.lbl{font-size:13px;color:#B3B0A8;font-weight:500}
+.card{background:#1A1A18;border:1px solid #2C2B28;border-radius:6px;padding:24px;min-width:0}
+.h2{margin:0;font-size:17px;font-weight:700;font-stretch:112%;letter-spacing:-.005em}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid #3D3C38;background:transparent;color:#EDEBE6;border-radius:4px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;transition:border-color .15s,background .15s}
+.btn:hover{border-color:#918E86;color:#EDEBE6}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:#FF6A2B;border-color:#FF6A2B;color:#1F0D03}
+.btn.pri:hover{background:#FF8650;border-color:#FF8650;color:#1F0D03}
+.btn.ghost{border-color:transparent}
+.btn.dan{border-color:#5A2A2A;color:#FF8A8A}
+.btn.dan:hover{border-color:#FF6B6B}
+.ibtn{width:44px;height:44px;display:inline-grid;place-items:center;border:1px solid #2C2B28;border-radius:4px;background:transparent;color:#B3B0A8;cursor:pointer}
+.ibtn:hover{color:#EDEBE6;border-color:#918E86}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid #2C2B28;border-radius:4px;padding:3px;gap:2px;background:#121211}
+.seg button{min-height:36px;padding:0 12px;border:0;border-radius:2px;background:transparent;color:#B3B0A8;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.seg button:hover{color:#EDEBE6}
+.seg button[aria-pressed=true]{background:#2C2B28;color:#EDEBE6}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12.5px;font-weight:600;border:1px solid #3D3C38;color:#B3B0A8;white-space:nowrap}
+.chip.ok{border-color:#2D5A40;color:#7FD9A4}
+.chip.warn{border-color:#6A5520;color:#F2C14E}
+.chip.bad{border-color:#6A2C2C;color:#FF8A8A}
+.chip.heat{border-color:#7A3A1C;color:#FF8A55}
+.bar{position:relative;height:6px;background:#2C2B28;border-radius:3px;overflow:hidden}
+.bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.tab{width:100%;border-collapse:collapse;font-size:14px}
+.tab th{text-align:left;font-weight:500;font-size:12.5px;color:#918E86;padding:10px 12px;border-bottom:1px solid #2C2B28;white-space:nowrap}
+.tab td{padding:13px 12px;border-bottom:1px solid #22221F;white-space:nowrap}
+.tab tr:hover td{background:#1F1F1C}
+.tab .r{text-align:right}
+.inp{min-height:44px;width:100%;padding:0 14px;background:#121211;border:1px solid #3D3C38;border-radius:4px;color:#EDEBE6;font:inherit}
+.inp::placeholder{color:#918E86}
+.inp:hover{border-color:#5A5954}
+.inp:focus{border-color:#FF6A2B;outline:none;box-shadow:0 0 0 3px rgba(255,106,43,.18)}
+.rail a.nv{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:4px;color:#B3B0A8;text-decoration:none;font-size:14.5px;font-weight:500}
+.rail a.nv:hover{background:#1F1F1C;color:#EDEBE6}
+.rail a.nv[aria-current=page]{background:#22221F;color:#EDEBE6;box-shadow:inset 2px 0 0 #FF6A2B}
+.rail .grp{font-size:12px;color:#918E86;font-weight:600;padding:16px 12px 6px;letter-spacing:.02em}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #22221F;font-size:14px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:#B3B0A8}
+.kv>span:last-child{white-space:nowrap}
+.ph{display:grid;place-items:center;background:repeating-linear-gradient(0deg,#1F1F1C 0 3px,#22221F 3px 4px);color:#918E86;font-size:12.5px;text-align:center;border-radius:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#FF6A2B;animation:pulse 1.8s ease-in-out infinite}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){.live-dot,.rise{animation:none}}
+</style>
+</helmet>
+<div style="width:390px;height:844px;overflow:hidden;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;position:relative">
+<div style="height:100%;display:flex;flex-direction:column">
+<header style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 8px">
+<div style="display:flex;gap:10px;align-items:center"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="0" y="0" width="28" height="28" rx="4" fill="#FF6A2B"></rect><path d="M6 20h16M6 16h16M6 12h12M6 8h7" stroke="#1F0D03" stroke-width="2" stroke-linecap="round"></path></svg><div><div style="font-weight:800;font-stretch:118%">BambuForge</div><div style="font-size:12px;color:#B3B0A8;display:flex;gap:6px;align-items:center"><span class="live-dot" aria-hidden="true"></span>X2D · druckt</div></div></div>
+<div style="display:flex;gap:6px"><button class="btn" aria-label="2 Warnungen" style="padding:0 10px;color:#F2C14E;border-color:#6A5520"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg><span class="mono">2</span></button><button class="ibtn" aria-label="Kammerlicht"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></button></div></header>
+<div style="flex:1;overflow:hidden;padding:4px 16px 12px;display:flex;flex-direction:column;gap:10px">
+<section class="card" style="padding:16px 18px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="chip heat">Druckt</span><span class="mono" style="font-size:13px;color:#B3B0A8">Schicht 214 / 420</span></div>
+<h1 style="margin:8px 0 0;font-size:21px;line-height:1.15;font-weight:800;font-stretch:114%">Lampenschirm Voronoi</h1>
+<div style="display:flex;align-items:baseline;gap:12px;margin-top:10px"><span class="mono" style="font-size:52px;line-height:1;letter-spacing:-.05em">51<span style="font-size:28px;color:#B3B0A8">%</span></span><span style="color:#B3B0A8;font-size:14px">noch <strong style="color:#EDEBE6">2 h 18 min</strong><br>fertig <strong style="color:#EDEBE6">13:12</strong></span></div>
+<div class="bar" style="height:4px;margin-top:14px"><span style="width:51%;background:#FF6A2B"></span></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>Pause</button><button class="btn dan" style="flex:1;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12"/></svg>Stopp</button></div></section>
+<section class="card" style="padding:12px 18px;display:flex;justify-content:space-between;align-items:flex-end"><div><div class="lbl">Kostet bisher</div><div class="mono" style="font-size:30px;color:#FF6A2B;line-height:1.1">2,47 €</div></div><div style="text-align:right"><div class="lbl">am Ende ≈</div><div class="mono" style="font-size:20px">4,61 €</div></div></section>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="card" style="padding:10px 14px"><div style="display:flex;gap:6px;align-items:center" class="lbl"><span style="width:8px;height:8px;border-radius:2px;background:#FF6A2B"></span>Düse links</div><div class="mono" style="font-size:21px;margin-top:0">220°<span style="font-size:14px;color:#918E86"> / 220</span></div></div><div class="card" style="padding:10px 14px"><div style="display:flex;gap:6px;align-items:center" class="lbl"><span style="width:8px;height:8px;border-radius:2px;background:#F2C14E"></span>Düse rechts</div><div class="mono" style="font-size:21px;margin-top:0">140°<span style="font-size:14px;color:#918E86"> / 140</span></div></div><div class="card" style="padding:10px 14px"><div style="display:flex;gap:6px;align-items:center" class="lbl"><span style="width:8px;height:8px;border-radius:2px;background:#5AA9E6"></span>Bett</div><div class="mono" style="font-size:21px;margin-top:0">65°<span style="font-size:14px;color:#918E86"> / 65</span></div></div><div class="card" style="padding:10px 14px"><div style="display:flex;gap:6px;align-items:center" class="lbl"><span style="width:8px;height:8px;border-radius:2px;background:#B9A6F0"></span>Kammer</div><div class="mono" style="font-size:21px;margin-top:0">38°<span style="font-size:14px;color:#918E86"></span></div></div></div>
+<section class="card" style="padding:12px 14px"><div class="lbl" style="margin-bottom:8px">AMS</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:100%;height:40px;border-radius:3px;background:#121211;position:relative;border:1px solid #2C2B28" aria-hidden="true"><span style="position:absolute;left:4px;right:4px;bottom:4px;height:max(6px,calc(78% - 6px));background:#F5F3EE;border-radius:2px"></span></span><span class="mono" style="font-size:12px">78 %</span></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:100%;height:40px;border-radius:3px;background:#121211;position:relative;border:1px solid #FF6A2B" aria-hidden="true"><span style="position:absolute;left:4px;right:4px;bottom:4px;height:max(6px,calc(42% - 6px));background:#0078BF;border-radius:2px"></span></span><span class="mono" style="font-size:12px">42 %</span></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:100%;height:40px;border-radius:3px;background:#121211;position:relative;border:1px solid #2C2B28" aria-hidden="true"><span style="position:absolute;left:4px;right:4px;bottom:4px;height:max(6px,calc(12% - 6px));background:#C12E1F;border-radius:2px"></span></span><span class="mono" style="font-size:12px">12 %</span></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:100%;height:40px;border-radius:3px;background:#121211;position:relative;border:1px solid #2C2B28" aria-hidden="true"><span style="position:absolute;left:4px;right:4px;bottom:4px;height:max(6px,calc(91% - 6px));background:#F08A24;border-radius:2px"></span></span><span class="mono" style="font-size:12px">91 %</span></div></div></section>
+</div>
+<nav aria-label="Hauptnavigation" style="display:flex;border-top:1px solid #2C2B28;background:#1A1A18;padding-bottom:18px"><a href="Main.dc.html" aria-current="page" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 6px;text-decoration:none;font-size:11.5px;font-weight:600;color:#FF6A2B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8v6H8z"/><path d="M8 17h8"/></svg>Jetzt</a><a href="Drucke-Verlauf.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 6px;text-decoration:none;font-size:11.5px;font-weight:600;color:#B3B0A8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>Drucke</a><a href="Filament-Bestand.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 6px;text-decoration:none;font-size:11.5px;font-weight:600;color:#B3B0A8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6"/></svg>Filament</a><a href="Werkstatt-Wartung.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 6px;text-decoration:none;font-size:11.5px;font-weight:600;color:#B3B0A8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/></svg>Werkstatt</a><a href="MakerWorld.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 6px;text-decoration:none;font-size:11.5px;font-weight:600;color:#B3B0A8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Mehr</a></nav></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
