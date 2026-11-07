@@ -12,7 +12,7 @@ unattended on a **Synology NAS**, and runs just as happily on a laptop.
 > core is the standard Bambu schema and works on other Bambu printers with minor
 > tweaks.
 
-<img width="1999" alt="overview" src="https://github.com/user-attachments/assets/ea4019c7-f876-4b81-9d98-b8095be4118b" />
+![The Now page during a two-colour print](docs/screenshots/now.png)
 
 ---
 
@@ -113,17 +113,142 @@ connection entirely so the NAS disks can sleep.
 
 ## Screenshots
 
-Machine page:
-<img width="2023" alt="machine" src="https://github.com/user-attachments/assets/256139ec-9f66-4930-9732-73da9322a894" />
+One screenshot per page, in the order of the sidebar. Every figure, print and
+model in them is **demo data** — the app was run against a seeded database and
+a simulated printer, so nothing here is a real workshop.
 
-Print history:
-<img width="2019" alt="print_history" src="https://github.com/user-attachments/assets/f88c826f-99f5-4c5a-abda-04c1a296c749" />
+- [Printer › Now](#printer--now) · [Hardware](#printer--hardware) · [USB drive](#printer--usb-drive) · [Raw data](#printer--raw-data)
+- [Prints › History](#prints--history) · [Statistics](#prints--statistics)
+- [Filament › Inventory](#filament--inventory) · [Purchases](#filament--purchases)
+- [Workshop › Maintenance](#workshop--maintenance) · [Notes](#workshop--notes)
+- [MakerWorld › Discover](#makerworld--discover) · [Model page](#makerworld--model-page)
+- [Settings](#settings) · [Setup wizard](#setup-wizard)
 
-Statistics:
-<img width="2025" alt="statistics" src="https://github.com/user-attachments/assets/cfa53b64-40b0-4d30-85d3-6522b75d2842" />
+#### Printer › Now
 
-Maintenance:
-<img width="2014" alt="maintenance" src="https://github.com/user-attachments/assets/16aa5446-d695-454d-b8bb-97366646067d" />
+The running job at a glance: progress, layer, remaining time and the wall-clock
+finish, filament changes done and still to come, and the layer height from the
+sliced file. The column on the left is the print's colour stack, layer by
+layer, with the current layer marked. On the right, what the print has cost so
+far and what it will come to — power from the smart plug, material from the
+sliced grams — split per spool and compared with the last print of the same
+model. Pause, stop and the speed mode sit below, behind a confirm. Temperatures
+for both nozzles, bed and chamber follow further down.
+
+![Now](docs/screenshots/now.png)
+
+#### Printer › Hardware
+
+Everything the printer reports about itself that is not the job: all four fans
+on a 0–100 % scale, the vent box and airflow mode, the AI monitoring switches,
+internal storage, Wi-Fi, firmware and update state for printer, AMS and
+toolhead, build plate and the nozzles fitted.
+
+![Hardware](docs/screenshots/hardware.png)
+
+#### Printer › USB drive
+
+How full the stick in the printer is (as the printer reports it) and what is
+on it, largest first. Each sliced file is tied back to the print in the
+history that made it, so the list reads as *Lantern Lamp Shade*, not as a
+filename.
+
+![USB drive](docs/screenshots/usb-drive.png)
+
+#### Printer › Raw data
+
+The last complete MQTT report, unmodified. Keys the app reads are highlighted,
+the rest are greyed out — handy when a firmware update adds a field.
+
+![Raw data](docs/screenshots/raw-data.png)
+
+#### Prints › History
+
+Prints per day (or filament, print time, energy, cost) over 30 days, 90 days
+or a year, the running totals, and the full print log with power, material and
+total cost per job. MakerWorld prints show the model's picture and link to it.
+Rows can be renamed, grouped under one model, corrected or deleted, and each
+one expands to everything known about it.
+
+![History](docs/screenshots/history.png)
+
+#### Prints › Statistics
+
+Totals since the first recorded print, success rate and average print time,
+power and material cost for today, this week and this month, cost per month
+split into material and power, the most-printed models, and which pricing rule
+the material costs came from.
+
+![Statistics](docs/screenshots/statistics.png)
+
+#### Filament › Inventory
+
+What is loaded right now — each AMS slot and the external spool with colour,
+name, grams and metres left, a low-stock flag and a reorder link — followed by
+every filament ever used: how much was printed with it, bought, is left, what
+it costs per kg and when it was last used. Searchable and filterable.
+
+![Filament inventory](docs/screenshots/filament-inventory.png)
+
+#### Filament › Purchases
+
+Order confirmations, pasted or uploaded as PDF, turned into order lines and
+matched to the filaments they bought. Group by product, material, colour or
+order; the price paid per kg feeds the material cost of every print.
+
+![Filament purchases](docs/screenshots/filament-purchases.png)
+
+#### Workshop › Maintenance
+
+Bambu's maintenance tasks, counted in actual print hours rather than calendar
+time: what is due, what is coming up, and a **Done** button to reset each one.
+Intervals can be adjusted to how the printer is used.
+
+![Maintenance](docs/screenshots/maintenance.png)
+
+#### Workshop › Notes
+
+A place for everything that would otherwise be a sticky note on the printer:
+settings that worked, tips, project ideas. Notes have categories and can carry
+pictures.
+
+![Notes](docs/screenshots/notes.png)
+
+#### MakerWorld › Discover
+
+MakerWorld inside the app: Trending and the categories, search, your own
+collections and the channels you follow (with the Bambu Cloud sign-in).
+
+![MakerWorld](docs/screenshots/makerworld.png)
+
+#### MakerWorld › Model page
+
+One model with its pictures, description and every print profile — time,
+weight and filaments, with the profiles for your printer first. Each filament
+is checked against the AMS and the shelf (*Slot 2 ✓*, *on the shelf*, *not in
+stock*), and the page says how often the model has been printed here already.
+
+![MakerWorld model page](docs/screenshots/makerworld-model.png)
+
+#### Settings
+
+Behind the gear at the bottom of the sidebar. Everything is stored in the
+database and grouped into tabs — Printer, Cost, Filament, Controls, Recording,
+Power, Cloud, Slicer, Camera — plus Database and Backup. Each field says
+whether it applies immediately or needs a restart.
+
+![Settings](docs/screenshots/settings.png)
+
+#### Setup wizard
+
+What a fresh install shows instead of the dashboard: five steps from the
+database to the printer, plug and prices, each with a **Test** button. Finish
+writes the connection file and restarts into the dashboard.
+
+![Setup wizard](docs/screenshots/setup-wizard.png)
+
+> The optional **Live** view (camera via go2rtc) appears in the sidebar only
+> when the camera is switched on, and is not shown here.
 
 ---
 
@@ -432,6 +557,8 @@ Everything the dashboard does is a plain HTTP endpoint.
 | `tools/` | One-off helpers: cloud login, plug setup, MQTT sniffing, scheduled backups, diagnostics. |
 | `tests/` | The test suite — `pwsh tests/runall.ps1`. |
 | `docs/INTERNALS.md` | Why the awkward parts are the way they are. Only needed if you change the code. |
+| `docs/screenshots/` | The pictures in this README, taken with demo data. |
+| `docs/design/` | The design drafts the current pages were built against. |
 
 **Stack:** Python 3 + Flask (threaded, SSE), paho-mqtt over TLS, PyMySQL, optional
 `tapo` and `pypdf`, go2rtc for the camera. The frontend is one hand-written HTML
