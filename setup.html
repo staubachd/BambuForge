@@ -38,7 +38,7 @@
     font-family:var(--sans);
     line-height:1.5; padding:28px 20px 60px;
   }
-  .wrap{max-width:900px; margin:0 auto}
+  .wrap{max-width:1160px; margin:0 auto}
   header{display:flex; align-items:center; gap:14px; margin-bottom:22px}
   .logo{display:grid; place-items:center}
   .logo svg{display:block}
@@ -55,13 +55,30 @@
   .seg button.on{background:var(--border); color:var(--text)}
 
   /* the step rail: where you are, and what is still to come */
-  .rail{display:flex; gap:0; margin-bottom:20px; flex-wrap:wrap}
+  /* two columns: the steps down the side, the step itself beside them */
+  .wiz{display:flex; gap:44px; align-items:flex-start; flex-wrap:wrap}
+  .wiz-side{flex:1 1 240px; max-width:300px}
+  .wiz > .card{flex:999 1 520px; min-width:0}
+  .wiz-h{margin:0 0 10px; font-size:32px; line-height:1.08; font-weight:800; font-stretch:118%;
+    letter-spacing:-.02em}
+  .wiz-lede{margin:0 0 24px; color:var(--text-2); font-size:14.5px}
+  .rail{display:flex; flex-direction:column; gap:0; margin-bottom:20px}
   .rail div{
     flex:1; min-width:120px; padding:9px 12px; font-size:12.5px; font-weight:600;
     color:var(--text-3); border-bottom:2px solid var(--border);
   }
-  .rail div.on{color:var(--text); border-bottom-color:var(--accent)}
-  .rail div.done{color:var(--ok); border-bottom-color:var(--ok)}
+  .rail div.on{color:var(--text); border-bottom-color:var(--border)}
+  .rail div.done{color:var(--ok); border-bottom-color:var(--border)}
+  @media(min-width:861px){
+    .rail div{flex:none; padding:12px 12px; border-bottom-width:1px; font-size:13.5px}
+    .rail div.on{box-shadow:inset 2px 0 0 var(--accent); background:var(--surface)}
+  }
+  @media(max-width:860px){
+    .wiz{gap:20px} .wiz-side{max-width:none} .wiz-h{font-size:26px}
+    .rail{flex-direction:row; flex-wrap:wrap}
+    .rail div{flex:1 1 150px}
+    .rail div.on{border-bottom-color:var(--accent)}
+  }
   .rail span{display:inline-block; width:20px; height:20px; border-radius:3px; font-family:var(--mono);
     background:var(--border); color:var(--text-2); font-size:11px; text-align:center;
     line-height:19px; margin-right:7px}
@@ -138,7 +155,13 @@
     </span>
   </header>
 
-  <div class="rail" id="rail"></div>
+  <div class="wiz">
+  <aside class="wiz-side">
+    <h2 class="wiz-h" id="wizHead">Ten minutes to the first print price.</h2>
+    <p class="wiz-lede" id="wizLede"></p>
+    <!-- the steps: where you are, and what is still to come -->
+    <div class="rail" id="rail" role="list"></div>
+  </aside>
   <div class="card">
     <h2 id="stepTitle"></h2>
     <p class="lede" id="stepLede"></p>
@@ -151,6 +174,7 @@
       <button class="btn primary" id="nextBtn">Weiter</button>
     </div>
   </div>
+  </div>
 </div>
 
 <script>
@@ -162,6 +186,9 @@ const esc = s => String(s == null ? "" : s)
    English, so they are translated here alongside this page's own strings. */
 const DE = {
   "Setup":"Einrichtung",
+  "Ten minutes to the first print price.":"Zehn Minuten bis zum ersten Druckpreis.",
+  "Everything after the first step can be changed later in the settings.":
+    "Alles nach dem ersten Schritt lässt sich später in den Einstellungen ändern.",
   "Back":"Zurück", "Next":"Weiter", "Finish":"Fertigstellen", "Test connection":"Verbindung testen",
   "Test printer":"Drucker testen", "Testing…":"Teste…", "Skip":"Überspringen",
   "Database":"Datenbank", "Printer":"Drucker", "Plug, cloud & camera":"Steckdose, Cloud & Kamera",
@@ -393,8 +420,11 @@ const LEDE = {
 
 function render(){
   const s = seed.steps[step];
+  $("wizHead").textContent = t("Ten minutes to the first print price.");
+  $("wizLede").textContent = t("Everything after the first step can be changed later in the settings.");
   $("rail").innerHTML = seed.steps.map((x, i) =>
-    `<div class="${i === step ? "on" : (i < step ? "done" : "")}"><span>${
+    `<div role="listitem" class="${i === step ? "on" : (i < step ? "done" : "")}"${
+      i === step ? ' aria-current="step"' : ""}><span>${
       i < step ? "✓" : i + 1}</span>${esc(t(x.title))}</div>`).join("");
   $("stepTitle").textContent = t(LEDE[s.key][0]);
   $("stepLede").textContent  = t(LEDE[s.key][1]);

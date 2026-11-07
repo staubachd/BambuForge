@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BambuForge – Filament · Bestand</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:#EDEBE6}a:hover{color:#FF6A2B}
+*{box-sizing:border-box}
+:focus-visible{outline:2px solid #FF6A2B;outline-offset:2px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wide{font-stretch:118%}
+.lbl{font-size:13px;color:#B3B0A8;font-weight:500}
+.card{background:#1A1A18;border:1px solid #2C2B28;border-radius:6px;padding:24px;min-width:0}
+.h2{margin:0;font-size:17px;font-weight:700;font-stretch:112%;letter-spacing:-.005em}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid #3D3C38;background:transparent;color:#EDEBE6;border-radius:4px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;transition:border-color .15s,background .15s}
+.btn:hover{border-color:#918E86;color:#EDEBE6}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:#FF6A2B;border-color:#FF6A2B;color:#1F0D03}
+.btn.pri:hover{background:#FF8650;border-color:#FF8650;color:#1F0D03}
+.btn.ghost{border-color:transparent}
+.btn.dan{border-color:#5A2A2A;color:#FF8A8A}
+.btn.dan:hover{border-color:#FF6B6B}
+.ibtn{width:44px;height:44px;display:inline-grid;place-items:center;border:1px solid #2C2B28;border-radius:4px;background:transparent;color:#B3B0A8;cursor:pointer}
+.ibtn:hover{color:#EDEBE6;border-color:#918E86}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid #2C2B28;border-radius:4px;padding:3px;gap:2px;background:#121211}
+.seg button{min-height:36px;padding:0 12px;border:0;border-radius:2px;background:transparent;color:#B3B0A8;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.seg button:hover{color:#EDEBE6}
+.seg button[aria-pressed=true]{background:#2C2B28;color:#EDEBE6}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12.5px;font-weight:600;border:1px solid #3D3C38;color:#B3B0A8;white-space:nowrap}
+.chip.ok{border-color:#2D5A40;color:#7FD9A4}
+.chip.warn{border-color:#6A5520;color:#F2C14E}
+.chip.bad{border-color:#6A2C2C;color:#FF8A8A}
+.chip.heat{border-color:#7A3A1C;color:#FF8A55}
+.bar{position:relative;height:6px;background:#2C2B28;border-radius:3px;overflow:hidden}
+.bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.tab{width:100%;border-collapse:collapse;font-size:14px}
+.tab th{text-align:left;font-weight:500;font-size:12.5px;color:#918E86;padding:10px 12px;border-bottom:1px solid #2C2B28;white-space:nowrap}
+.tab td{padding:13px 12px;border-bottom:1px solid #22221F;white-space:nowrap}
+.tab tr:hover td{background:#1F1F1C}
+.tab .r{text-align:right}
+.inp{min-height:44px;width:100%;padding:0 14px;background:#121211;border:1px solid #3D3C38;border-radius:4px;color:#EDEBE6;font:inherit}
+.inp::placeholder{color:#918E86}
+.inp:hover{border-color:#5A5954}
+.inp:focus{border-color:#FF6A2B;outline:none;box-shadow:0 0 0 3px rgba(255,106,43,.18)}
+.rail a.nv{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:4px;color:#B3B0A8;text-decoration:none;font-size:14.5px;font-weight:500}
+.rail a.nv:hover{background:#1F1F1C;color:#EDEBE6}
+.rail a.nv[aria-current=page]{background:#22221F;color:#EDEBE6;box-shadow:inset 2px 0 0 #FF6A2B}
+.rail .grp{font-size:12px;color:#918E86;font-weight:600;padding:16px 12px 6px;letter-spacing:.02em}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #22221F;font-size:14px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:#B3B0A8}
+.kv>span:last-child{white-space:nowrap}
+.ph{display:grid;place-items:center;background:repeating-linear-gradient(0deg,#1F1F1C 0 3px,#22221F 3px 4px);color:#918E86;font-size:12.5px;text-align:center;border-radius:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#FF6A2B;animation:pulse 1.8s ease-in-out infinite}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){.live-dot,.rise{animation:none}}
+</style>
+</helmet>
+<div style="min-height:1340px;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;display:flex;flex-wrap:wrap;align-items:stretch">
+<nav class="rail" aria-label="Hauptnavigation" style="flex:1 1 232px;max-width:264px;min-width:0;padding:20px 12px;border-right:1px solid #2C2B28;display:flex;flex-direction:column;gap:2px">
+<a href="Main.dc.html" style="display:flex;align-items:center;gap:10px;padding:4px 12px 18px;text-decoration:none;color:#EDEBE6"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="0" y="0" width="28" height="28" rx="4" fill="#FF6A2B"></rect><path d="M6 20h16M6 16h16M6 12h12M6 8h7" stroke="#1F0D03" stroke-width="2" stroke-linecap="round"></path></svg><span style="font-size:19px;font-weight:800;font-stretch:122%;letter-spacing:-.02em">BambuForge</span></a>
+<div style="margin:0 4px 6px;padding:12px;border:1px solid #2C2B28;border-radius:6px;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px"><span class="live-dot" aria-hidden="true"></span>X2D · druckt</div>
+<div class="mono" style="font-size:12px;color:#918E86">0948AD5C1200123 · LAN</div>
+</div>
+<div class="grp">Drucker</div><a class="nv" href="Main.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8v6H8z"/><path d="M8 17h8"/></svg><span>Jetzt</span><span class="live-dot" style="margin-left:auto" aria-hidden="true"></span></a><a class="nv" href="Drucker-Hardware.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><span>Hardware</span></a><a class="nv" href="Drucker-USB.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v8H8z"/><path d="M6 11h12v6a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z"/></svg><span>USB-Stick</span></a><a class="nv" href="Drucker-Rohdaten.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span>Rohdaten</span></a><a class="nv" href="Live.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="m16 10 5-3v10l-5-3"/></svg><span>Live</span></a><div class="grp">Drucke</div><a class="nv" href="Drucke-Verlauf.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Verlauf</span></a><a class="nv" href="Drucke-Statistik.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><span>Statistik</span></a><div class="grp">Filament</div><a class="nv" href="Filament-Bestand.dc.html" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6"/></svg><span>Bestand</span></a><a class="nv" href="Filament-Kaeufe.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 7H7"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg><span>Käufe</span></a><div class="grp">Werkstatt</div><a class="nv" href="Werkstatt-Wartung.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/></svg><span>Wartung</span></a><a class="nv" href="Werkstatt-Notizen.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4"/><path d="M8 12h8M8 16h6"/></svg><span>Notizen</span></a><div class="grp">Entdecken</div><a class="nv" href="MakerWorld.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>MakerWorld</span></a>
+<div style="flex:1 1 24px"></div>
+<a class="nv" href="Einstellungen.dc.html" style="margin-top:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Einstellungen</span></a>
+</nav>
+<main style="flex:999 1 560px;min-width:0;padding:0 40px 64px">
+<div style="max-width:1280px;margin:0 auto">
+<header style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;padding:24px 0 28px">
+<div style="min-width:0">
+<div class="lbl" style="color:#918E86">Filament</div>
+<h1 style="margin:2px 0 0;font-size:34px;line-height:1.1;font-weight:800;font-stretch:120%;letter-spacing:-.02em">Bestand</h1>
+</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+<div class="seg" role="group" aria-label="Aufzeichnung"><button aria-pressed="true">Auto</button><button aria-pressed="false">An</button><button aria-pressed="false">Aus</button></div>
+<button class="btn" aria-label="2 Warnungen" style="padding:0 12px;color:#F2C14E;border-color:#6A5520"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg><span class="mono">2</span></button>
+<button class="ibtn" aria-label="Kammerlicht"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
+<div class="seg" role="group" aria-label="Sprache"><button aria-pressed="true">DE</button><button aria-pressed="false">EN</button></div>
+<button class="ibtn" aria-label="Hell/Dunkel umschalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+</div>
+</header>
+
+<section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:#2C2B28;border:1px solid #2C2B28;border-radius:6px;overflow:hidden" aria-label="Kennzahlen">
+<div style="background:#1A1A18;padding:22px"><div class="lbl">Verbraucht</div><div class="mono" style="font-size:30px;margin-top:4px">6,98 kg</div><div style="font-size:13px;color:#918E86">aus 40 Drucken</div></div><div style="background:#1A1A18;padding:22px"><div class="lbl">Gekauft</div><div class="mono" style="font-size:30px;margin-top:4px">12,00 kg</div><div style="font-size:13px;color:#918E86">9 Bestellzeilen</div></div><div style="background:#1A1A18;padding:22px"><div class="lbl">Übrig</div><div class="mono" style="font-size:30px;margin-top:4px">5,02 kg</div><div style="font-size:13px;color:#918E86">auf 6 Spulen</div></div><div style="background:#1A1A18;padding:22px"><div class="lbl">Ausgegeben</div><div class="mono" style="font-size:30px;margin-top:4px">187,72 €</div><div style="font-size:13px;color:#918E86">Ø 15,64 €/kg</div></div><div style="background:#1A1A18;padding:22px"><div class="lbl">Filamente</div><div class="mono" style="font-size:30px;margin-top:4px">6</div><div style="font-size:13px;color:#918E86">4 im AMS</div></div>
+</section>
+
+<section style="margin-top:28px" aria-labelledby="ln"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2 id="ln" class="h2">Jetzt geladen</h2><a class="lbl" href="Main.dc.html">zur Live-Ansicht</a></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+<div class="card" style="padding:14px 16px;display:flex;gap:12px;align-items:center"><span style="width:28px;height:44px;border-radius:3px;background:#F5F3EE;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><div><div class="mono" style="font-size:12px;color:#918E86">Slot 1</div><div style="font-weight:600">Jade White</div><div class="mono" style="font-size:13px;color:#B3B0A8">78 %</div></div></div><div class="card" style="padding:14px 16px;display:flex;gap:12px;align-items:center;border-color:#FF6A2B"><span style="width:28px;height:44px;border-radius:3px;background:#0078BF;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><div><div class="mono" style="font-size:12px;color:#918E86">Slot 2 · fördert</div><div style="font-weight:600">Marine Blue</div><div class="mono" style="font-size:13px;color:#B3B0A8">42 %</div></div></div><div class="card" style="padding:14px 16px;display:flex;gap:12px;align-items:center"><span style="width:28px;height:44px;border-radius:3px;background:#C12E1F;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><div><div class="mono" style="font-size:12px;color:#918E86">Slot 3</div><div style="font-weight:600">PETG Red</div><div class="mono" style="font-size:13px;color:#B3B0A8">12 %</div></div></div><div class="card" style="padding:14px 16px;display:flex;gap:12px;align-items:center"><span style="width:28px;height:44px;border-radius:3px;background:#F08A24;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><div><div class="mono" style="font-size:12px;color:#918E86">Slot 4</div><div style="font-weight:600">Sunlu Orange</div><div class="mono" style="font-size:13px;color:#B3B0A8">91 %</div></div></div>
+</div></section>
+
+<section class="card" style="padding:0;overflow:hidden;margin-top:28px" aria-labelledby="cons">
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;padding:20px 24px">
+<div><h2 id="cons" class="h2">Alle Filamente</h2><p style="margin:2px 0 0;font-size:13.5px;color:#B3B0A8">Jede Spule, die je im AMS war – auch aufgebrauchte</p></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><label style="width:280px"><span class="lbl" style="display:block;margin-bottom:6px">Suchen</span><input class="inp" placeholder="Hersteller, Farbe, Code …"></label>
+<div class="seg" role="group" aria-label="Filter"><button aria-pressed="true">Alle</button><button aria-pressed="false">Im AMS</button><button aria-pressed="false">Wenig</button><button aria-pressed="false">Unbenutzt</button></div>
+<div class="seg" role="group" aria-label="Farbformat"><button aria-pressed="true">HEX</button><button aria-pressed="false">RGB</button></div></div></div>
+<div style="overflow-x:auto"><table class="tab"><thead><tr><th>Filament</th><th>Typ</th><th class="r">Verbraucht ▾</th><th>Übrig</th><th class="r">€/kg</th><th class="r">Kosten</th><th class="r">Drucke</th><th>Zuletzt</th><th>Status</th></tr></thead><tbody><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#0078BF;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PLA Matte · Marine Blue</div><div style="font-size:13px;color:#B3B0A8">Bambu Lab · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #0078BF kopieren">#0078BF</button> · A06-B00</div></div></div></td>
+<td>PLA</td><td class="r mono">1.84 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:8%;background:#F2C14E"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">0.16 kg</span></div></td>
+<td class="r mono">24,99 €</td><td class="r mono">45,98 €</td><td class="r mono">84</td><td class="mono" style="color:#B3B0A8">heute</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip heat">Slot 2</span><span class="chip warn">wenig · nachbestellen</span></div></td></tr><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#F5F3EE;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PLA Basic · Jade White</div><div style="font-size:13px;color:#B3B0A8">Bambu Lab · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #F5F3EE kopieren">#F5F3EE</button> · A00-W01</div></div></div></td>
+<td>PLA</td><td class="r mono">1.21 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:60%;background:#EDEBE6"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">1.79 kg</span></div></td>
+<td class="r mono">19,99 €</td><td class="r mono">24,27 €</td><td class="r mono">67</td><td class="mono" style="color:#B3B0A8">heute</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip heat">Slot 1</span></div></td></tr><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#C12E1F;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PETG HF · Red</div><div style="font-size:13px;color:#B3B0A8">Bambu Lab · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #C12E1F kopieren">#C12E1F</button> · G02-R00</div></div></div></td>
+<td>PETG</td><td class="r mono">1.76 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:12%;background:#F2C14E"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">0.24 kg</span></div></td>
+<td class="r mono">19,99 €</td><td class="r mono">35,18 €</td><td class="r mono">22</td><td class="mono" style="color:#B3B0A8">28.10.</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip heat">Slot 3</span><span class="chip warn">wenig · nachbestellen</span></div></td></tr><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#F08A24;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PLA+ · Orange</div><div style="font-size:13px;color:#B3B0A8">Sunlu · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #F08A24 kopieren">#F08A24</button> · —</div></div></div></td>
+<td>PLA</td><td class="r mono">0.64 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:68%;background:#EDEBE6"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">1.36 kg</span></div></td>
+<td class="r mono">13,90 €</td><td class="r mono">8,90 €</td><td class="r mono">31</td><td class="mono" style="color:#B3B0A8">31.10.</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip heat">Slot 4</span></div></td></tr><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PLA Basic · Black</div><div style="font-size:13px;color:#B3B0A8">Bambu Lab · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #000000 kopieren">#000000</button> · A00-K00</div></div></div></td>
+<td>PLA</td><td class="r mono">1.53 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:24%;background:#EDEBE6"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">0.47 kg</span></div></td>
+<td class="r mono">19,99 €</td><td class="r mono">30,58 €</td><td class="r mono">9</td><td class="mono" style="color:#B3B0A8">03.10.</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"></div></td></tr><tr><td><div style="display:flex;gap:14px;align-items:center"><span style="width:36px;height:36px;border-radius:50%;background:#D4A93C;outline:1px solid #3D3C38;outline-offset:-1px;box-shadow:inset 0 0 0 9px rgba(0,0,0,.18)" aria-hidden="true"></span>
+<div><div style="font-weight:700">PLA Silk+ · Gold</div><div style="font-size:13px;color:#B3B0A8">Bambu Lab · <button class="mono" style="background:none;border:1px solid #3D3C38;border-radius:3px;color:#B3B0A8;font-size:12px;padding:1px 6px;cursor:pointer" aria-label="Farbcode #D4A93C kopieren">#D4A93C</button> · A06-Y01</div></div></div></td>
+<td>PLA</td><td class="r mono">0.00 kg</td>
+<td style="min-width:160px"><div style="display:flex;gap:10px;align-items:center"><div class="bar" style="flex:1;height:8px"><span style="width:100%;background:#EDEBE6"></span></div><span class="mono" style="font-size:13px;width:64px;text-align:right">1.00 kg</span></div></td>
+<td class="r mono">24,99 €</td><td class="r mono">—</td><td class="r mono">0</td><td class="mono" style="color:#B3B0A8">—</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip">unbenutzt</span></div></td></tr></tbody></table></div>
+<p style="margin:0;padding:16px 24px;font-size:13px;color:#918E86;border-top:1px solid #22221F">Namen kommen vom RFID-Tag. Fremdspulen lassen sich von Hand benennen und bepreisen – bereits gelaufene Drucke werden dann neu berechnet.</p>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1340}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

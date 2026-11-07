@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BambuForge – Drucke · Verlauf</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:#EDEBE6}a:hover{color:#FF6A2B}
+*{box-sizing:border-box}
+:focus-visible{outline:2px solid #FF6A2B;outline-offset:2px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wide{font-stretch:118%}
+.lbl{font-size:13px;color:#B3B0A8;font-weight:500}
+.card{background:#1A1A18;border:1px solid #2C2B28;border-radius:6px;padding:24px;min-width:0}
+.h2{margin:0;font-size:17px;font-weight:700;font-stretch:112%;letter-spacing:-.005em}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid #3D3C38;background:transparent;color:#EDEBE6;border-radius:4px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;transition:border-color .15s,background .15s}
+.btn:hover{border-color:#918E86;color:#EDEBE6}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:#FF6A2B;border-color:#FF6A2B;color:#1F0D03}
+.btn.pri:hover{background:#FF8650;border-color:#FF8650;color:#1F0D03}
+.btn.ghost{border-color:transparent}
+.btn.dan{border-color:#5A2A2A;color:#FF8A8A}
+.btn.dan:hover{border-color:#FF6B6B}
+.ibtn{width:44px;height:44px;display:inline-grid;place-items:center;border:1px solid #2C2B28;border-radius:4px;background:transparent;color:#B3B0A8;cursor:pointer}
+.ibtn:hover{color:#EDEBE6;border-color:#918E86}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid #2C2B28;border-radius:4px;padding:3px;gap:2px;background:#121211}
+.seg button{min-height:36px;padding:0 12px;border:0;border-radius:2px;background:transparent;color:#B3B0A8;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.seg button:hover{color:#EDEBE6}
+.seg button[aria-pressed=true]{background:#2C2B28;color:#EDEBE6}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12.5px;font-weight:600;border:1px solid #3D3C38;color:#B3B0A8;white-space:nowrap}
+.chip.ok{border-color:#2D5A40;color:#7FD9A4}
+.chip.warn{border-color:#6A5520;color:#F2C14E}
+.chip.bad{border-color:#6A2C2C;color:#FF8A8A}
+.chip.heat{border-color:#7A3A1C;color:#FF8A55}
+.bar{position:relative;height:6px;background:#2C2B28;border-radius:3px;overflow:hidden}
+.bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.tab{width:100%;border-collapse:collapse;font-size:14px}
+.tab th{text-align:left;font-weight:500;font-size:12.5px;color:#918E86;padding:10px 12px;border-bottom:1px solid #2C2B28;white-space:nowrap}
+.tab td{padding:13px 12px;border-bottom:1px solid #22221F;white-space:nowrap}
+.tab tr:hover td{background:#1F1F1C}
+.tab .r{text-align:right}
+.inp{min-height:44px;width:100%;padding:0 14px;background:#121211;border:1px solid #3D3C38;border-radius:4px;color:#EDEBE6;font:inherit}
+.inp::placeholder{color:#918E86}
+.inp:hover{border-color:#5A5954}
+.inp:focus{border-color:#FF6A2B;outline:none;box-shadow:0 0 0 3px rgba(255,106,43,.18)}
+.rail a.nv{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:4px;color:#B3B0A8;text-decoration:none;font-size:14.5px;font-weight:500}
+.rail a.nv:hover{background:#1F1F1C;color:#EDEBE6}
+.rail a.nv[aria-current=page]{background:#22221F;color:#EDEBE6;box-shadow:inset 2px 0 0 #FF6A2B}
+.rail .grp{font-size:12px;color:#918E86;font-weight:600;padding:16px 12px 6px;letter-spacing:.02em}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #22221F;font-size:14px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:#B3B0A8}
+.kv>span:last-child{white-space:nowrap}
+.ph{display:grid;place-items:center;background:repeating-linear-gradient(0deg,#1F1F1C 0 3px,#22221F 3px 4px);color:#918E86;font-size:12.5px;text-align:center;border-radius:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#FF6A2B;animation:pulse 1.8s ease-in-out infinite}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){.live-dot,.rise{animation:none}}
+</style>
+</helmet>
+<div style="min-height:1640px;background:#121211;color:#EDEBE6;font-family:Archivo,system-ui,sans-serif;display:flex;flex-wrap:wrap;align-items:stretch">
+<nav class="rail" aria-label="Hauptnavigation" style="flex:1 1 232px;max-width:264px;min-width:0;padding:20px 12px;border-right:1px solid #2C2B28;display:flex;flex-direction:column;gap:2px">
+<a href="Main.dc.html" style="display:flex;align-items:center;gap:10px;padding:4px 12px 18px;text-decoration:none;color:#EDEBE6"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="0" y="0" width="28" height="28" rx="4" fill="#FF6A2B"></rect><path d="M6 20h16M6 16h16M6 12h12M6 8h7" stroke="#1F0D03" stroke-width="2" stroke-linecap="round"></path></svg><span style="font-size:19px;font-weight:800;font-stretch:122%;letter-spacing:-.02em">BambuForge</span></a>
+<div style="margin:0 4px 6px;padding:12px;border:1px solid #2C2B28;border-radius:6px;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px"><span class="live-dot" aria-hidden="true"></span>X2D · druckt</div>
+<div class="mono" style="font-size:12px;color:#918E86">0948AD5C1200123 · LAN</div>
+</div>
+<div class="grp">Drucker</div><a class="nv" href="Main.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8v6H8z"/><path d="M8 17h8"/></svg><span>Jetzt</span><span class="live-dot" style="margin-left:auto" aria-hidden="true"></span></a><a class="nv" href="Drucker-Hardware.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><span>Hardware</span></a><a class="nv" href="Drucker-USB.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v8H8z"/><path d="M6 11h12v6a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z"/></svg><span>USB-Stick</span></a><a class="nv" href="Drucker-Rohdaten.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span>Rohdaten</span></a><a class="nv" href="Live.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="m16 10 5-3v10l-5-3"/></svg><span>Live</span></a><div class="grp">Drucke</div><a class="nv" href="Drucke-Verlauf.dc.html" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Verlauf</span></a><a class="nv" href="Drucke-Statistik.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><span>Statistik</span></a><div class="grp">Filament</div><a class="nv" href="Filament-Bestand.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6"/></svg><span>Bestand</span></a><a class="nv" href="Filament-Kaeufe.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 7H7"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg><span>Käufe</span></a><div class="grp">Werkstatt</div><a class="nv" href="Werkstatt-Wartung.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/></svg><span>Wartung</span></a><a class="nv" href="Werkstatt-Notizen.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4"/><path d="M8 12h8M8 16h6"/></svg><span>Notizen</span></a><div class="grp">Entdecken</div><a class="nv" href="MakerWorld.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>MakerWorld</span></a>
+<div style="flex:1 1 24px"></div>
+<a class="nv" href="Einstellungen.dc.html" style="margin-top:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Einstellungen</span></a>
+</nav>
+<main style="flex:999 1 560px;min-width:0;padding:0 40px 64px">
+<div style="max-width:1280px;margin:0 auto">
+<header style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;padding:24px 0 28px">
+<div style="min-width:0">
+<div class="lbl" style="color:#918E86">Drucke</div>
+<h1 style="margin:2px 0 0;font-size:34px;line-height:1.1;font-weight:800;font-stretch:120%;letter-spacing:-.02em">Verlauf</h1>
+</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+<div class="seg" role="group" aria-label="Aufzeichnung"><button aria-pressed="true">Auto</button><button aria-pressed="false">An</button><button aria-pressed="false">Aus</button></div>
+<button class="btn" aria-label="2 Warnungen" style="padding:0 12px;color:#F2C14E;border-color:#6A5520"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg><span class="mono">2</span></button>
+<button class="ibtn" aria-label="Kammerlicht"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
+<div class="seg" role="group" aria-label="Sprache"><button aria-pressed="true">DE</button><button aria-pressed="false">EN</button></div>
+<button class="ibtn" aria-label="Hell/Dunkel umschalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+</div>
+</header>
+
+<section class="card" aria-labelledby="d1">
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:16px">
+<div><h2 id="d1" class="h2">Pro Tag</h2><p style="margin:2px 0 0;font-size:13.5px;color:#B3B0A8">40 Drucke an 30 Tagen · Balken anklicken filtert die Liste</p></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" role="group" aria-label="Kennzahl"><button aria-pressed="false">Drucke</button><button aria-pressed="false">Filament</button><button aria-pressed="false">Druckzeit</button><button aria-pressed="false">Energie</button><button aria-pressed="true">Kosten</button></div>
+<div class="seg" role="group" aria-label="Zeitraum"><button aria-pressed="false">30 T</button><button aria-pressed="true">90 T</button><button aria-pressed="false">1 J</button></div></div></div>
+<svg viewBox="0 0 1200 180" style="width:100%;height:auto;display:block" role="img" aria-label="Kosten pro Tag, letzte 90 Tage; markiert: 04.11., 3,87 Euro"><line x1="0" x2="1200" y1="156" y2="156" stroke="#3D3C38"></line><rect x="1.0" y="128.5" width="10.3" height="27.5" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="14.3" y="82.3" width="10.3" height="73.7" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="27.7" y="89.5" width="10.3" height="66.5" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="54.3" y="129.9" width="10.3" height="26.1" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="81.0" y="112.7" width="10.3" height="43.3" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="107.7" y="107.0" width="10.3" height="49.0" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="134.3" y="98.1" width="10.3" height="57.9" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="147.7" y="122.5" width="10.3" height="33.5" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="161.0" y="99.2" width="10.3" height="56.8" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="174.3" y="117.0" width="10.3" height="39.0" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="201.0" y="133.4" width="10.3" height="22.6" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="241.0" y="136.1" width="10.3" height="19.9" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="294.3" y="99.6" width="10.3" height="56.4" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="401.0" y="104.7" width="10.3" height="51.3" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="494.3" y="72.8" width="10.3" height="83.2" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="534.3" y="95.0" width="10.3" height="61.0" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="667.7" y="115.8" width="10.3" height="40.2" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="761.0" y="33.7" width="10.3" height="122.3" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="787.7" y="16.0" width="10.3" height="140.0" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="867.7" y="80.3" width="10.3" height="75.7" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="881.0" y="127.3" width="10.3" height="28.7" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="894.3" y="137.8" width="10.3" height="18.2" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="934.3" y="80.3" width="10.3" height="75.7" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="961.0" y="102.9" width="10.3" height="53.1" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1001.0" y="63.8" width="10.3" height="92.2" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1014.3" y="81.2" width="10.3" height="74.8" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1041.0" y="38.5" width="10.3" height="117.5" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1054.3" y="140.8" width="10.3" height="15.2" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1107.7" y="124.5" width="10.3" height="31.5" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1121.0" y="136.4" width="10.3" height="19.6" rx="1" fill="#EDEBE6" opacity="0.82"></rect><rect x="1147.7" y="125.1" width="10.3" height="30.9" rx="1" fill="#FF6A2B" opacity="1"></rect><rect x="1174.3" y="102.6" width="10.3" height="53.4" rx="1" fill="#EDEBE6" opacity="0.82"></rect><text x="0" y="176" fill="#918E86" font-size="11" font-family="JetBrains Mono, monospace">10.08.</text><text x="293" y="176" fill="#918E86" font-size="11" font-family="JetBrains Mono, monospace">01.09.</text><text x="587" y="176" fill="#918E86" font-size="11" font-family="JetBrains Mono, monospace">23.09.</text><text x="880" y="176" fill="#918E86" font-size="11" font-family="JetBrains Mono, monospace">15.10.</text><text x="1120" y="176" fill="#918E86" font-size="11" font-family="JetBrains Mono, monospace">02.11.</text></svg>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:16px 0">
+<div class="card" style="padding:18px 20px"><div class="lbl">Drucke</div><div class="mono" style="font-size:28px;margin-top:4px">40</div><div style="font-size:13px;color:#918E86">38 fertig · 2 fehlgeschlagen</div></div><div class="card" style="padding:18px 20px"><div class="lbl">Gesamt</div><div class="mono" style="font-size:28px;margin-top:4px">177,00 €</div><div style="font-size:13px;color:#918E86">Ø 4,43 € pro Druck</div></div><div class="card" style="padding:18px 20px"><div class="lbl">Energie</div><div class="mono" style="font-size:28px;margin-top:4px">25,42 kWh</div><div style="font-size:13px;color:#918E86">72,38 € Strom</div></div><div class="card" style="padding:18px 20px"><div class="lbl">Filament</div><div class="mono" style="font-size:28px;margin-top:4px">5,24 kg</div><div style="font-size:13px;color:#918E86">104,62 € Material</div></div>
+</div>
+
+<section class="card" style="padding:0;overflow:hidden" aria-labelledby="h1">
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:20px 24px">
+<h2 id="h1" class="h2">Druckverlauf</h2>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" role="group" aria-label="Ansicht"><button aria-pressed="true">Zeitachse</button><button aria-pressed="false">Gruppen zuerst</button><button aria-pressed="false">Nur Gruppen</button><button aria-pressed="false">Nur einzelne</button></div><button class="btn">Aktualisieren</button></div></div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 24px;background:#22221F;border-top:1px solid #2C2B28;border-bottom:1px solid #2C2B28"><span style="font-weight:600">1 ausgewählt</span><button class="btn" style="min-height:36px">Gruppieren …</button><button class="btn ghost" style="min-height:36px">Auswahl aufheben</button></div>
+<div style="overflow-x:auto"><table class="tab"><thead><tr><th></th><th>Start</th><th>Auftrag</th><th>Ergebnis</th><th class="r">Dauer</th><th class="r">Filament</th><th class="r">Strom · Material</th><th class="r">Gesamt</th><th></th></tr></thead>
+<tbody><tr style="background:#1F1F1C"><td style="width:44px"><input type="checkbox" aria-label="Gridfinity 3×2 Bin auswählen" checked style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">04.11. <span style="color:#918E86">04:04</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#0078BF;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><span style="width:10px;height:10px;border-radius:2px;background:#F5F3EE;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Gridfinity 3×2 Bin</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">5 h 52 min</td><td class="r mono">166,9 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:1.91;background:#FF6A2B"></span><span style="flex:1.96;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">1,91 € · 1,96 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">3,87 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Gridfinity 3×2 Bin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td colspan="9" style="padding:0;background:#121211;white-space:normal">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px 32px;padding:20px 24px 24px 56px;border-bottom:1px solid #2C2B28">
+<div><div class="lbl">Slicer</div><div style="margin-top:4px">0,20 mm Standard · 15 % Gyroid · Stützen aus</div></div>
+<div><div class="lbl">Modellhöhe</div><div class="mono" style="margin-top:4px">84,0 mm · 420 Schichten</div></div>
+<div><div class="lbl">Filament</div><div style="margin-top:4px">Marine Blue 98,4 g · Jade White 68,5 g</div></div>
+<div><div class="lbl">Spitzenleistung</div><div class="mono" style="margin-top:4px">604 W</div></div>
+<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap"><button class="btn">Umbenennen</button><button class="btn">Gramm korrigieren</button><button class="btn dan">Löschen</button></div>
+</div></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Stiftehalter auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">01.11. <span style="color:#918E86">04:44</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Stiftehalter</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">3 h 21 min</td><td class="r mono">210,3 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:1.52;background:#FF6A2B"></span><span style="flex:2.12;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">1,52 € · 2,12 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">3,64 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Stiftehalter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Getriebe Prototyp auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">31.10. <span style="color:#918E86">23:54</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#F08A24;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Getriebe Prototyp</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">55 min</td><td class="r mono">239,7 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:1.72;background:#FF6A2B"></span><span style="flex:1.76;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">1,72 € · 1,76 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">3,48 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Getriebe Prototyp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Benchy auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">30.10. <span style="color:#918E86">08:36</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#C12E1F;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Benchy</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">55 min</td><td class="r mono">19,5 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:1.66;background:#FF6A2B"></span><span style="flex:3.65;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">1,66 € · 3,65 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">5,31 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Benchy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Planter Low-Poly auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">28.10. <span style="color:#918E86">08:57</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#F5F3EE;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Planter Low-Poly</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">5 h 58 min</td><td class="r mono">78,5 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:3.28;background:#FF6A2B"></span><span style="flex:1.54;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">3,28 € · 1,54 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">4,82 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Planter Low-Poly"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Headphone Stand auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">03.10. <span style="color:#918E86">07:24</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><span style="width:10px;height:10px;border-radius:2px;background:#C12E1F;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Headphone Stand</span></div></td>
+<td><span class="chip bad">✕ Fehlgeschlagen</span></td><td class="r mono">2 h 57 min</td><td class="r mono">85,7 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:0.61;background:#FF6A2B"></span><span style="flex:4.15;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">0,61 € · 4,15 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">4,76 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Headphone Stand"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Headphone Stand auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">02.10. <span style="color:#918E86">03:00</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Headphone Stand</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">42 min</td><td class="r mono">69,3 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:2.94;background:#FF6A2B"></span><span style="flex:2.44;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">2,94 € · 2,44 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">5,38 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Headphone Stand"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Lampenschirm Voronoi auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">01.10. <span style="color:#918E86">02:01</span></td>
+<td style=""><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#0078BF;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span><span style="width:10px;height:10px;border-radius:2px;background:#F5F3EE;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Lampenschirm Voronoi</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">3 h 36 min</td><td class="r mono">67,8 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:0.84;background:#FF6A2B"></span><span style="flex:0.47;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">0,84 € · 0,47 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">1,31 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Lampenschirm Voronoi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr style="background:#121211"><td><input type="checkbox" aria-label="Gruppe auswählen" style="width:18px;height:18px;accent-color:#FF6A2B"></td><td class="mono" style="color:#918E86">3 Platten</td>
+<td><div style="display:flex;gap:10px;align-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span style="font-weight:700">Werkzeugwand-Set</span><span class="chip" style="height:22px">Gruppe</span></div></td><td><span class="chip ok">3 / 3 fertig</span></td><td class="r mono">11 h 04 min</td><td class="r mono">412,0 g</td><td class="r mono" style="color:#B3B0A8">4,71 € · 8,30 €</td><td class="r mono" style="font-weight:700;font-size:15px">13,01 €</td><td></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Haken groß auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">15.08. <span style="color:#918E86">08:04</span></td>
+<td style="padding-left:44px;"><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Haken groß</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">5 h 43 min</td><td class="r mono">206,7 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:0.81;background:#FF6A2B"></span><span style="flex:4.95;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">0,81 € · 4,95 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">5,76 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Haken groß"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Haken klein ×12 auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">14.08. <span style="color:#918E86">22:10</span></td>
+<td style="padding-left:44px;"><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#000000;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Haken klein ×12</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">3 h 12 min</td><td class="r mono">121,3 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:2.2;background:#FF6A2B"></span><span style="flex:2.1;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">2,20 € · 2,10 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">4,30 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Haken klein ×12"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr><tr><td style="width:44px"><input type="checkbox" aria-label="Leiste auswählen"  style="width:18px;height:18px;accent-color:#FF6A2B"></td>
+<td class="mono" style="color:#B3B0A8">14.08. <span style="color:#918E86">02:16</span></td>
+<td style="padding-left:44px;"><div style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#F08A24;outline:1px solid #3D3C38;outline-offset:-1px" aria-hidden="true"></span></span><span style="font-weight:600">Leiste</span></div></td>
+<td><span class="chip ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg> Fertig</span></td><td class="r mono">2 h 09 min</td><td class="r mono">84,0 g</td>
+<td class="r"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center"><span style="display:flex;width:44px;height:6px;gap:1px;border-radius:1px;overflow:hidden" aria-hidden="true"><span style="flex:1.7;background:#FF6A2B"></span><span style="flex:1.25;background:#EDEBE6"></span></span><span class="mono" style="font-size:13px;color:#B3B0A8">1,70 € · 1,25 €</span></div></td>
+<td class="r mono" style="font-weight:600;font-size:15px">2,95 €</td>
+<td><button class="ibtn" style="border:0;width:36px;height:36px" aria-label="Details zu Leiste"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></td></tr></tbody></table></div>
+<div style="display:flex;gap:16px;align-items:center;padding:16px 24px;flex-wrap:wrap"><button class="btn">Ältere laden</button><span class="lbl">noch 29 ältere Drucke</span></div>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

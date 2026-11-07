@@ -531,6 +531,8 @@ def _stats_block() -> dict:
     dur = eng = pcost = fil = mcost = 0.0
     durations = []
     months, models, days = {}, {}, {}
+    rules = {"hand": 0.0, "orders": 0.0, "matrix": 0.0, "default": 0.0}
+    measured, dearest = 0, None
     for r in prints:
         st = r.get("final_state")
         s, e = r.get("started_at"), r.get("ended_at")
@@ -554,6 +556,9 @@ def _stats_block() -> dict:
             mm["prints"] += 1
             mm["energy_wh"] += r.get("energy_wh") or 0
             mm["cost"] += pc + mc
+            # the two halves too, so the month bar can show what it is made of
+            mm["power_cost"] = mm.get("power_cost", 0.0) + pc
+            mm["material_cost"] = mm.get("material_cost", 0.0) + mc
             mm["filament_g"] += g
             # A print is counted on the day it STARTED, so one job never lands
             # in two buckets and the daily numbers still sum to the totals.
@@ -566,6 +571,18 @@ def _stats_block() -> dict:
             dd["filament_g"] += g
             if e and e > s:
                 dd["seconds"] += e - s
+        # where the material figures came from: which rule priced each line
+        try:
+            for ln in json.loads(r.get("filament_detail") or "[]") or []:
+                rules[_rule_bucket(ln.get("rule"))] += float(ln.get("cost") or 0)
+        except (TypeError, ValueError):
+            pass
+        if r.get("energy_wh"):
+            measured += 1
+        if pc + mc > (dearest or {}).get("cost", 0):
+            dearest = {"job_id": r.get("job_id"), "name": _print_of(r) or "—",
+                       "cost": round(pc + mc, 4), "filament_g": round(g, 1),
+                       "started_at": s, "ended_at": e}
         name = r.get("design_title") or r.get("label") or r.get("name") or "—"
         mkey = r.get("design_id") or name
         md = models.setdefault(mkey, {"name": name, "design_id": r.get("design_id"),
@@ -577,6 +594,8 @@ def _stats_block() -> dict:
     for mm in months.values():
         mm["energy_wh"] = round(mm["energy_wh"], 1)
         mm["cost"] = round(mm["cost"], 2)
+        mm["power_cost"] = round(mm.get("power_cost", 0.0), 4)
+        mm["material_cost"] = round(mm.get("material_cost", 0.0), 4)
         mm["filament_g"] = round(mm["filament_g"], 1)
     for md in models.values():
         md["filament_g"] = round(md["filament_g"], 1)
@@ -603,7 +622,25 @@ def _stats_block() -> dict:
                     "seconds": round(days[k]["seconds"])}
                    for k in sorted(days)][-370:],
         "top_models": sorted(models.values(), key=lambda x: -x["count"])[:8],
+        # how the material cost was priced, by share of the money: typed in,
+        # learned from invoices, the brand x material matrix, the default
+        "cost_rules": {k: round(v, 4) for k, v in rules.items()},
+        # how many prints have a measured power figure at all
+        "power_measured": {"prints": measured, "of": len(prints)},
+        "dearest": dearest,
     }
+
+
+def _rule_bucket(rule) -> str:
+    """The four families of pricing rule, as the statistics page groups them."""
+    r = str(rule or "")
+    if r == "set by hand":
+        return "hand"
+    if r.startswith("order"):
+        return "orders"
+    if r == "default" or not r:
+        return "default"
+    return "matrix"     # slot, filament id, brand x material, material
 
 
 def _recorded_print_hours() -> float:
