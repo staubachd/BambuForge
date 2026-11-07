@@ -714,6 +714,7 @@ def on_message(client, userdata, msg):
     _track_print(state)
     _maybe_persist_print(state)
     _live_changes(state)
+    _live_cost(state)
     # surface the saved label / cloud title on the live tile so it matches history
     _sn = _print_row.get("stored") or {}
     if state.get("job") and state["job"].get("task_id") == _print_row.get("job_id"):
@@ -1868,7 +1869,10 @@ LIVE_SLICE_DELAY = 30.0      # after the job starts: the row exists, the file is
 LIVE_SLICE_RETRY = 90.0
 LIVE_SLICE_TRIES = 2
 _live_slice = {"job_id": None, "change_layers": None, "changes": None,
-               "tries": 0, "next_at": 0.0, "busy": False, "done": None}
+               "tries": 0, "next_at": 0.0, "busy": False, "done": None,
+               # the whole slicer block of the running print, for the live cost
+               # and the colour column (filaments, grams, layer runs)
+               "meta": None}
 
 
 def _live_slice_read(job_id: str) -> None:
@@ -1892,7 +1896,7 @@ def _live_slice_read(job_id: str) -> None:
         if _live_slice["job_id"] == job_id:
             if got:
                 _live_slice.update(change_layers=got["change_layers"],
-                                   changes=got.get("changes"))
+                                   changes=got.get("changes"), meta=got)
                 print(f"[slicer] {job_id}: {got.get('changes')} filament change(s) in this print")
             else:
                 _live_slice["tries"] += 1 if counted else 0
@@ -1910,7 +1914,8 @@ def _live_changes(state: dict) -> None:
     now = time.time()
     if _live_slice["job_id"] != tid:
         _live_slice.update(job_id=tid, change_layers=None, changes=None, tries=0,
-                           next_at=now + LIVE_SLICE_DELAY, done=None)
+                           next_at=now + LIVE_SLICE_DELAY, done=None, meta=None)
+        _live_cost_cache.update(job_id=tid, material=None, last=None, last_done=False)
     if _live_slice["change_layers"] is None:
         if (SLICER_CFG.get("enabled") and not _live_slice["busy"]
                 and _live_slice["tries"] < LIVE_SLICE_TRIES and now >= _live_slice["next_at"]):
@@ -1925,6 +1930,136 @@ def _live_changes(state: dict) -> None:
         _live_slice["done"] = done
     if _live_slice["done"] is not None:
         job["fil_changes"] = {"done": _live_slice["done"], "total": _live_slice["changes"]}
+
+
+# --- what the running print costs, while it runs -------------------------------
+# The finished print is costed from the cloud's per-slot grams. While it runs
+# there is no such thing, but there is the sliced file, read early for the
+# filament changes: it says how many grams of which filament the whole print
+# takes. Material so far is that total scaled by progress - an estimate, and
+# labelled as one on the page. Power is not estimated: it is the plug's own
+# integral for this job. The projection adds the material total to the power so
+# far stretched over the whole print, once enough of it has run to say.
+_live_cost_cache = {"job_id": None, "material": None, "last": None, "last_done": False}
+LIVE_COST_MIN_FRACTION = 0.05
+
+
+def _live_material(tid: str, meta: dict) -> dict | None:
+    """Grams and cost per filament of the whole print, priced by the same rule
+    chain as a finished one. Worked out once per job: the prices it reads only
+    change when someone edits one, and then the next job picks it up."""
+    if _live_cost_cache["job_id"] == tid and _live_cost_cache["material"] is not None:
+        return _live_cost_cache["material"]
+    fils = [f for f in (meta.get("filaments") or []) if f.get("grams")]
+    if not fils:
+        return None
+    stored = _print_row.get("stored") or {}
+    try:
+        bambu_map = json.loads(stored.get("ams_bambu") or "{}")
+    except (TypeError, ValueError):
+        bambu_map = {}
+    try:
+        slot_map = json.loads(stored.get("ams_slots") or "{}")
+    except (TypeError, ValueError):
+        slot_map = {}
+    spools, total = [], 0.0
+    for f in fils:
+        color = filament_catalog.norm_color(f.get("color"))
+        # which AMS slot holds it: the slicer numbers filaments by project, not
+        # by tray, so the colour is what ties the two together
+        slot = next((int(k) for k, v in sorted(slot_map.items())
+                     if color and v.get("color") == color), None)
+        snap = (slot_map.get(str(slot)) or {}) if slot else {}
+        entry = {"slotId": (slot - 1) if slot else None,
+                 "filamentId": snap.get("sku") or f.get("code"),
+                 "filamentType": f.get("type") or snap.get("type")}
+        fkey = _canon_fkey(filament_catalog.key(entry["filamentId"], color, entry["filamentType"]))
+        per_kg, rule = _filament_price_per_kg(entry, bambu_map, fkey)
+        grams = float(f.get("grams") or 0)
+        cost = grams / 1000.0 * per_kg
+        total += cost
+        spools.append({"slot": slot, "color": color, "type": entry["filamentType"],
+                       "code": snap.get("code"), "grams": round(grams, 2),
+                       "per_kg": per_kg, "rule": rule, "cost": round(cost, 4)})
+    out = {"spools": spools, "cost": round(total, 4),
+           "grams": round(sum(s["grams"] for s in spools), 2)}
+    if stored.get("ams_slots"):
+        # only final once the AMS snapshot exists; before it, slots are unknown
+        _live_cost_cache["material"] = out
+    return out
+
+
+def _live_last_of(job: dict, tid: str):
+    """The last finished print of the same model, looked up once per job."""
+    if _live_cost_cache["job_id"] == tid and _live_cost_cache["last_done"]:
+        return _live_cost_cache["last"]
+    last = None
+    try:
+        row = store.last_print_of(job.get("design_id") or _print_row.get("design_id"),
+                                  job.get("name"), exclude_job=tid)
+        if row:
+            total = (row.get("cost") or 0) + (row.get("filament_cost") or 0)
+            if total:
+                last = {"cost": round(total, 4), "ended_at": row.get("ended_at"),
+                        "name": _print_of(row)}
+    except Exception as e:
+        print(f"[cost] last print of the model: {e}")
+    if _live_cost_cache["job_id"] == tid:
+        _live_cost_cache.update(last=last, last_done=True)
+    return last
+
+
+def _layer_colours(meta: dict) -> list | None:
+    """The slicer's layer runs with colours in place of filament ids:
+    [[first, last, ["RRGGBB", ...]], ...], 0-based layers as the slicer counts."""
+    runs = meta.get("layer_fils")
+    if not runs:
+        return None
+    by_id = {f.get("slot"): filament_catalog.norm_color(f.get("color"))
+             for f in (meta.get("filaments") or [])}
+    return [[a, b, [by_id.get(i) for i in ids]] for a, b, ids in runs]
+
+
+def _live_cost(state: dict) -> None:
+    """Put `live_cost`, `layer_runs` and the slicer facts on a running job.
+    Silent when nothing is known - the page then leaves those panels out."""
+    job = state.get("job") or {}
+    tid = str(job.get("task_id") or "")
+    if not tid or tid == "0" or job.get("state") not in ACTIVE_STATES:
+        return
+    price = float(COST_CFG.get("price_per_kwh", 0) or 0)
+    wh = _job_energy["wh"] if _job_energy.get("task_id") == tid else None
+    frac = None
+    if job.get("layer") and job.get("total_layers"):
+        frac = min(1.0, max(0.0, float(job["layer"]) / float(job["total_layers"])))
+    elif job.get("percent") is not None:
+        frac = min(1.0, max(0.0, float(job["percent"]) / 100.0))
+    meta = _live_slice.get("meta") if _live_slice.get("job_id") == tid else None
+    mat = _live_material(tid, meta) if meta else None
+    out = {"currency": COST_CFG.get("currency", "€"), "fraction": frac,
+           "energy_wh": round(wh, 1) if wh is not None else None,
+           "energy_cost": round(wh / 1000.0 * price, 4) if wh is not None else None,
+           "price_per_kwh": price}
+    if mat:
+        out["material_total"] = mat["cost"]
+        out["grams_total"] = mat["grams"]
+        out["spools"] = mat["spools"]
+        if frac is not None:
+            out["material_so_far"] = round(mat["cost"] * frac, 4)
+            out["grams_so_far"] = round(mat["grams"] * frac, 1)
+    if out.get("energy_cost") is not None or out.get("material_so_far") is not None:
+        out["so_far"] = round((out.get("energy_cost") or 0) + (out.get("material_so_far") or 0), 4)
+    if mat and frac and frac >= LIVE_COST_MIN_FRACTION and out.get("energy_cost") is not None:
+        out["projected"] = round(mat["cost"] + out["energy_cost"] / frac, 4)
+    last = _live_last_of(job, tid)
+    if last:
+        out["last_of_model"] = last
+    job["live_cost"] = out
+    if meta:
+        runs = _layer_colours(meta)
+        if runs:
+            job["layer_runs"] = runs
+        job["slice"] = {k: meta[k] for k in ("layer_h", "profile", "nozzle_mm") if meta.get(k)}
 
 
 _cloud_client = None
@@ -2094,6 +2229,7 @@ def _slice_block(row: dict, full: bool = False):
         return None
     if not full and isinstance(d, dict):
         d.pop("change_layers", None)
+        d.pop("layer_fils", None)
     return d
 
 

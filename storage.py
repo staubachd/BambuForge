@@ -1044,6 +1044,26 @@ class Storage:
             cur.close(); conn.close()
         return n
 
+    def last_print_of(self, design_id: str | None, name: str | None,
+                      exclude_job: str = "") -> dict | None:
+        """The most recent finished print of the same model - by MakerWorld id
+        when there is one, else by the name the printer gave the job. What the
+        live view compares the running print's cost against."""
+        if not design_id and not name:
+            return None
+        col, val = ("design_id", design_id) if design_id else ("name", name)
+        conn, cur = self._cursor()
+        cur.execute(
+            f"SELECT {','.join(PRINT_COLS)} FROM prints "
+            f"WHERE {col}={self.ph} AND job_id<>{self.ph} AND ended_at IS NOT NULL "
+            f"AND final_state={self.ph} ORDER BY started_at DESC LIMIT 1",
+            (val, exclude_job, "FINISH"))
+        r = cur.fetchone()
+        if self.backend == "sqlite":
+            return dict(r) if r else None
+        cur.close(); conn.close()
+        return dict(zip(PRINT_COLS, r)) if r else None
+
     def purge(self, keep_days: float = 30.0) -> int:
         cutoff = time.time() - keep_days * 86400
         conn, cur = self._cursor()
