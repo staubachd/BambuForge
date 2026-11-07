@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-look="forge">
+<html lang="en" data-look="kammer">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,47 +7,24 @@
 <!-- inline SVG favicon: the X2D as an isometric block, red top on two greys,
      dark window in front ("1a" from the Claude Design favicon sheet) -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBvbHlnb24gcG9pbnRzPSIxNiwzIDI3LDkuNSAxNiwxNiA1LDkuNSIgZmlsbD0iI2VjMzAxMyIvPjxwb2x5Z29uIHBvaW50cz0iNSw5LjUgMTYsMTYgMTYsMjkgNSwyMi41IiBmaWxsPSIjY2ZjY2M1Ii8+PHBvbHlnb24gcG9pbnRzPSIxNiwxNiAyNyw5LjUgMjcsMjIuNSAxNiwyOSIgZmlsbD0iIzhhODc3ZiIvPjxwb2x5Z29uIHBvaW50cz0iNywxMi42OCAxNCwxNi44MiAxNCwyNS44MiA3LDIxLjY4IiBmaWxsPSIjMjAxZTFkIi8+PC9zdmc+">
-<!-- IBM Plex, the typeface of the look; without it the page falls back to the
-     system sans and mono and stays fully usable -->
+<!-- Archivo (a width axis, used wide for headings) and JetBrains Mono for every
+     figure. Without them the page falls back to the system fonts and stays
+     fully usable. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
   /* ---------- design tokens ---------- */
   :root{
-    --bg:#f4f5f8; --bg-2:#eceef3;
-    --surface:#ffffff; --surface-2:#f6f7f9;
-    --border:rgba(17,19,24,.08); --border-strong:rgba(17,19,24,.14);
-    --track:rgba(17,19,24,.07);
-    --text:#12141a; --text-2:#565d6b; --text-3:#8b93a1;
-    --accent:#6366f1; --accent-2:#818cf8; --accent-soft:rgba(99,102,241,.12);
-    --good:#059669; --warn:#d97706; --danger:#dc2626; --info:#2563eb;
-    --shadow:0 1px 2px rgba(17,19,24,.06), 0 8px 24px rgba(17,19,24,.06);
-    --shadow-lg:0 2px 4px rgba(17,19,24,.06), 0 16px 40px rgba(17,19,24,.10);
-    /* chart aliases (consumed by chart JS) */
+    /* chart aliases (consumed by chart JS); every other token is defined once,
+       in the :root:root blocks below */
     --hair:var(--border); --muted:var(--text-3); --ink2:var(--text-2);
-    --s-noz0:#2a78d6; --s-noz1:#1baf7a; --s-bed:#eda100; --s-chamber:#008300;
-    --s-power:#eb6834;   /* own chart, own axis - never overlaid on temperatures */
-    color-scheme:light;
-  }
-  :root[data-theme="dark"]{
-    --bg:#0a0b0d; --bg-2:#101216;
-    --surface:#15171c; --surface-2:#1b1e24;
-    --border:rgba(255,255,255,.07); --border-strong:rgba(255,255,255,.13);
-    --track:rgba(255,255,255,.09);
-    --text:#f3f4f6; --text-2:#a5abb6; --text-3:#6b7280;
-    --accent:#818cf8; --accent-2:#a5b4fc; --accent-soft:rgba(129,140,248,.16);
-    --good:#10b981; --warn:#f59e0b; --danger:#ef4444; --info:#3b82f6;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
-    --shadow-lg:0 2px 4px rgba(0,0,0,.4), 0 20px 48px rgba(0,0,0,.5);
-    --s-noz0:#3987e5; --s-noz1:#199e70; --s-bed:#c98500; --s-chamber:#008300;
-    --s-power:#d95926;
-    color-scheme:dark;
   }
 
   /* ============================================================
-     The look: flat bordered panels instead of floating cards, sentence case in
-     place of uppercase letter-spaced micro-labels, figures in tabular mono.
+     Tokens and readability rules: flat bordered panels instead of floating
+     cards, sentence case in place of uppercase letter-spaced micro-labels,
+     figures in tabular mono. The look itself (look-kammer) is further down.
 
      It is a layer over the base rules further down, which still describe the
      older soft-card look. It stands BEFORE them in the file, so a tie in
@@ -55,47 +32,48 @@
      extra weight and must not be reduced to a plain `:root`.
      ============================================================ */
   :root:root{
-    /* Firefox Proton. Not a two-colour pair like the earlier schemes but a
-       neutral grey scale with one accent, which is why it needs no colour
-       demoted to a tint: the accent is a mid-tone in both themes and reads as
-       text on its own ground. Light uses Firefox's primary blue, dark its cyan.
-       Greys: #15141A #2B2A33 #42414D #5B5B66 #8F8F9D #CFCFD8 #F0F0F4 #FBFBFE */
-    --bg:#f9f9fb; --bg-2:#f0f0f4;
-    --surface:#ffffff; --surface-2:#f9f9fb;
-    --border:#cfcfd8; --border-strong:#8f8f9d;
-    --track:#e0e0e6;
-    --text:#15141a; --text-2:#5b5b66; --text-3:#8f8f9d;
-    --accent:#0060df; --accent-2:#0250bb; --accent-soft:rgba(0,96,223,.10);
-    /* readable foreground on an --accent fill */
+    /* Kammer, light: the same warm greys as the dark theme, inverted to paper.
+       The heat orange is deepened until it reads as text on the card. */
+    --bg:#f4f2ee; --bg-2:#ebe8e2;
+    --surface:#fbfaf7; --surface-2:#f0ede7;
+    --border:#e0dcd3; --border-strong:#c9c4ba;
+    --track:#e4e0d8;
+    --text:#1a1917; --text-2:#45433e; --text-3:#6b6862; --faint:#9a978f;
+    --accent:#b23d0a; --accent-2:#9a3407; --accent-fg:#b23d0a; --accent-soft:rgba(178,61,10,.10);
     --accent-ink:#ffffff;
-    /* the primary fill, as Firefox draws its default button */
-    --brand:#0060df; --brand-ink:#ffffff;
-    --on-status:#ffffff;   /* status fills are dark here */
-    --good-soft:rgba(2,121,72,.12); --warn-soft:rgba(140,79,0,.12);
-    --danger-soft:rgba(197,17,66,.12);
-    --good:#027948; --warn:#8c4f00; --danger:#c51142; --info:#0060df;
-    --shadow:none; --shadow-lg:0 12px 36px rgba(21,20,26,.16);
-    --s-noz0:#0060df; --s-noz1:#027948; --s-bed:#8c4f00; --s-chamber:#5b6b1c;
-    --s-power:#c51142;
+    --brand:#b23d0a; --brand-ink:#ffffff;
+    --on-status:#ffffff;
+    --good:#1d7a3d; --warn:#8a5a00; --danger:#c2323b; --info:#2a64ad;
+    --good-soft:rgba(29,122,61,.11); --warn-soft:rgba(138,90,0,.11);
+    --danger-soft:rgba(194,50,59,.10);
+    --shadow:none; --shadow-lg:0 12px 36px rgba(26,25,23,.14);
+    --s-noz0:#c2410c; --s-noz1:#8a6a00; --s-bed:#2a64ad; --s-chamber:#7652ac;
+    --s-power:#c2410c;
+    --stripe:rgb(0 0 0 / .035);
+    --sans:Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+    color-scheme:light;
   }
   :root:root[data-theme="dark"]{
-    /* the one that was actually asked for: in-content #1C1B22, cards #2B2A33,
-       raised #42414D, text #FBFBFE, accent #00DDFF with dark ink on it */
-    --bg:#1c1b22; --bg-2:#18171e;
-    --surface:#2b2a33; --surface-2:#35343d;
-    --border:#52515c; --border-strong:#8f8f9d;
-    --track:#42414d;
-    --text:#fbfbfe; --text-2:#cfcfd8; --text-3:#8f8f9d;
-    --accent:#45a1ff; --accent-2:#80b4ff; --accent-soft:rgba(69,161,255,.14);
-    --accent-ink:#2b2a33;
-    --brand:#45a1ff; --brand-ink:#2b2a33;
-    --on-status:#1c1b22;   /* ...and light here */
-    --good-soft:rgba(84,255,189,.16); --warn-soft:rgba(255,189,79,.16);
-    --danger-soft:rgba(255,154,162,.16);
-    --good:#54ffbd; --warn:#ffbd4f; --danger:#ff9aa2; --info:#80b4ff;
-    --shadow:none; --shadow-lg:0 16px 44px rgba(0,0,0,.7);
-    --s-noz0:#45a1ff; --s-noz1:#54ffbd; --s-bed:#ffbd4f; --s-chamber:#b8d96a;
-    --s-power:#ff9aa2;
+    /* Kammer, dark: a warm graphite chamber, one heat-orange signal, figures
+       in mono. Every text tone clears 4.5:1 on the card. */
+    --bg:#121211; --bg-2:#0e0e0d;
+    --surface:#1a1a18; --surface-2:#22221f;
+    --border:#2c2b28; --border-strong:#3d3c38;
+    --track:#2c2b28;
+    --text:#edebe6; --text-2:#b3b0a8; --text-3:#918e86; --faint:#6f6c66;
+    --accent:#ff6a2b; --accent-2:#ff8650; --accent-fg:#ff8a55; --accent-soft:rgba(255,106,43,.12);
+    --accent-ink:#1f0d03;
+    --brand:#ff6a2b; --brand-ink:#1f0d03;
+    --on-status:#121211;
+    --good:#5bc88a; --warn:#f2c14e; --danger:#ff6b6b; --info:#5aa9e6;
+    --good-soft:rgba(91,200,138,.13); --warn-soft:rgba(242,193,78,.13);
+    --danger-soft:rgba(255,107,107,.13);
+    --shadow:none; --shadow-lg:0 24px 64px rgb(0 0 0 / .55);
+    --s-noz0:#ff6a2b; --s-noz1:#f2c14e; --s-bed:#5aa9e6; --s-chamber:#b9a6f0;
+    --s-power:#ff6a2b;
+    --stripe:rgb(255 255 255 / .03);
+    color-scheme:dark;
   }
   html:root body::before{background:none}
   html:root body{font-size:15.5px; line-height:1.55}
@@ -497,6 +475,7 @@
 
   /* ---------- chart ---------- */
   .chart-head{display:flex; align-items:center; gap:14px; margin-bottom:8px; flex-wrap:wrap}
+  .chart-h{margin:0; font-size:15px; font-weight:700; color:var(--text)}
   .legend{display:flex; gap:15px; flex-wrap:wrap}
   .legend span{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--text-2); font-weight:500}
   .legend i{width:11px; height:11px; border-radius:3px}
@@ -1199,370 +1178,530 @@
   section{margin-top:16px}
 </style>
 <!-- ============================================================
-     The look in use: ModelForge's studio style - warm near-black panels, one
-     blue accent, IBM Plex Sans for words and Plex Mono for figures and the
-     small uppercase labels. It is the top layer over the two above it, which
-     still describe the earlier looks and supply everything this does not
-     restate.
+     The look: Kammer - the printer's heated chamber as an instrument panel.
+     Warm graphite (or paper, in light), one heat-orange signal that marks what
+     is live or actionable, Archivo set wide for headings and JetBrains Mono for
+     every figure. Small radii: machined, not soft.
 
-     Everything here is scoped to :root:root[data-look=forge] - the attribute
-     sits on <html> in the markup - one step heavier than the :root:root layer,
-     so it wins without !important and without depending on where it sits.
+     The tokens live in the :root:root blocks of the first sheet; this layer is
+     the components and the shell (side rail, page head). Scoped to
+     :root:root[data-look=kammer] - the attribute sits on <html> - so it wins
+     over the base rules without !important and without depending on order.
      ============================================================ -->
-<style id="look-forge">
-  :root:root[data-look=forge]{
-    /* light: not part of ModelForge, which is dark only - the same warm greys
-       inverted to paper, with the accent deepened until it reads as text */
-    --bg:#f3f2ee; --bg-2:#ebe9e3;
-    --surface:#fbfaf7; --surface-2:#f1efe9;
-    --border:#e2dfd7; --border-strong:#cfccc4;
-    --track:#e6e3db;
-    --text:#1c1c1a; --text-2:#3a3935; --text-3:#6f6c66; --faint:#9a978f;
-    --accent:#2d6cb8; --accent-2:#245ea3; --accent-fg:#2d6cb8; --accent-soft:rgba(45,108,184,.10);
-    --accent-ink:#ffffff;
-    --brand:#2d6cb8; --brand-ink:#ffffff;
-    --on-status:#ffffff;
-    --good:#1d7d3e; --warn:#a35f00; --danger:#c5353e; --info:#2d6cb8;
-    --good-soft:rgba(29,125,62,.11); --warn-soft:rgba(163,95,0,.11);
-    --danger-soft:rgba(197,53,62,.10);
-    --shadow:none; --shadow-lg:0 12px 36px rgba(28,28,26,.14);
-    --s-noz0:#2d6cb8; --s-noz1:#1d7d3e; --s-bed:#c26300; --s-chamber:#7652ac;
-    --s-power:#c5353e;
-    --stripe:rgb(0 0 0 / .035);
-    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
-    color-scheme:light;
-  }
-  :root:root[data-look=forge][data-theme="dark"]{
-    /* ModelForge's own values (its oklch accents, converted to hex so the
-       charts can hand them straight to SVG) */
-    --bg:#141413; --bg-2:#10100f;
-    --surface:#1c1c1a; --surface-2:#232320;
-    --border:#2e2d2a; --border-strong:#3a3935;
-    --track:#2e2d2a;
-    --text:#ecebe6; --text-2:#cfccc5; --text-3:#9a978f; --faint:#6f6c66;
-    --accent:#5894e0; --accent-2:#67a4f1; --accent-fg:#81b4f6; --accent-soft:rgba(88,148,224,.14);
-    /* ModelForge puts white on its blue; that is 3.1:1, so ink is dark here */
-    --accent-ink:#141413;
-    --brand:#5894e0; --brand-ink:#141413;
-    --on-status:#141413;
-    --good:#5bbd74; --warn:#eeb154; --danger:#ef6567; --info:#81b4f6;
-    --good-soft:rgba(91,189,116,.13); --warn-soft:rgba(238,177,84,.13);
-    --danger-soft:rgba(239,101,103,.14);
-    --shadow:none; --shadow-lg:0 24px 64px rgb(0 0 0 / .5);
-    --s-noz0:#5894e0; --s-noz1:#5bbd74; --s-bed:#ff9f43; --s-chamber:#b093e5;
-    --s-power:#ef6567;
-    --stripe:rgb(255 255 255 / .035);
-    color-scheme:dark;
-  }
-
+<style id="look-kammer">
   /* --- ground and type --- */
-  :root:root[data-look=forge] body{font-family:var(--sans); font-size:14.5px; line-height:1.5;
+  :root:root[data-look=kammer] body{font-family:var(--sans); font-size:14.5px; line-height:1.5;
     font-variant-numeric:tabular-nums}
-  :root:root[data-look=forge] body::before{background:none}
-  [data-look=forge] *{scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent}
-  [data-look=forge] ::selection{background:color-mix(in srgb, var(--accent) 40%, transparent)}
-  :root:root[data-look=forge] :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  :root:root[data-look=kammer] body::before{background:none}
+  [data-look=kammer] *{scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent}
+  [data-look=kammer] ::selection{background:color-mix(in srgb, var(--accent) 40%, transparent)}
+  :root:root[data-look=kammer] :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 
   /* --- masthead: isometric mark, two-weight wordmark, mono status chips --- */
-  :root:root[data-look=forge] .logo{width:auto; height:auto; background:none; border:0;
+  :root:root[data-look=kammer] .logo{width:auto; height:auto; background:none; border:0;
     box-shadow:none; border-radius:0}
-  :root:root[data-look=forge] .logo svg{display:block}
-  :root:root[data-look=forge] .brand{gap:10px}
-  :root:root[data-look=forge] .brand h1{font-size:19px; font-weight:600; letter-spacing:-.015em; line-height:1}
-  :root:root[data-look=forge] .brand h1 span{font-weight:400; color:var(--text-3)}
-  :root:root[data-look=forge] .brand .sub{font-family:var(--mono); font-size:11.5px; margin-top:4px}
-  :root:root[data-look=forge] .sections{background:var(--surface); border:1px solid var(--border);
-    border-radius:10px; padding:4px}
-  :root:root[data-look=forge] .sections button{font-size:14px; font-weight:500; color:var(--text-3);
-    border-radius:7px; padding:7px 14px}
-  :root:root[data-look=forge] .sections button:hover{color:var(--text); background:none}
-  :root:root[data-look=forge] .sections button.on{background:var(--surface-2); color:var(--text); box-shadow:none}
-  :root:root[data-look=forge] .pill{font-family:var(--mono); font-size:12px; font-weight:400;
+  :root:root[data-look=kammer] .logo svg{display:block}
+  :root:root[data-look=kammer] .brand{gap:10px}
+  :root:root[data-look=kammer] .brand h1{font-size:19px; font-weight:600; letter-spacing:-.015em; line-height:1}
+  :root:root[data-look=kammer] .brand h1 span{font-weight:400; color:var(--text-3)}
+  :root:root[data-look=kammer] .brand .sub{font-family:var(--mono); font-size:11.5px; margin-top:4px}
+  :root:root[data-look=kammer] .sections{background:var(--surface); border:1px solid var(--border);
+    border-radius:6px; padding:4px}
+  :root:root[data-look=kammer] .sections button{font-size:14px; font-weight:500; color:var(--text-3);
+    border-radius:3px; padding:7px 14px}
+  :root:root[data-look=kammer] .sections button:hover{color:var(--text); background:none}
+  :root:root[data-look=kammer] .sections button.on{background:var(--surface-2); color:var(--text); box-shadow:none}
+  :root:root[data-look=kammer] .pill{font-family:var(--mono); font-size:12px; font-weight:400;
     color:var(--text-2); background:var(--surface); border:1px solid var(--border-strong);
-    border-radius:8px; padding:7px 12px; box-shadow:none}
-  :root:root[data-look=forge] .recwrap{padding:4px 6px 4px 10px}
-  :root:root[data-look=forge] .hbtn{cursor:pointer}
-  :root:root[data-look=forge] .hbtn:hover{border-color:var(--faint)}
-  :root:root[data-look=forge] .hbtn.has-warn{color:var(--warn);
+    border-radius:4px; padding:7px 12px; box-shadow:none}
+  :root:root[data-look=kammer] .recwrap{padding:4px 6px 4px 10px}
+  :root:root[data-look=kammer] .hbtn{cursor:pointer}
+  :root:root[data-look=kammer] .hbtn:hover{border-color:var(--faint)}
+  :root:root[data-look=kammer] .hbtn.has-warn{color:var(--warn);
     border-color:color-mix(in srgb, var(--warn) 55%, transparent)}
-  :root:root[data-look=forge] .icon-btn{width:36px; height:36px; border-radius:9px;
+  :root:root[data-look=kammer] .icon-btn{width:36px; height:36px; border-radius:4px;
     background:var(--surface-2); border:1px solid var(--border-strong); color:var(--text-2); box-shadow:none}
-  :root:root[data-look=forge] .icon-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
-  :root:root[data-look=forge] .icon-btn.led-on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
+  :root:root[data-look=kammer] .icon-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
+  :root:root[data-look=kammer] .icon-btn.led-on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
 
   /* --- second level: tabs on a rule, the active one a raised fill --- */
-  :root:root[data-look=forge] .subnav{gap:4px; padding:0 0 10px; margin:16px 0 20px}
-  :root:root[data-look=forge] .subnav.empty{padding:0; margin:8px 0 0}
-  :root:root[data-look=forge] .subnav button{font-size:13px; font-weight:500; color:var(--text-3);
-    border:0; margin:0; border-radius:8px; padding:6px 11px}
-  :root:root[data-look=forge] .subnav button:hover{color:var(--text)}
-  :root:root[data-look=forge] .subnav button.on{background:var(--surface-2); color:var(--text); font-weight:600}
-  :root:root[data-look=forge] .subnav .sub-note{font-family:var(--mono); font-size:11.5px}
-  :root:root[data-look=forge] .settabs{gap:4px; padding-bottom:8px}
-  :root:root[data-look=forge] .settabs button{border:0; margin:0; border-radius:8px; padding:6px 10px;
+  :root:root[data-look=kammer] .subnav{gap:4px; padding:0 0 10px; margin:16px 0 20px}
+  :root:root[data-look=kammer] .subnav.empty{padding:0; margin:8px 0 0}
+  :root:root[data-look=kammer] .subnav button{font-size:13px; font-weight:500; color:var(--text-3);
+    border:0; margin:0; border-radius:4px; padding:6px 11px}
+  :root:root[data-look=kammer] .subnav button:hover{color:var(--text)}
+  :root:root[data-look=kammer] .subnav button.on{background:var(--surface-2); color:var(--text); font-weight:600}
+  :root:root[data-look=kammer] .subnav .sub-note{font-family:var(--mono); font-size:11.5px}
+  :root:root[data-look=kammer] .settabs{gap:4px; padding-bottom:8px}
+  :root:root[data-look=kammer] .settabs button{border:0; margin:0; border-radius:4px; padding:6px 10px;
     font-weight:500; color:var(--text-3)}
-  :root:root[data-look=forge] .settabs button.on{background:var(--surface-2); color:var(--text); font-weight:600}
+  :root:root[data-look=kammer] .settabs button.on{background:var(--surface-2); color:var(--text); font-weight:600}
 
   /* --- panels, and the darker wells set into them --- */
-  :root:root[data-look=forge] .card{background:var(--surface); border:1px solid var(--border);
-    border-radius:14px; box-shadow:none; padding:18px 20px}
-  :root:root[data-look=forge] .card-head{margin-bottom:14px}
-  :root:root[data-look=forge] .card-head h3,
-  :root:root[data-look=forge] .sub-head,
-  :root:root[data-look=forge] .mw-sub,
-  :root:root[data-look=forge] .det h4,
-  :root:root[data-look=forge] .dupes h4{
-    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.06em;
-    text-transform:uppercase; color:var(--text-3)}
-  :root:root[data-look=forge] .dupes h4{color:var(--warn)}
-  :root:root[data-look=forge] .card-head .meta{font-family:var(--mono); font-size:11.5px}
-  :root:root[data-look=forge] .spool,
-  :root:root[data-look=forge] .det,
-  :root:root[data-look=forge] .note,
-  :root:root[data-look=forge] .mw-prof,
-  :root:root[data-look=forge] .chip{background:var(--bg); border:1px solid var(--border);
-    border-radius:10px; box-shadow:none}
-  :root:root[data-look=forge] .spool .donut-hole{background:var(--bg)}
+  :root:root[data-look=kammer] .card{background:var(--surface); border:1px solid var(--border);
+    border-radius:6px; box-shadow:none; padding:18px 20px}
+  :root:root[data-look=kammer] .card-head{margin-bottom:14px}
+  :root:root[data-look=kammer] .card-head h3,
+  :root:root[data-look=kammer] .sub-head,
+  :root:root[data-look=kammer] .mw-sub,
+  :root:root[data-look=kammer] .det h4,
+  :root:root[data-look=kammer] .dupes h4{
+    font-family:var(--sans); font-size:15px; font-weight:700; letter-spacing:-.005em;
+    font-stretch:112%; text-transform:none; color:var(--text)}
+  :root:root[data-look=kammer] .dupes h4{color:var(--warn)}
+  :root:root[data-look=kammer] .card-head .meta{font-family:var(--mono); font-size:11.5px}
+  :root:root[data-look=kammer] .spool,
+  :root:root[data-look=kammer] .det,
+  :root:root[data-look=kammer] .note,
+  :root:root[data-look=kammer] .mw-prof,
+  :root:root[data-look=kammer] .chip{background:var(--bg); border:1px solid var(--border);
+    border-radius:6px; box-shadow:none}
+  :root:root[data-look=kammer] .spool .donut-hole{background:var(--bg)}
   /* the loaded slot, the way ModelForge marks the current version */
-  :root:root[data-look=forge] .spool.active{border-color:var(--accent);
+  :root:root[data-look=kammer] .spool.active{border-color:var(--accent);
     background:color-mix(in srgb, var(--accent) 7%, var(--bg)); box-shadow:inset 3px 0 0 var(--accent)}
-  :root:root[data-look=forge] .spool.active .donut-hole{background:color-mix(in srgb, var(--accent) 7%, var(--bg))}
-  :root:root[data-look=forge] .spool.low{border-color:color-mix(in srgb, var(--warn) 60%, transparent)}
-  :root:root[data-look=forge] .spool.active .slot-badge{background:var(--accent); color:var(--accent-ink)}
-  :root:root[data-look=forge] .slot-badge{font-family:var(--mono); font-weight:500; border-radius:5px;
+  :root:root[data-look=kammer] .spool.active .donut-hole{background:color-mix(in srgb, var(--accent) 7%, var(--bg))}
+  :root:root[data-look=kammer] .spool.low{border-color:color-mix(in srgb, var(--warn) 60%, transparent)}
+  :root:root[data-look=kammer] .spool.active .slot-badge{background:var(--accent); color:var(--accent-ink)}
+  :root:root[data-look=kammer] .slot-badge{font-family:var(--mono); font-weight:500; border-radius:3px;
     background:var(--surface-2); border-color:var(--border-strong)}
-  :root:root[data-look=forge] .note.editing{border-color:var(--accent); background:var(--accent-soft)}
-  :root:root[data-look=forge] .warn{background:var(--bg); border:1px solid var(--border);
-    border-left:2px solid var(--warn); border-radius:8px; color:var(--text-2)}
-  :root:root[data-look=forge] .warn.is-acked{border-left-color:var(--good)}
-  :root:root[data-look=forge] .stage{background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  :root:root[data-look=kammer] .note.editing{border-color:var(--accent); background:var(--accent-soft)}
+  :root:root[data-look=kammer] .warn{background:var(--bg); border:1px solid var(--border);
+    border-left:2px solid var(--warn); border-radius:4px; color:var(--text-2)}
+  :root:root[data-look=kammer] .warn.is-acked{border-left-color:var(--good)}
+  :root:root[data-look=kammer] .stage{background:var(--bg); border:1px solid var(--border); border-radius:4px;
     font-family:var(--mono); font-size:12px}
-  :root:root[data-look=forge] .errbar{background:color-mix(in srgb, var(--danger) 14%, var(--surface));
+  :root:root[data-look=kammer] .errbar{background:color-mix(in srgb, var(--danger) 14%, var(--surface));
     border:1px solid color-mix(in srgb, var(--danger) 50%, transparent); color:var(--danger);
-    font-family:var(--mono); font-size:12px; font-weight:500; border-radius:10px}
-  :root:root[data-look=forge] .dupes{background:color-mix(in srgb, var(--warn) 8%, var(--bg));
-    border-color:color-mix(in srgb, var(--warn) 45%, transparent); border-radius:10px}
-  :root:root[data-look=forge] .draft{border-radius:10px}
-  :root:root[data-look=forge] .selbar,
-  :root:root[data-look=forge] .day-filter{border-radius:10px;
+    font-family:var(--mono); font-size:12px; font-weight:500; border-radius:6px}
+  :root:root[data-look=kammer] .dupes{background:color-mix(in srgb, var(--warn) 8%, var(--bg));
+    border-color:color-mix(in srgb, var(--warn) 45%, transparent); border-radius:6px}
+  :root:root[data-look=kammer] .draft{border-radius:6px}
+  :root:root[data-look=kammer] .selbar,
+  :root:root[data-look=kammer] .day-filter{border-radius:6px;
     border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
 
   /* --- small uppercase mono labels, ModelForge's signature --- */
-  :root:root[data-look=forge] .meta-label,
-  :root:root[data-look=forge] .kpi .kl,
-  :root:root[data-look=forge] .ctrl-lbl,
-  :root:root[data-look=forge] .chip .k,
-  :root:root[data-look=forge] .cost-col-h,
-  :root:root[data-look=forge] .draft-head,
-  :root:root[data-look=forge] .ring-state,
-  :root:root[data-look=forge] .head-stats .hs-label,
-  :root:root[data-look=forge] .htab tr.divider td{
-    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.06em;
-    text-transform:uppercase; color:var(--text-3)}
-  :root:root[data-look=forge] .temp-label{font-family:var(--mono); font-size:11.5px; font-weight:500;
-    letter-spacing:.04em}
-  :root:root[data-look=forge] .legend span{font-family:var(--mono); font-size:11.5px; font-weight:400}
-  :root:root[data-look=forge] .legend i{border-radius:2px}
+  :root:root[data-look=kammer] .meta-label,
+  :root:root[data-look=kammer] .kpi .kl,
+  :root:root[data-look=kammer] .ctrl-lbl,
+  :root:root[data-look=kammer] .chip .k,
+  :root:root[data-look=kammer] .cost-col-h,
+  :root:root[data-look=kammer] .draft-head,
+  :root:root[data-look=kammer] .ring-state,
+  :root:root[data-look=kammer] .head-stats .hs-label,
+  :root:root[data-look=kammer] .htab tr.divider td{
+    font-family:var(--sans); font-size:12.5px; font-weight:500; letter-spacing:0;
+    text-transform:none; color:var(--text-2)}
+  :root:root[data-look=kammer] .temp-label{font-family:var(--sans); font-size:14px; font-weight:600;
+    letter-spacing:0; color:var(--text)}
+  :root:root[data-look=kammer] .legend span{font-family:var(--sans); font-size:13px; font-weight:500}
+  :root:root[data-look=kammer] .legend i{border-radius:2px}
 
   /* --- figures in Plex Mono --- */
-  :root:root[data-look=forge] .kpi .kv,
-  :root:root[data-look=forge] .pwr-now,
-  :root:root[data-look=forge] .meta-val,
-  :root:root[data-look=forge] .hs-val,
-  :root:root[data-look=forge] #pct,
-  :root:root[data-look=forge] .ring-pct,
-  :root:root[data-look=forge] .temp-val,
-  :root:root[data-look=forge] .htab .num,
-  :root:root[data-look=forge] .row .v,
-  :root:root[data-look=forge] .donut-hole,
-  :root:root[data-look=forge] .cline .lc,
-  :root:root[data-look=forge] .cline .la,
-  :root:root[data-look=forge] .cost-last .cl-tot,
-  :root:root[data-look=forge] .det .dl .v,
-  :root:root[data-look=forge] .det .slot .sg,
-  :root:root[data-look=forge] .dtab .num,
-  :root:root[data-look=forge] .hexchip,
-  :root:root[data-look=forge] .warn code,
-  :root:root[data-look=forge] .conn-v,
-  :root:root[data-look=forge] #rawBox,
-  :root:root[data-look=forge] .err-sub,
-  :root:root[data-look=forge] .spool-left,
-  :root:root[data-look=forge] .mbar .mv,
-  :root:root[data-look=forge] .mnt-due,
-  :root:root[data-look=forge] .grp-sum,
-  :root:root[data-look=forge] .upd{
+  :root:root[data-look=kammer] .kpi .kv,
+  :root:root[data-look=kammer] .pwr-now,
+  :root:root[data-look=kammer] .meta-val,
+  :root:root[data-look=kammer] .hs-val,
+  :root:root[data-look=kammer] #pct,
+  :root:root[data-look=kammer] .ring-pct,
+  :root:root[data-look=kammer] .temp-val,
+  :root:root[data-look=kammer] .htab .num,
+  :root:root[data-look=kammer] .row .v,
+  :root:root[data-look=kammer] .donut-hole,
+  :root:root[data-look=kammer] .cline .lc,
+  :root:root[data-look=kammer] .cline .la,
+  :root:root[data-look=kammer] .cost-last .cl-tot,
+  :root:root[data-look=kammer] .det .dl .v,
+  :root:root[data-look=kammer] .det .slot .sg,
+  :root:root[data-look=kammer] .dtab .num,
+  :root:root[data-look=kammer] .hexchip,
+  :root:root[data-look=kammer] .warn code,
+  :root:root[data-look=kammer] .conn-v,
+  :root:root[data-look=kammer] #rawBox,
+  :root:root[data-look=kammer] .err-sub,
+  :root:root[data-look=kammer] .spool-left,
+  :root:root[data-look=kammer] .mbar .mv,
+  :root:root[data-look=kammer] .mnt-due,
+  :root:root[data-look=kammer] .grp-sum,
+  :root:root[data-look=kammer] .upd{
     font-family:var(--mono); font-variant-numeric:tabular-nums}
-  :root:root[data-look=forge] .kpi .kv{font-size:26px; font-weight:500; letter-spacing:-.02em}
-  :root:root[data-look=forge] .temp-val{font-weight:500; letter-spacing:-.02em}
-  :root:root[data-look=forge] .ring-pct, :root:root[data-look=forge] #pct{font-weight:500}
-  :root:root[data-look=forge] .pwr-now{font-weight:500}
-  :root:root[data-look=forge] .meta-val{font-size:15px; font-weight:500}
-  :root:root[data-look=forge] .job-name,
-  :root:root[data-look=forge] .idle-h,
-  :root:root[data-look=forge] .mw-title{font-weight:600; letter-spacing:-.01em}
-  :root:root[data-look=forge] .spool-type,
-  :root:root[data-look=forge] .note-h,
-  :root:root[data-look=forge] .grp-name{font-weight:600}
-  :root:root[data-look=forge] .ring-track{stroke:var(--track)}
-  :root:root[data-look=forge] .axis-txt{font-family:var(--mono); font-size:10.5px}
+  :root:root[data-look=kammer] .kpi .kv{font-size:26px; font-weight:500; letter-spacing:-.02em}
+  :root:root[data-look=kammer] .temp-val{font-weight:500; letter-spacing:-.02em}
+  :root:root[data-look=kammer] .ring-pct, :root:root[data-look=kammer] #pct{font-weight:500}
+  :root:root[data-look=kammer] .pwr-now{font-weight:500}
+  :root:root[data-look=kammer] .meta-val{font-size:15px; font-weight:500}
+  :root:root[data-look=kammer] .job-name,
+  :root:root[data-look=kammer] .idle-h,
+  :root:root[data-look=kammer] .mw-title{font-weight:600; letter-spacing:-.01em}
+  :root:root[data-look=kammer] .spool-type,
+  :root:root[data-look=kammer] .note-h,
+  :root:root[data-look=kammer] .grp-name{font-weight:600}
+  :root:root[data-look=kammer] .ring-track{stroke:var(--track)}
+  :root:root[data-look=kammer] .axis-txt{font-family:var(--mono); font-size:10.5px}
 
   /* --- chips and status tags: round, outlined in their own colour --- */
-  :root:root[data-look=forge] .statepill{background:color-mix(in srgb, currentColor 10%, transparent);
+  :root:root[data-look=kammer] .statepill{background:color-mix(in srgb, currentColor 10%, transparent);
     border:1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius:20px;
     font-size:12px; font-weight:500; padding:3px 11px}
-  :root:root[data-look=forge] .tag,
-  :root:root[data-look=forge] .badge,
-  :root:root[data-look=forge] .note-cat,
-  :root:root[data-look=forge] .pill-state,
-  :root:root[data-look=forge] .mw-m{border-radius:20px; font-weight:500; font-size:11px;
+  :root:root[data-look=kammer] .tag,
+  :root:root[data-look=kammer] .badge,
+  :root:root[data-look=kammer] .note-cat,
+  :root:root[data-look=kammer] .pill-state,
+  :root:root[data-look=kammer] .mw-m{border-radius:20px; font-weight:500; font-size:11px;
     padding:1px 8px; border:1px solid color-mix(in srgb, currentColor 40%, transparent)}
-  :root:root[data-look=forge] .mw-tags span{border-radius:20px; background:transparent;
+  :root:root[data-look=kammer] .mw-tags span{border-radius:20px; background:transparent;
     border-color:var(--border-strong)}
 
   /* --- buttons --- */
-  :root:root[data-look=forge] .wbtn,
-  :root:root[data-look=forge] .ctrl-btn{background:var(--surface-2); border:1px solid var(--border-strong);
-    color:var(--text); border-radius:9px; box-shadow:none; font-weight:500; font-size:13px; padding:6px 13px}
-  :root:root[data-look=forge] .ctrl-btn{padding:8px 14px}
-  :root:root[data-look=forge] .wbtn:hover:not(:disabled),
-  :root:root[data-look=forge] .ctrl-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
-  :root:root[data-look=forge] .wbtn.ack-btn{background:var(--accent); border-color:transparent;
+  :root:root[data-look=kammer] .wbtn,
+  :root:root[data-look=kammer] .ctrl-btn{background:var(--surface-2); border:1px solid var(--border-strong);
+    color:var(--text); border-radius:4px; box-shadow:none; font-weight:500; font-size:13px; padding:6px 13px}
+  :root:root[data-look=kammer] .ctrl-btn{padding:8px 14px}
+  :root:root[data-look=kammer] .wbtn:hover:not(:disabled),
+  :root:root[data-look=kammer] .ctrl-btn:hover:not(:disabled){border-color:var(--faint); color:var(--text)}
+  :root:root[data-look=kammer] .wbtn.ack-btn{background:var(--accent); border-color:transparent;
     color:var(--accent-ink); font-weight:600}
-  :root:root[data-look=forge] .wbtn.ack-btn:hover{background:var(--accent-2); border-color:transparent; color:var(--accent-ink)}
-  :root:root[data-look=forge] .ctrl-btn.danger{background:none; color:var(--danger); border-color:var(--border-strong)}
-  :root:root[data-look=forge] .ctrl-btn.danger:hover{background:none; color:var(--danger); border-color:var(--danger)}
+  :root:root[data-look=kammer] .wbtn.ack-btn:hover{background:var(--accent-2); border-color:transparent; color:var(--accent-ink)}
+  :root:root[data-look=kammer] .ctrl-btn.danger{background:none; color:var(--danger); border-color:var(--border-strong)}
+  :root:root[data-look=kammer] .ctrl-btn.danger:hover{background:none; color:var(--danger); border-color:var(--danger)}
   /* segmented controls: a sunken well, the chosen part raised out of it */
-  :root:root[data-look=forge] .seg,
-  :root:root[data-look=forge] .ranges{background:var(--bg); border:1px solid var(--border-strong);
-    border-radius:9px; padding:2px; gap:2px}
-  :root:root[data-look=forge] .seg button,
-  :root:root[data-look=forge] .ranges button{font-family:var(--sans); color:var(--text-3);
-    border-radius:7px; font-weight:500}
-  :root:root[data-look=forge] .seg button:hover,
-  :root:root[data-look=forge] .ranges button:hover{color:var(--text)}
-  :root:root[data-look=forge] .seg button.on,
-  :root:root[data-look=forge] .ranges button.on{background:var(--surface-2); color:var(--text);
+  :root:root[data-look=kammer] .seg,
+  :root:root[data-look=kammer] .ranges{background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:4px; padding:2px; gap:2px}
+  :root:root[data-look=kammer] .seg button,
+  :root:root[data-look=kammer] .ranges button{font-family:var(--sans); color:var(--text-3);
+    border-radius:3px; font-weight:500}
+  :root:root[data-look=kammer] .seg button:hover,
+  :root:root[data-look=kammer] .ranges button:hover{color:var(--text)}
+  :root:root[data-look=kammer] .seg button.on,
+  :root:root[data-look=kammer] .ranges button.on{background:var(--surface-2); color:var(--text);
     font-weight:600; box-shadow:none}
-  :root:root[data-look=forge] #speedSeg button.on{background:var(--accent-soft); color:var(--accent-fg)}
+  :root:root[data-look=kammer] #speedSeg button.on{background:var(--accent-soft); color:var(--accent-fg)}
   /* filter pills: outlined, the chosen one raised with an accent edge */
-  :root:root[data-look=forge] .note-cats button,
-  :root:root[data-look=forge] .mw-navs button,
-  :root:root[data-look=forge] .temp-set,
-  :root:root[data-look=forge] .assign-btn{background:transparent; border:1px solid var(--border-strong);
+  :root:root[data-look=kammer] .note-cats button,
+  :root:root[data-look=kammer] .mw-navs button,
+  :root:root[data-look=kammer] .temp-set,
+  :root:root[data-look=kammer] .assign-btn{background:transparent; border:1px solid var(--border-strong);
     border-radius:20px; color:var(--text-2); box-shadow:none; font-weight:500}
-  :root:root[data-look=forge] .assign-btn{text-transform:none; letter-spacing:0; font-size:11px}
-  :root:root[data-look=forge] .note-cats button:hover,
-  :root:root[data-look=forge] .mw-navs button:hover,
-  :root:root[data-look=forge] .temp-set:hover,
-  :root:root[data-look=forge] .assign-btn:hover{color:var(--text); border-color:var(--faint)}
-  :root:root[data-look=forge] .note-cats button.on,
-  :root:root[data-look=forge] .mw-navs button.on,
-  :root:root[data-look=forge] .mw-navs button.mine.on{background:var(--surface-2); color:var(--text);
+  :root:root[data-look=kammer] .assign-btn{text-transform:none; letter-spacing:0; font-size:11px}
+  :root:root[data-look=kammer] .note-cats button:hover,
+  :root:root[data-look=kammer] .mw-navs button:hover,
+  :root:root[data-look=kammer] .temp-set:hover,
+  :root:root[data-look=kammer] .assign-btn:hover{color:var(--text); border-color:var(--faint)}
+  :root:root[data-look=kammer] .note-cats button.on,
+  :root:root[data-look=kammer] .mw-navs button.on,
+  :root:root[data-look=kammer] .mw-navs button.mine.on{background:var(--surface-2); color:var(--text);
     border-color:var(--accent); box-shadow:none}
-  :root:root[data-look=forge] .mw-navs button.mine{color:var(--accent-fg);
+  :root:root[data-look=kammer] .mw-navs button.mine{color:var(--accent-fg);
     border-color:color-mix(in srgb, var(--accent) 50%, transparent)}
   /* accent as text takes ModelForge's lighter tint on the dark ground */
-  :root:root[data-look=forge] .mw-link,
-  :root:root[data-look=forge] .reorder,
-  :root:root[data-look=forge] .warn a,
-  :root:root[data-look=forge] .note-body a,
-  :root:root[data-look=forge] .linkbtn,
-  :root:root[data-look=forge] .mw-more-txt,
-  :root:root[data-look=forge] .htab .nm .mw-h{color:var(--accent-fg)}
+  :root:root[data-look=kammer] .mw-link,
+  :root:root[data-look=kammer] .reorder,
+  :root:root[data-look=kammer] .warn a,
+  :root:root[data-look=kammer] .note-body a,
+  :root:root[data-look=kammer] .linkbtn,
+  :root:root[data-look=kammer] .mw-more-txt,
+  :root:root[data-look=kammer] .htab .nm .mw-h{color:var(--accent-fg)}
 
   /* --- form fields: sunken into the page ground --- */
-  :root:root[data-look=forge] .filt-in,
-  :root:root[data-look=forge] .buy-paste,
-  :root:root[data-look=forge] .note-title-in,
-  :root:root[data-look=forge] .set-row input[type=text],
-  :root:root[data-look=forge] .set-row input[type=password],
-  :root:root[data-look=forge] .set-row select,
-  :root:root[data-look=forge] .mtx input,
-  :root:root[data-look=forge] .draft input,
-  :root:root[data-look=forge] .nm-input{background:var(--bg); border:1px solid var(--border-strong);
-    border-radius:8px; color:var(--text)}
-  :root:root[data-look=forge] .filt-in{padding:7px 10px}
-  :root:root[data-look=forge] .nm-input{border-color:var(--accent)}
-  :root:root[data-look=forge] .filt-in::placeholder,
-  :root:root[data-look=forge] .buy-paste::placeholder,
-  :root:root[data-look=forge] .note-title-in::placeholder{color:var(--faint)}
-  :root:root[data-look=forge] .filt-in:focus,
-  :root:root[data-look=forge] .buy-paste:focus,
-  :root:root[data-look=forge] .note-title-in:focus,
-  :root:root[data-look=forge] .set-row input:focus,
-  :root:root[data-look=forge] .set-row select:focus,
-  :root:root[data-look=forge] .mtx input:focus,
-  :root:root[data-look=forge] .draft input:focus{border-color:var(--accent)}
+  :root:root[data-look=kammer] .filt-in,
+  :root:root[data-look=kammer] .buy-paste,
+  :root:root[data-look=kammer] .note-title-in,
+  :root:root[data-look=kammer] .set-row input[type=text],
+  :root:root[data-look=kammer] .set-row input[type=password],
+  :root:root[data-look=kammer] .set-row select,
+  :root:root[data-look=kammer] .mtx input,
+  :root:root[data-look=kammer] .draft input,
+  :root:root[data-look=kammer] .nm-input{background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:4px; color:var(--text)}
+  :root:root[data-look=kammer] .filt-in{padding:7px 10px}
+  :root:root[data-look=kammer] .nm-input{border-color:var(--accent)}
+  :root:root[data-look=kammer] .filt-in::placeholder,
+  :root:root[data-look=kammer] .buy-paste::placeholder,
+  :root:root[data-look=kammer] .note-title-in::placeholder{color:var(--faint)}
+  :root:root[data-look=kammer] .filt-in:focus,
+  :root:root[data-look=kammer] .buy-paste:focus,
+  :root:root[data-look=kammer] .note-title-in:focus,
+  :root:root[data-look=kammer] .set-row input:focus,
+  :root:root[data-look=kammer] .set-row select:focus,
+  :root:root[data-look=kammer] .mtx input:focus,
+  :root:root[data-look=kammer] .draft input:focus{border-color:var(--accent)}
 
   /* --- tables --- */
-  :root:root[data-look=forge] .htab th{font-family:var(--mono); font-size:11px; font-weight:500;
-    letter-spacing:.05em; text-transform:uppercase; color:var(--text-3); border-bottom-color:var(--border-strong)}
-  :root:root[data-look=forge] .htab th.srt.on{color:var(--accent-fg)}
-  :root:root[data-look=forge] .htab tr:hover td{background:var(--surface-2)}
-  :root:root[data-look=forge] .htab tr.grp td{background:var(--bg)}
-  :root:root[data-look=forge] .dtab th{font-family:var(--mono); font-size:11px; font-weight:500;
-    letter-spacing:.05em; text-transform:uppercase}
+  :root:root[data-look=kammer] .htab th{font-family:var(--sans); font-size:12.5px; font-weight:500;
+    letter-spacing:0; text-transform:none; color:var(--text-3); border-bottom-color:var(--border-strong)}
+  :root:root[data-look=kammer] .htab th.srt.on{color:var(--accent-fg)}
+  :root:root[data-look=kammer] .htab tr:hover td{background:var(--surface-2)}
+  :root:root[data-look=kammer] .htab tr.grp td{background:var(--bg)}
+  :root:root[data-look=kammer] .dtab th{font-family:var(--sans); font-size:12.5px; font-weight:500;
+    letter-spacing:0; text-transform:none}
 
   /* --- MakerWorld cards: picture over a hatched placeholder, like the library --- */
-  :root:root[data-look=forge] .mw-card{background:var(--bg); border:1px solid var(--border); border-radius:14px}
-  :root:root[data-look=forge] .mw-card:hover{border-color:var(--border-strong); transform:none}
-  :root:root[data-look=forge] .mw-card img,
-  :root:root[data-look=forge] .mw-card .mw-noimg{border-bottom:1px solid var(--border)}
-  :root:root[data-look=forge] .mw-noimg,
-  :root:root[data-look=forge] .mw-main,
-  :root:root[data-look=forge] .dropzone{background-color:var(--bg);
+  :root:root[data-look=kammer] .mw-card{background:var(--bg); border:1px solid var(--border); border-radius:6px}
+  :root:root[data-look=kammer] .mw-card:hover{border-color:var(--border-strong); transform:none}
+  :root:root[data-look=kammer] .mw-card img,
+  :root:root[data-look=kammer] .mw-card .mw-noimg{border-bottom:1px solid var(--border)}
+  :root:root[data-look=kammer] .mw-noimg,
+  :root:root[data-look=kammer] .mw-main,
+  :root:root[data-look=kammer] .dropzone{background-color:var(--bg);
     background-image:repeating-linear-gradient(135deg, var(--stripe) 0 8px, transparent 8px 16px)}
-  :root:root[data-look=forge] .mw-card .mw-ct{font-weight:600}
-  :root:root[data-look=forge] .mw-card .mw-cc,
-  :root:root[data-look=forge] .mw-stats{font-family:var(--mono); font-size:11px}
-  :root:root[data-look=forge] .mw-feedcard{border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
-  :root:root[data-look=forge] .dropzone{border:1px dashed var(--faint); border-radius:10px}
-  :root:root[data-look=forge] .dropzone:hover,
-  :root:root[data-look=forge] .dropzone.over{border-color:var(--accent)}
-  :root:root[data-look=forge] #liveWrap{border-radius:10px; border:1px solid var(--border)}
+  :root:root[data-look=kammer] .mw-card .mw-ct{font-weight:600}
+  :root:root[data-look=kammer] .mw-card .mw-cc,
+  :root:root[data-look=kammer] .mw-stats{font-family:var(--mono); font-size:11px}
+  :root:root[data-look=kammer] .mw-feedcard{border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
+  :root:root[data-look=kammer] .dropzone{border:1px dashed var(--faint); border-radius:6px}
+  :root:root[data-look=kammer] .dropzone:hover,
+  :root:root[data-look=kammer] .dropzone.over{border-color:var(--accent)}
+  :root:root[data-look=kammer] #liveWrap{border-radius:6px; border:1px solid var(--border)}
 
   /* --- floating layers --- */
-  :root:root[data-look=forge] .modal{background:rgb(8 8 7 / .65)}
-  :root:root[data-look=forge] .mw-lb{background:rgba(0,0,0,.82)}
-  :root:root[data-look=forge] .modal-card{background:var(--surface); border:1px solid var(--border-strong);
-    border-radius:14px; padding:22px 24px; box-shadow:var(--shadow-lg)}
-  :root:root[data-look=forge] .hpanel{border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
-  :root:root[data-look=forge] .tip{background:var(--surface-2); border-radius:8px;
+  :root:root[data-look=kammer] .modal{background:rgb(8 8 7 / .65)}
+  :root:root[data-look=kammer] .mw-lb{background:rgba(0,0,0,.82)}
+  :root:root[data-look=kammer] .modal-card{background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:6px; padding:22px 24px; box-shadow:var(--shadow-lg)}
+  :root:root[data-look=kammer] .hpanel{border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  :root:root[data-look=kammer] .tip{background:var(--surface-2); border-radius:4px;
     font-family:var(--mono); font-size:11.5px}
-  :root:root[data-look=forge] .toast{background:var(--surface-2); border-radius:10px; font-weight:500}
+  :root:root[data-look=kammer] .toast{background:var(--surface-2); border-radius:6px; font-weight:500}
+
+  /* ============ Kammer: ground, type, scale ============ */
+  :root:root[data-look=kammer] body{font-size:15px; line-height:1.5}
+  /* the old look scaled everything by zoom:1.1; the rail sits outside .wrap,
+     so both would scale differently. Sizes are set for 1:1 instead. */
+  :root:root[data-look=kammer] .wrap{zoom:normal; max-width:1440px; margin:0 auto;
+    padding:0 40px 64px; min-width:0}
+  :root:root[data-look=kammer] h1, :root:root[data-look=kammer] h2,
+  :root:root[data-look=kammer] h3{font-family:var(--sans)}
+
+  /* ============ shell: side rail + content ============ */
+  .app{display:flex; align-items:stretch; min-height:100vh}
+  .app > .wrap{flex:1 1 auto}
+  .rail{flex:none; width:248px; position:sticky; top:0; align-self:flex-start;
+    height:100vh; overflow-y:auto; display:flex; flex-direction:column; gap:2px;
+    padding:20px 12px 16px; border-right:1px solid var(--border); background:var(--bg)}
+  .rail .brand{display:flex; align-items:center; gap:10px; padding:2px 10px 16px}
+  :root:root[data-look=kammer] .rail .brand h1{font-size:19px; font-weight:800;
+    font-stretch:122%; letter-spacing:-.02em; line-height:1; color:var(--text)}
+  :root:root[data-look=kammer] .rail .brand h1 span{font-weight:800; color:inherit}
+  .rail .logo svg{display:block}
+  /* the machine itself: connection and serial, the one card in the rail */
+  .rail-status{margin:0 4px 8px; padding:10px 12px; border:1px solid var(--border);
+    border-radius:6px; display:flex; flex-direction:column; gap:3px; min-width:0}
+  .rail-status .rs-line{display:flex; align-items:center; gap:8px; font-weight:600;
+    font-size:14px; color:var(--text)}
+  .rail-status .sub{font-family:var(--mono); font-size:11.5px; color:var(--text-3);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rail-status .upd{font-family:var(--mono); font-size:11.5px; color:var(--text-3)}
+  :root:root[data-look=kammer] .rail .sections{display:flex; flex-direction:column;
+    align-items:stretch; gap:1px; margin:0; padding:0; background:none; border:0; border-radius:0}
+  .rail .rgrp{display:flex; flex-direction:column; gap:1px}
+  /* a group's title is a button too: it lands on the section's first view, and on a
+     phone it is the tab in the bottom bar */
+  :root:root[data-look=kammer] .rail .sections button{display:flex; align-items:center; gap:10px;
+    width:100%; text-align:left; font:inherit; font-family:var(--sans); cursor:pointer;
+    border:0; border-radius:4px; background:none; box-shadow:none; white-space:nowrap}
+  :root:root[data-look=kammer] .rail .sections .rsec{min-height:30px; padding:14px 12px 4px;
+    font-size:12.5px; font-weight:600; color:var(--text-3); letter-spacing:.01em}
+  :root:root[data-look=kammer] .rail .sections .rsec svg{display:none}
+  :root:root[data-look=kammer] .rail .sections .rsec:hover{color:var(--text); background:none}
+  :root:root[data-look=kammer] .rail .sections .rview,
+  :root:root[data-look=kammer] .rail .rfoot button{min-height:40px; padding:0 12px;
+    font-size:14.5px; font-weight:500; color:var(--text-2)}
+  :root:root[data-look=kammer] .rail .sections .rview:hover,
+  :root:root[data-look=kammer] .rail .rfoot button:hover{background:var(--surface); color:var(--text)}
+  :root:root[data-look=kammer] .rail .sections .rview.on,
+  :root:root[data-look=kammer] .rail .rfoot button.on{background:var(--surface-2); color:var(--text);
+    box-shadow:inset 2px 0 0 var(--accent)}
+  .rail svg{flex:none; opacity:.9}
+  .rail .rfoot{margin-top:auto; padding-top:16px}
+  :root:root[data-look=kammer] .rail .rfoot button{display:flex; align-items:center; gap:10px; width:100%;
+    border:0; border-radius:4px; background:none; font:inherit; font-family:var(--sans);
+    font-size:14.5px; cursor:pointer; text-align:left}
+
+  /* ============ top bar: where you are, and the machine-wide switches ============ */
+  :root:root[data-look=kammer] header.topbar{display:flex; flex-wrap:wrap; align-items:flex-end;
+    gap:14px 10px; padding:24px 0 26px; margin:0}
+  .pagehead{min-width:0; margin-right:auto}
+  .pagehead .crumb{font-size:13px; color:var(--text-3); font-weight:500; min-height:19px}
+  .pagehead h2{margin:2px 0 0; font-size:32px; line-height:1.1; font-weight:800;
+    font-stretch:120%; letter-spacing:-.02em; color:var(--text)}
+  :root:root[data-look=kammer] .topbar .pill{min-height:40px; border-radius:4px; font-family:var(--sans);
+    font-size:13px; background:var(--surface)}
+  :root:root[data-look=kammer] .topbar .icon-btn{width:40px; height:40px; border-radius:4px;
+    background:var(--surface)}
+  :root:root[data-look=kammer] .topbar .seg button{min-height:30px; padding:0 11px; font-size:13px}
+  :root:root[data-look=kammer] .topbar .hdr-actions{margin-left:0}
+  /* the subnav is the phone's way between views; the rail does it on a desk */
+  :root:root[data-look=kammer] .subnav{display:none}
+
+  /* ============ panels and controls ============ */
+  :root:root[data-look=kammer] .card{padding:22px 24px; border-radius:6px}
+  :root:root[data-look=kammer] .card-head h3{font-size:16px}
+  :root:root[data-look=kammer] .card-head .meta{font-family:var(--sans); font-size:13px; color:var(--text-3)}
+  :root:root[data-look=kammer] .dash{gap:16px}
+  :root:root[data-look=kammer] .wbtn,
+  :root:root[data-look=kammer] .ctrl-btn{min-height:38px; padding:0 14px; font-family:var(--sans);
+    font-weight:600; background:transparent; border-color:var(--border-strong); border-radius:4px;
+    display:inline-flex; align-items:center; justify-content:center; gap:7px}
+  :root:root[data-look=kammer] .ctrl-btn{min-height:44px; padding:0 16px}
+  :root:root[data-look=kammer] .wbtn:hover:not(:disabled),
+  :root:root[data-look=kammer] .ctrl-btn:hover:not(:disabled){border-color:var(--text-3); background:var(--surface-2)}
+  :root:root[data-look=kammer] .wbtn:active:not(:disabled),
+  :root:root[data-look=kammer] .ctrl-btn:active:not(:disabled){transform:translateY(1px)}
+  :root:root[data-look=kammer] .seg button,
+  :root:root[data-look=kammer] .ranges button{font-weight:600}
+  :root:root[data-look=kammer] #speedSeg button.on{background:var(--accent-soft); color:var(--accent-fg)}
+  :root:root[data-look=kammer] .seg,
+  :root:root[data-look=kammer] .ranges{flex-wrap:wrap; max-width:100%}
+  :root:root[data-look=kammer] .statepill{font-family:var(--sans); font-weight:600; font-size:12.5px}
+  /* the big figures: the job's percent, temperatures, KPIs */
+  :root:root[data-look=kammer] .job-name{font-family:var(--sans); font-weight:800;
+    font-stretch:114%; letter-spacing:-.015em}
+  :root:root[data-look=kammer] .idle-h{font-family:var(--sans); font-weight:800; font-stretch:114%}
+  :root:root[data-look=kammer] .kpi .kv{font-size:30px; font-weight:500}
+  :root:root[data-look=kammer] .temp-val{font-size:38px}
+  :root:root[data-look=kammer] .ring-prog{stroke:var(--accent)}
+  /* the percent is the one number you read from across the room */
+  :root:root[data-look=kammer] .ring-wrap,
+  :root:root[data-look=kammer] .ring{width:184px; height:184px}
+  :root:root[data-look=kammer] .ring-pct{font-size:54px; letter-spacing:-.05em; color:var(--text)}
+  :root:root[data-look=kammer] .ring-pct #pct{font-size:inherit}
+  :root:root[data-look=kammer] .ring-pct span:last-child{font-size:22px}
+  :root:root[data-look=kammer] .ring-prog{stroke-width:9}
+  :root:root[data-look=kammer] .meta-label,
+  :root:root[data-look=kammer] .kpi .kl,
+  :root:root[data-look=kammer] .ctrl-lbl,
+  :root:root[data-look=kammer] .chip .k,
+  :root:root[data-look=kammer] .cost-col-h,
+  :root:root[data-look=kammer] .draft-head,
+  :root:root[data-look=kammer] .ring-state,
+  :root:root[data-look=kammer] .head-stats .hs-label{font-family:var(--sans); font-size:13px;
+    font-weight:500; letter-spacing:0; text-transform:none; color:var(--text-2)}
+  /* a live state pulses in the heat colour; nothing else on the page moves */
+  :root:root[data-look=kammer] .dot.on{background:var(--accent)}
+  :root:root[data-look=kammer] .dot.on::after{background:var(--accent)}
+  :root:root[data-look=kammer] .htab td{padding:12px 14px 12px 0}
+  :root:root[data-look=kammer] .modal-card{border-radius:6px}
+
+  /* the views come in rather than snap: a short rise on the panels of the view
+     that just came on screen */
+  @keyframes kammer-rise{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  :root:root[data-look=kammer] .dash.view.on > *{animation:kammer-rise .45s cubic-bezier(.2,.7,.2,1) both}
+  :root:root[data-look=kammer] .dash.view.on > :nth-child(2){animation-delay:.04s}
+  :root:root[data-look=kammer] .dash.view.on > :nth-child(3){animation-delay:.08s}
+  :root:root[data-look=kammer] .dash.view.on > :nth-child(n+4){animation-delay:.12s}
+  @media (prefers-reduced-motion: reduce){
+    :root:root[data-look=kammer] .dash.view.on > *{animation:none}
+    :root:root[data-look=kammer] .dot.on::after{animation:none}
+    :root:root[data-look=kammer] *{transition:none !important}
+  }
+
+  /* ============ tablet: a narrower rail ============ */
+  @media (max-width:1200px){
+    .rail{width:216px}
+    :root:root[data-look=kammer] .wrap{padding:0 24px 56px}
+  }
+  /* ============ phone: the rail becomes a bottom tab bar ============ */
+  @media (max-width:900px){
+    .app{display:block}
+    .rail{position:fixed; z-index:30; left:0; right:0; bottom:0; top:auto; width:auto; height:auto;
+      flex-direction:row; padding:0 0 env(safe-area-inset-bottom); border-right:0;
+      border-top:1px solid var(--border); background:var(--surface); overflow:visible}
+    .rail .brand, .rail-status{display:none}
+    /* the base sheet sends .sections to order:10 at full width below 1150px */
+    :root:root[data-look=kammer] .rail .sections{flex-direction:row; flex:1; gap:0; order:0; width:auto}
+    .rail .rgrp{flex:1; flex-direction:row}
+    :root:root[data-look=kammer] .rail .sections .rview{display:none}
+    :root:root[data-look=kammer] .rail .sections .rsec,
+    :root:root[data-look=kammer] .rail .sections #liveSec,
+    :root:root[data-look=kammer] .rail .rfoot button{flex:1; flex-direction:column; justify-content:center;
+      gap:3px; min-height:58px; padding:8px 2px 6px; font-size:11px; font-weight:600;
+      color:var(--text-2); text-align:center; box-shadow:none; background:none}
+    :root:root[data-look=kammer] .rail .sections #liveSec{display:flex}
+    :root:root[data-look=kammer] .rail .sections .rsec svg{display:block}
+    :root:root[data-look=kammer] .rail .sections .rsec.on,
+    :root:root[data-look=kammer] .rail .sections #liveSec.on,
+    :root:root[data-look=kammer] .rail .rfoot button.on{color:var(--accent-fg); background:none; box-shadow:none}
+    .rail .rfoot{margin:0; padding:0; display:flex; flex:0 0 auto; width:16.6%}
+    .rail .rfoot span[data-i18n]{display:none}
+    :root:root[data-look=kammer] .wrap{padding:0 16px 96px}
+    :root:root[data-look=kammer] header.topbar{padding:16px 0 14px; align-items:center}
+    .pagehead{flex:1 1 100%}
+    .pagehead h2{font-size:26px}
+    :root:root[data-look=kammer] .subnav{display:flex; margin:0 0 16px; overflow-x:auto; flex-wrap:nowrap;
+      padding-bottom:6px}
+    :root:root[data-look=kammer] .subnav.empty{display:none}
+    :root:root[data-look=kammer] .subnav button{white-space:nowrap; min-height:40px}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">
-      <div class="logo">
-        <!-- the X2D as an isometric block, ModelForge-style: red top, two greys,
-             the dark window in the front face. Same drawing as the favicon. -->
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-          <polygon points="16,3 27,9.5 16,16 5,9.5" fill="#ec3013"/>
-          <polygon points="5,9.5 16,16 16,29 5,22.5" fill="#cfccc5"/>
-          <polygon points="16,16 27,9.5 27,22.5 16,29" fill="#8a877f"/>
-          <polygon points="7,12.68 14,16.82 14,25.82 7,21.68" fill="#201e1d"/>
-        </svg>
-      </div>
-      <div>
-        <h1>Bambu<span>Forge</span></h1>
-        <div class="sub" id="serial">—</div>
-      </div>
+<div class="app">
+<aside class="rail" id="rail">
+  <div class="brand">
+    <div class="logo">
+      <!-- the mark: the heat-orange plate with layer lines growing up it -->
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <rect width="28" height="28" rx="4" fill="#ff6a2b"/>
+        <path d="M6 20h16M6 16h16M6 12h12M6 8h7" stroke="#1f0d03" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </div>
-    <nav class="sections" id="sections">
-      <button data-sec="printer"  data-i18n="Printer">Printer</button>
-      <button data-sec="prints"   data-i18n="Prints">Prints</button>
-      <button data-sec="filament" data-i18n="Filament">Filament</button>
-      <button data-sec="workshop" data-i18n="Workshop">Workshop</button>
-      <button data-sec="makerworld" data-i18n="MakerWorld">MakerWorld</button>
+    <h1>BambuForge</h1>
+  </div>
+  <!-- the machine: connection, and which printer this is -->
+  <div class="rail-status">
+    <div class="rs-line"><span class="dot" id="conn"></span><span id="connText">connecting…</span></div>
+    <div class="sub" id="serial">—</div>
+    <span class="upd" id="lastUpd"></span>
+  </div>
+  <!-- every section and every view at once, so where you are and where else
+       you could be are both on screen. Built to match NAV (t_layout checks it). -->
+  <nav class="sections" id="sections" aria-label="Sections">
+    <div class="rgrp">
+      <button class="rsec" data-sec="printer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8v6H8z"/><path d="M8 17h8"/></svg><span data-i18n="Printer">Printer</span></button>
+      <button class="rview" data-sec="printer" data-view="now"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8v6H8z"/><path d="M8 17h8"/></svg><span data-i18n="Now">Now</span></button>
+      <button class="rview" data-sec="printer" data-view="machine"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><span data-i18n="Hardware">Hardware</span></button>
+      <button class="rview" data-sec="printer" data-view="drive"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v8H8z"/><path d="M6 11h12v6a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z"/></svg><span data-i18n="USB drive">USB drive</span></button>
+      <button class="rview" data-sec="printer" data-view="raw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="Raw data">Raw data</span></button>
       <!-- revealed once /api/camera reports one is configured -->
-      <button data-sec="live" id="liveSec" data-i18n="Live" style="display:none">Live</button>
-    </nav>
-    <div class="hgap"></div>
-    <span class="pill"><span class="dot" id="conn"></span><span id="connText">connecting…</span><span class="upd" id="lastUpd"></span></span>
+      <button class="rview" id="liveSec" style="display:none" data-sec="live" data-view="camera"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="m16 10 5-3v10l-5-3"/></svg><span data-i18n="Live">Live</span></button>
+    </div>
+    <div class="rgrp">
+      <button class="rsec" data-sec="prints"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span data-i18n="Prints">Prints</span></button>
+      <button class="rview" data-sec="prints" data-view="history"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span data-i18n="History">History</span></button>
+      <button class="rview" data-sec="prints" data-view="statistics"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><span data-i18n="Statistics">Statistics</span></button>
+    </div>
+    <div class="rgrp">
+      <button class="rsec" data-sec="filament"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6"/></svg><span data-i18n="Filament">Filament</span></button>
+      <button class="rview" data-sec="filament" data-view="inventory"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6"/></svg><span data-i18n="Inventory">Inventory</span></button>
+      <button class="rview" data-sec="filament" data-view="purchases"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 7H7"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg><span data-i18n="Purchases">Purchases</span></button>
+    </div>
+    <div class="rgrp">
+      <button class="rsec" data-sec="workshop"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/></svg><span data-i18n="Workshop">Workshop</span></button>
+      <button class="rview" data-sec="workshop" data-view="maintenance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/></svg><span data-i18n="Maintenance">Maintenance</span></button>
+      <button class="rview" data-sec="workshop" data-view="notes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4"/><path d="M8 12h8M8 16h6"/></svg><span data-i18n="Notes">Notes</span></button>
+    </div>
+    <div class="rgrp">
+      <button class="rsec" data-sec="makerworld"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span data-i18n="MakerWorld">MakerWorld</span></button>
+      <button class="rview" data-sec="makerworld" data-view="browse"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span data-i18n="Discover">Discover</span></button>
+    </div>
+  </nav>
+  <!-- reached by the gear, not by a section: it is about the app, not about
+       the printer -->
+  <div class="rfoot">
+    <button id="settingsBtn" title="Settings" aria-label="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.2.6.75 1.02 1.4 1.02H21a2 2 0 1 1 0 4h-.09c-.65 0-1.2.42-1.51 1z"/></svg><span data-i18n="Settings">Settings</span>
+    </button>
+  </div>
+</aside>
+<div class="wrap">
+  <header class="topbar">
+    <div class="pagehead">
+      <div class="crumb" id="crumb"></div>
+      <h2 id="pageTitle">—</h2>
+    </div>
     <!-- Wi-Fi strength lives on the Machine tab: static-ish detail, not worth a
          permanent slot in a header that has to survive a phone screen -->
     <span class="pill recwrap" id="recWrap" title="Auto = record only while printing (stream stays connected). On = always record. Off = stop recording AND disconnect the printer stream so the app is fully idle.">
@@ -1589,23 +1728,19 @@
         <button data-lang="en">EN</button>
       </span>
     </span>
-    <!-- light, settings, theme: one group, kept together and pushed to the
-         right so a narrow bar wraps all three at once instead of stranding
-         whichever one no longer fits -->
+    <!-- light and theme: one group, kept together so a narrow bar wraps both
+         at once instead of stranding whichever one no longer fits -->
     <div class="hdr-actions">
       <button class="icon-btn" id="ledBtn" title="Chamber light" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
       </button>
-      <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.2.6.75 1.02 1.4 1.02H21a2 2 0 1 1 0 4h-.09c-.65 0-1.2.42-1.51 1z"/></svg>
-      </button>
-      <button class="icon-btn" id="themeBtn" title="Toggle theme">◐</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
     </div>
   </header>
 
-  <!-- second level: which view of the current section is on screen. Built by
-       the router from NAV, so the markup cannot fall out of step with it. -->
+  <!-- second level, for a phone: the rail turns into a bottom bar of sections
+       there, and this is how you move between a section's views. Built by the
+       router from NAV, so the markup cannot fall out of step with it. -->
   <nav class="subnav" id="subnav"></nav>
 
   <!-- ============ PRINTER · Now ============
@@ -1664,13 +1799,13 @@
   <section class="span-4 temps-2x2 compact">
     <!-- 2x2 order: Nozzle 1 | Nozzle 2  /  Bed | Chamber -->
     <div class="card temp">
-      <div class="temp-label"><span id="noz0Label">Nozzle 1</span> <span class="badge" id="noz0Badge" style="display:none">active</span></div>
+      <div class="temp-label"><span id="noz0Label" data-i18n="Nozzle 1">Nozzle 1</span> <span class="badge" id="noz0Badge" style="display:none">active</span></div>
       <div class="temp-val"><span id="noz0">—</span><span class="deg">°C</span></div>
       <div class="bar"><span class="fill" id="noz0Fill"></span><span class="mark" id="noz0Mark"></span></div>
       <div class="temp-sub" id="noz0Sub">—</div>
     </div>
     <div class="card temp">
-      <div class="temp-label"><span id="noz1Label">Nozzle 2</span> <span class="badge" id="noz1Badge" style="display:none">active</span></div>
+      <div class="temp-label"><span id="noz1Label" data-i18n="Nozzle 2">Nozzle 2</span> <span class="badge" id="noz1Badge" style="display:none">active</span></div>
       <div class="temp-val"><span id="noz1">—</span><span class="deg">°C</span></div>
       <div class="bar"><span class="fill" id="noz1Fill"></span><span class="mark" id="noz1Mark"></span></div>
       <div class="temp-sub" id="noz1Sub">—</div>
@@ -1696,7 +1831,7 @@
   </section>
   <section class="card span-6">
     <div class="chart-head">
-      <h3 style="margin:0;font-size:12px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)" data-i18n="Temperatures">Temperatures</h3>
+      <h3 class="chart-h" data-i18n="Temperatures">Temperatures</h3>
       <span id="recPaused" style="display:none;font-size:12px;color:var(--warn);font-weight:600">⏸ paused</span>
       <div class="ranges" id="ranges" style="margin-left:auto">
         <button data-h="1" class="on">1h</button>
@@ -1705,10 +1840,10 @@
       </div>
     </div>
     <div class="legend" style="margin:2px 0 6px">
-      <span><i style="background:var(--s-noz0)"></i>Nozzle 1</span>
-      <span><i style="background:var(--s-noz1)"></i>Nozzle 2</span>
-      <span><i style="background:var(--s-bed)"></i>Bed</span>
-      <span><i style="background:var(--s-chamber)"></i>Chamber</span>
+      <span><i style="background:var(--s-noz0)"></i><span data-i18n="Nozzle 1">Nozzle 1</span></span>
+      <span><i style="background:var(--s-noz1)"></i><span data-i18n="Nozzle 2">Nozzle 2</span></span>
+      <span><i style="background:var(--s-bed)"></i><span data-i18n="Bed">Bed</span></span>
+      <span><i style="background:var(--s-chamber)"></i><span data-i18n="Chamber">Chamber</span></span>
     </div>
     <div class="chart-wrap">
       <svg id="chart" viewBox="0 0 900 200" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block"></svg>
@@ -2094,6 +2229,7 @@
 
 </div>
 
+</div><!-- .app -->
 <!-- a model's pictures, full size -->
 <div class="modal mw-lb" id="mwLightbox" hidden>
   <button class="icon-btn mw-lb-x" id="mwLbClose" type="button" aria-label="Close">✕</button>
@@ -2269,7 +2405,7 @@ const DE = {
   "Paused: filament runout":"Pausiert: Filament leer", "Paused: nozzle clog":"Pausiert: Düse verstopft",
   "Calibrating motor noise":"Motorgeräusch kalibrieren",
   // temperatures
-  "Bed":"Bed", "Chamber":"Kammer", "heated chamber":"beheizte Kammer",
+  "Connecting...":"Verbinde…", "Bed":"Bett", "Chamber":"Kammer", "heated chamber":"beheizte Kammer",
   "Nozzle 1":"Düse 1", "Nozzle 2":"Düse 2",
   "direct drive":"Direktantrieb", "Bowden":"Bowden",
   "active":"aktiv", "Target":"Ziel", "Cooling down":"Kühlt ab",
@@ -3967,7 +4103,14 @@ function fmtDur(a,b){
 function ceil2(v){ return Math.ceil(+(v * 100).toFixed(6)) / 100; }
 function money(v, cur){
   if(v==null || v===0) return "—";
-  return (cur||"€") + " " + ceil2(v).toFixed(2);
+  return fmtMoney(ceil2(v), cur);
+}
+// The amount in the page's language: "3,87 €" in German, "€ 3.87" in English.
+// Rounding is the caller's (money() rounds up); this only writes it down.
+function fmtMoney(x, cur){
+  cur = cur || "€";
+  const n = (+x || 0).toFixed(2);
+  return LANG === "de" ? n.replace(".", ",") + " " + cur : cur + " " + n;
 }
 // per-slot breakdown as a tooltip: "Slot 1 PLA 28.3 g @ 20/kg = 0.566"
 function filTitle(r){
@@ -4089,7 +4232,7 @@ function renderPrints(allRows, cur){
   $("histMeta").textContent =
     (shown.length === rows.length ? `${rows.length} ${t("prints")}`
                                   : `${shown.length} ${t("of")} ${rows.length} ${t("prints")}`)
-    + ` · ${(totWh/1000).toFixed(2)} kWh · ${cur} ${ceil2(totCost).toFixed(2)} ${t("total")}`;
+    + ` · ${dec(totWh/1000, 2)} kWh · ${fmtMoney(ceil2(totCost), cur)} ${t("total")}`;
   if(!items.length){
     tb.innerHTML = `<tr><td style="color:var(--text-3);padding:10px 0">${
       t(histView === "groupsonly" ? "No grouped prints yet — select some and press Group."
@@ -4156,7 +4299,7 @@ function groupHead(g, cur){
       <span class="grp-sum">${g.rows.length} ${t(g.rows.length===1?"print":"prints")}${
         fails ? ` · ${fails} ✗` : ""} · ${(h?h+"h ":"")+m+"m"} · ${
         grams ? grams.toFixed(0)+" g · " : ""}${wh ? (wh/1000).toFixed(2)+" kWh · " : ""}${
-        cur} ${ceil2(cost).toFixed(2)}</span>
+        fmtMoney(ceil2(cost), cur)}</span>
     </div></td></tr>`;
 }
 function printRow(r, cur){
@@ -4498,8 +4641,10 @@ loadPrints(); setInterval(loadPrints, 60000);
 
 /* ---------- statistics ---------- */
 const durH = s => { if(!s) return "—"; const h=Math.floor(s/3600), m=Math.round((s%3600)/60); return (h?h+"h ":"")+m+"m"; };
-const kwhF = wh => wh==null ? "—" : (wh>=1000 ? (wh/1000).toFixed(2)+" kWh" : Math.round(wh)+" Wh");
-const kgF  = g  => g==null  ? "—" : (g>=1000  ? (g/1000).toFixed(2)+" kg"  : Math.round(g)+" g");
+// a decimal in the page's language: "5,24" in German, "5.24" in English
+const dec = (x, n) => { const s = (+x).toFixed(n); return LANG === "de" ? s.replace(".", ",") : s; };
+const kwhF = wh => wh==null ? "—" : (wh>=1000 ? dec(wh/1000, 2)+" kWh" : Math.round(wh)+" Wh");
+const kgF  = g  => g==null  ? "—" : (g>=1000  ? dec(g/1000, 2)+" kg"  : Math.round(g)+" g");
 const monLabel = ym => { const [y,mo]=ym.split("-"); return new Date(+y, +mo-1, 1).toLocaleDateString([], {month:"short", year:"2-digit"}); };
 /* Daily activity. One bar per calendar day including the empty ones - a gap in
    printing is information, and dropping those days would compress a quiet month
@@ -7008,6 +7153,11 @@ const NAV = {
   live:     [["camera","Live view"]],
 };
 const VIEW = {sec:"printer", view:"now"};
+// what the page head calls each section
+const SEC_LABEL = {printer:"Printer", prints:"Prints", filament:"Filament", workshop:"Workshop",
+  makerworld:"MakerWorld", settings:"Settings", live:"Live view"};
+// the line above the title, for sections with a single view
+const SEC_CRUMB = {makerworld:"Discover", settings:"App", live:"Printer"};
 // sections with no button in the masthead
 const NAV_HIDDEN = new Set(["settings"]);
 // what to (re)load when a view comes on screen
@@ -7034,9 +7184,21 @@ function go(sec, view, replace){
   VIEW.sec = sec; VIEW.view = view;
   const key = sec + "/" + view;
 
-  document.querySelectorAll("#sections button").forEach(b=>
-    b.classList.toggle("on", b.dataset.sec === sec));
+  // a view button is "on" for its own view, a section title for its section
+  document.querySelectorAll("#sections button").forEach(b=>{
+    const on = b.dataset.sec === sec && (!b.dataset.view || b.dataset.view === view);
+    b.classList.toggle("on", on);
+    if(b.dataset.view) b.toggleAttribute("aria-current", on);
+  });
   $("settingsBtn").classList.toggle("on", sec === "settings");
+  // the page head: which section, and which view of it. One-view sections are
+  // named by the section alone.
+  const vLabel = (NAV[sec].find(v => v[0] === view) || NAV[sec][0])[1];
+  const single = NAV[sec].length < 2;
+  $("crumb").dataset.i18n = single ? (SEC_CRUMB[sec] || "") : SEC_LABEL[sec];
+  $("pageTitle").dataset.i18n = single ? SEC_LABEL[sec] : vLabel;
+  $("crumb").textContent = t($("crumb").dataset.i18n);
+  $("pageTitle").textContent = t($("pageTitle").dataset.i18n);
   // a section with a single view has nothing to choose between, so it gets no
   // second-level bar rather than a bar with one entry in it
   $("subnav").innerHTML = NAV[sec].length < 2 ? "" :
@@ -7060,8 +7222,8 @@ function go(sec, view, replace){
 $("settingsBtn").addEventListener("click", ()=> go("settings", "page"));
 $("sections").addEventListener("click", e=>{
   const b = e.target.closest("button");
-  // returning to a section lands on its first view
-  if(b) go(b.dataset.sec, NAV[b.dataset.sec][0][0]);
+  // a view button names its view; a section title lands on the first one
+  if(b) go(b.dataset.sec, b.dataset.view || NAV[b.dataset.sec][0][0]);
 });
 $("subnav").addEventListener("click", e=>{
   const b = e.target.closest("button");
