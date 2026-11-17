@@ -1586,9 +1586,21 @@ def _apply_cloud_task(task: dict) -> bool:
         cloud_color = filament_catalog.norm_color(e.get("targetColor"))
         snap = slot_map.get(str(slot)) or {}
         if snap.get("color") and cloud_color and snap["color"] != cloud_color:
-            print(f"[cloud] slot {slot}: AMS had #{snap['color']}, job says "
-                  f"#{cloud_color} - ignoring the snapshot for this line")
-            snap = {}
+            # The slot number cannot be trusted: on real data every line of
+            # every job came back as slot 1, wherever the spool sat. The
+            # colour can, so find the tray by colour - the live cost view does
+            # the same. Only when the trays of that colour disagree about the
+            # spool is there no telling which one ran, and the profile stays.
+            hits = [(int(k), v) for k, v in sorted(slot_map.items(), key=lambda kv: int(kv[0]))
+                    if v.get("color") == cloud_color]
+            spools = {(v.get("sku"), v.get("type"), v.get("code")) for _, v in hits}
+            if len(spools) == 1:
+                slot, snap = hits[0]
+            else:
+                print(f"[cloud] slot {slot}: AMS had #{snap['color']}, job says "
+                      f"#{cloud_color}, and {len(hits)} tray(s) hold that colour "
+                      f"- ignoring the snapshot for this line")
+                snap = {}
         # resolved BEFORE pricing: a price set by hand is per filament identity,
         # so the identity has to exist before the price can be looked up
         fkey = _canon_fkey(filament_catalog.key(
